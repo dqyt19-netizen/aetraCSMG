@@ -2,15 +2,32 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aetra Meter Reading Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center h-screen">
   <div class="bg-white p-8 rounded-lg shadow-md text-center max-w-sm w-full space-y-4">
+    
+    <!-- LOGO AETRA AIR TANGERANG -->
+    <div class="flex justify-center mb-2">
+      <img 
+        src="logoaetra.jpg" 
+        alt="Logo Aetra Air Tangerang" 
+        class="h-16 object-contain"
+      >
+    </div>
+
     <h1 class="text-xl font-bold text-blue-600">Aetra Meter System</h1>
     <p class="text-gray-500 text-sm">Pilih halaman sesuai peran Anda:</p>
-    <a href="/petugas.html" class="block w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700">Masuk Aplikasi Petugas</a>
-    <a href="/admin.html" class="block w-full bg-gray-800 text-white py-2 rounded font-semibold hover:bg-gray-900">Masuk Dashboard Admin</a>
+    
+    <a href="/petugas.html" class="block w-full bg-blue-600 text-white py-2.5 rounded font-semibold hover:bg-blue-700 transition duration-200">
+      Masuk Aplikasi Petugas
+    </a>
+    <a href="/admin.html" class="block w-full bg-gray-800 text-white py-2.5 rounded font-semibold hover:bg-gray-900 transition duration-200">
+      Masuk Dashboard Admin
+    </a>
+    
   </div>
 </body>
 </html>
