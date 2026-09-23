@@ -17,7 +17,7 @@
     <!-- HEADER LOGO AETRA AIR TANGERANG -->
     <div class="bg-white p-6 border-b flex justify-center items-center">
       <img 
-        src="logoaetra.jpg" 
+        src="https://upload.wikimedia.org/wikipedia/commons/2/23/Logo_Aetra_Air_Tangerang.jpg" 
         alt="Logo Aetra Air Tangerang" 
         class="h-16 object-contain"
       >
@@ -26,16 +26,16 @@
     <!-- TAB PILIHAN: PETUGAS / ADMIN -->
     <div class="flex border-b text-sm font-bold text-center bg-gray-50">
       <button 
+        type="button" 
         id="tabPetugas" 
-        onclick="switchTab('petugas')" 
-        class="w-1/2 py-3 border-b-2 border-blue-600 text-blue-600 focus:outline-none transition-colors"
+        class="w-1/2 py-3 border-b-2 border-blue-600 text-blue-600 font-bold focus:outline-none transition-colors cursor-pointer"
       >
         Petugas Meter
       </button>
       <button 
+        type="button" 
         id="tabAdmin" 
-        onclick="switchTab('admin')" 
-        class="w-1/2 py-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+        class="w-1/2 py-3 border-b-2 border-transparent text-gray-500 font-bold hover:text-gray-700 focus:outline-none transition-colors cursor-pointer"
       >
         Administrator
       </button>
@@ -130,25 +130,29 @@
     
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Fungsi berpindah Tab antara Petugas dan Admin
-    function switchTab(type) {
-      const tabPetugas = document.getElementById('tabPetugas');
-      const tabAdmin = document.getElementById('tabAdmin');
-      const sectionPetugas = document.getElementById('sectionPetugas');
-      const sectionAdmin = document.getElementById('sectionAdmin');
+    // Dapatkan elemen DOM
+    const tabPetugas = document.getElementById('tabPetugas');
+    const tabAdmin = document.getElementById('tabAdmin');
+    const sectionPetugas = document.getElementById('sectionPetugas');
+    const sectionAdmin = document.getElementById('sectionAdmin');
 
-      if (type === 'petugas') {
-        sectionPetugas.classList.remove('hidden');
-        sectionAdmin.classList.add('hidden');
-        tabPetugas.className = "w-1/2 py-3 border-b-2 border-blue-600 text-blue-600 font-bold focus:outline-none transition-colors";
-        tabAdmin.className = "w-1/2 py-3 border-b-2 border-transparent text-gray-500 font-bold hover:text-gray-700 focus:outline-none transition-colors";
-      } else {
-        sectionPetugas.classList.add('hidden');
-        sectionAdmin.classList.remove('hidden');
-        tabAdmin.className = "w-1/2 py-3 border-b-2 border-gray-800 text-gray-800 font-bold focus:outline-none transition-colors";
-        tabPetugas.className = "w-1/2 py-3 border-b-2 border-transparent text-gray-500 font-bold hover:text-gray-700 focus:outline-none transition-colors";
-      }
-    }
+    // Event Listener Klik Tab Petugas
+    tabPetugas.addEventListener('click', () => {
+      sectionPetugas.classList.remove('hidden');
+      sectionAdmin.classList.add('hidden');
+      
+      tabPetugas.className = "w-1/2 py-3 border-b-2 border-blue-600 text-blue-600 font-bold focus:outline-none transition-colors cursor-pointer";
+      tabAdmin.className = "w-1/2 py-3 border-b-2 border-transparent text-gray-500 font-bold hover:text-gray-700 focus:outline-none transition-colors cursor-pointer";
+    });
+
+    // Event Listener Klik Tab Admin
+    tabAdmin.addEventListener('click', () => {
+      sectionPetugas.classList.add('hidden');
+      sectionAdmin.classList.remove('hidden');
+      
+      tabAdmin.className = "w-1/2 py-3 border-b-2 border-gray-800 text-gray-800 font-bold focus:outline-none transition-colors cursor-pointer";
+      tabPetugas.className = "w-1/2 py-3 border-b-2 border-transparent text-gray-500 font-bold hover:text-gray-700 focus:outline-none transition-colors cursor-pointer";
+    });
 
     // Process Login Petugas
     document.getElementById('formPetugas').addEventListener('submit', async (e) => {
@@ -168,11 +172,10 @@
           btn.innerText = "MASUK PETUGAS";
           btn.disabled = false;
         } else {
-          // Berhasil login -> Arahkan ke halaman petugas
           window.location.href = "petugas.html";
         }
       } catch (err) {
-        alert("Terjadi kesalahan koneksi. Pastikan SUPABASE_URL & SUPABASE_KEY sudah terisi dengan benar.");
+        alert("Terjadi kesalahan koneksi. Pastikan SUPABASE_URL & SUPABASE_KEY sudah benar.");
         btn.innerText = "MASUK PETUGAS";
         btn.disabled = false;
       }
@@ -196,11 +199,10 @@
           btn.innerText = "MASUK ADMIN";
           btn.disabled = false;
         } else {
-          // Berhasil login -> Arahkan ke halaman dashboard admin
           window.location.href = "admin.html";
         }
       } catch (err) {
-        alert("Terjadi kesalahan koneksi. Pastikan SUPABASE_URL & SUPABASE_KEY sudah terisi dengan benar.");
+        alert("Terjadi kesalahan koneksi. Pastikan SUPABASE_URL & SUPABASE_KEY sudah benar.");
         btn.innerText = "MASUK ADMIN";
         btn.disabled = false;
       }
