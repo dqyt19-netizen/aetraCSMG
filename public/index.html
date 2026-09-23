@@ -2,15 +2,154 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Aetra Meter Reading Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetra Air Tangerang - Login Petugas</title>
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-  <div class="bg-white p-8 rounded-lg shadow-md text-center max-w-sm w-full space-y-4">
-    <h1 class="text-xl font-bold text-blue-600">Aetra Meter System</h1>
-    <p class="text-gray-500 text-sm">Pilih halaman sesuai peran Anda:</p>
-    <a href="/petugas.html" class="block w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700">Masuk Aplikasi Petugas</a>
-    <a href="/admin.html" class="block w-full bg-gray-800 text-white py-2 rounded font-semibold hover:bg-gray-900">Masuk Dashboard Admin</a>
+<body class="bg-gray-100 min-h-screen flex flex-col justify-center items-center p-4">
+
+  <!-- CONTAINER UTAMA -->
+  <div class="w-full max-w-md bg-white rounded-lg shadow-lg overflow-hidden border">
+    
+    <!-- HEADER LOGO AETRA AIR TANGERANG -->
+    <div class="bg-white p-6 border-b flex justify-center items-center">
+      <img 
+        src="https://upload.wikimedia.org/wikipedia/commons/2/23/Logo_Aetra_Air_Tangerang.jpg" 
+        alt="Logo Aetra Air Tangerang" 
+        class="h-16 object-contain"
+      >
+    </div>
+
+    <!-- TAMPILAN 1: FORM LOGIN PETUGAS -->
+    <div id="loginSection" class="p-6">
+      <h2 class="text-xl font-bold text-gray-800 text-center mb-6">Login Petugas Meter</h2>
+      
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Pilih Nama Petugas</label>
+          <select id="selectPetugas" required class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none bg-white">
+            <option value="">-- Pilih Nama Anda --</option>
+            <option value="udin@aetra.co.id">Udin</option>
+            <option value="raka@aetra.co.id">Raka</option>
+            <option value="dimas@aetra.co.id">Dimas</option>
+            <option value="adel@aetra.co.id">Adel</option>
+            <option value="damra@aetra.co.id">Damra</option>
+            <option value="yayat@aetra.co.id">Yayat</option>
+            <option value="rika@aetra.co.id">Rika</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            value="123456" 
+            placeholder="••••••••" 
+            required 
+            class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+        </div>
+
+        <button 
+          type="submit" 
+          id="btnLogin" 
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition duration-200"
+        >
+          MASUK
+        </button>
+      </form>
+    </div>
+
+    <!-- TAMPILAN 2: HALAMAN SETELAH LOGIN (LOGGED IN) -->
+    <div id="welcomeSection" class="p-6 hidden">
+      <div class="flex justify-between items-center mb-6 pb-2 border-b">
+        <div>
+          <p class="text-xs text-gray-500">Status Account</p>
+          <p class="text-sm font-bold text-gray-800" id="userAccount">Petugas Logged In</p>
+        </div>
+        <button onclick="logout()" class="text-xs bg-red-100 text-red-600 px-3 py-1.5 rounded font-bold hover:bg-red-200">
+          Logout
+        </button>
+      </div>
+
+      <div class="text-center py-4">
+        <div class="inline-block p-3 bg-green-100 rounded-full mb-3 text-green-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-800">Login Berhasil!</h3>
+        <p class="text-sm text-gray-600 mt-1">Anda siap melakukan pencatatan meter air.</p>
+      </div>
+
+      <a href="petugas.html" class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition duration-200 mt-4">
+        BUKA FORM PENCATATAN
+      </a>
+    </div>
+
   </div>
+
+  <script>
+    // =========================================================
+    // ISIKAN SUPABASE_URL DAN SUPABASE_KEY MILIK ANDA DI SINI
+    // =========================================================
+    const SUPABASE_URL = "https://lfqhhyaxctbfaxjjytdz.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmcWhoeWF4Y3RiZmF4amp5dGR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNjE4MTYsImV4cCI6MjEwNTczNzgxNn0.uungyF3lq6-XH8lxW6SLeJDkTh7_eW0F1ss0Qzc3f0A";
+    
+    // Inisialisasi Supabase Client
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Cek Sesi Login saat Halaman Dimuat
+    async function checkSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('welcomeSection').classList.remove('hidden');
+        document.getElementById('userAccount').innerText = session.user.email;
+      }
+    }
+
+    // Process Form Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnLogin');
+      btn.innerText = "Memproses...";
+      btn.disabled = true;
+
+      const email = document.getElementById('selectPetugas').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          alert("Login Gagal: " + error.message);
+          btn.innerText = "MASUK";
+          btn.disabled = false;
+        } else {
+          // Berhasil Login -> Perbarui Tampilan
+          checkSession();
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert("Terjadi kesalahan koneksi. Pastikan SUPABASE_URL & SUPABASE_KEY sudah benar.");
+        btn.innerText = "MASUK";
+        btn.disabled = false;
+      }
+    });
+
+    // Logout Function
+    async function logout() {
+      await supabase.auth.signOut();
+      location.reload();
+    }
+
+    // Jalankan pengecekan sesi otomatis
+    checkSession();
+  </script>
 </body>
 </html>
