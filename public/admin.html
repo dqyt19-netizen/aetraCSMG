@@ -1,1 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Aetra Realtime</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Dashboard Pencatatan Meter (Realtime)</h1>
+      <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">● Live Connected</span>
+    </div>
 
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-100 border-b text-gray-700 text-sm">
+            <th class="p-3">Waktu Input</th>
+            <th class="p-3">ID Pelanggan</th>
+            <th class="p-3">Perusahaan</th>
+            <th class="p-3">Cycle</th>
+            <th class="p-3">Stand Meter</th>
+            <th class="p-3">Koordinat</th>
+            <th class="p-3">Bukti TTD</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody" class="divide-y text-sm">
+          <!-- Data akan otomatis masuk di sini secara realtime -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
+    const SUPABASE_KEY = "YOUR_SUPABASE_KEY";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Function Render Baris Tabel
+    function addRowToTable(data, prepend = false) {
+      const tbody = document.getElementById('tableBody');
+      const tr = document.createElement('tr');
+      tr.className = "hover:bg-gray-50";
+      tr.innerHTML = `
+        <td class="p-3">${new Date(data.created_at).toLocaleString('id-ID')}</td>
+        <td class="p-3 font-semibold">${data.id_pelanggan}</td>
+        <td class="p-3">${data.nama_perusahaan}</td>
+        <td class="p-3">${data.cycle}</td>
+        <td class="p-3 font-bold text-blue-600">${data.stand_meter}</td>
+        <td class="p-3"><a href="https://maps.google.com/?q=${data.latitude},${data.longitude}" target="_blank" class="text-blue-500 underline">Lihat Peta</a></td>
+        <td class="p-3"><a href="${data.foto_bukti_url}" target="_blank" class="text-xs bg-gray-200 p-1 rounded">Lihat TTD</a></td>
+      `;
+      if (prepend) {
+        tbody.insertBefore(tr, tbody.firstChild);
+      } else {
+        tbody.appendChild(tr);
+      }
+    }
+
+    // 1. Ambil Data Awal
+    async function loadInitialData() {
+      const { data, error } = await supabase
+        .from('meter_readings')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (data) data.forEach(item => addRowToTable(item));
+    }
+
+    // 2. Lakukan Listening Data REALTIME
+    supabase
+      .channel('realtime-meter')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'meter_readings' }, payload => {
+        // Begitu petugas tekan "KIRIM", baris ini otomatis muncul di layar Admin!
+        addRowToTable(payload.new, true);
+      })
+      .subscribe();
+
+    loadInitialData();
+  </script>
+</body>
+</html>
