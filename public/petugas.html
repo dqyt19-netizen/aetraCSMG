@@ -1,24 +1,193 @@
-<!-- SECTION 1: FORM LOGIN PETUGAS (DENGAN DROPDOWN NAMA) -->
-<div id="loginSection" class="w-full max-w-md bg-white p-6 rounded-b-lg shadow-md">
-  <h2 class="text-xl font-bold text-gray-800 text-center mb-4">Login Petugas Meter</h2>
-  <form id="loginForm" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Pilih Nama Petugas</label>
-      <select id="selectPetugas" required class="w-full p-2 border rounded mt-1 bg-white">
-        <option value="">-- Pilih Nama Anda --</option>
-        <option value="udin@aetra.co.id">Udin</option>
-        <option value="raka@aetra.co.id">Raka</option>
-        <option value="dimas@aetra.co.id">Dimas</option>
-        <option value="adel@aetra.co.id">Adel</option>
-        <option value="damra@aetra.co.id">Damra</option>
-        <option value="yayat@aetra.co.id">Yayat</option>
-        <option value="rika@aetra.co.id">Rika</option>
-      </select>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetra - Aplikasi Petugas</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+
+  <!-- HEADER LOGO -->
+  <div class="w-full max-w-md bg-white p-4 rounded-t-lg shadow-md border-b flex justify-center items-center">
+    <img src="logo-aetra.jpg" alt="Logo Aetra Air Tangerang" class="h-16 object-contain">
+  </div>
+
+  <!-- SECTION 1: FORM LOGIN PETUGAS -->
+  <div id="loginSection" class="w-full max-w-md bg-white p-6 rounded-b-lg shadow-md">
+    <h2 class="text-xl font-bold text-gray-800 text-center mb-4">Login Petugas Meter</h2>
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Email Petugas</label>
+        <input type="email" id="email" placeholder="petugas@aetra.co.id" required class="w-full p-2 border rounded mt-1">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" id="password" placeholder="••••••••" required class="w-full p-2 border rounded mt-1">
+      </div>
+      <button type="submit" id="btnLogin" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">MASUK</button>
+    </form>
+  </div>
+
+  <!-- SECTION 2: FORM INPUT PENCATATAN (TAMPIL SETELAH LOGIN) -->
+  <div id="formSection" class="w-full max-w-md bg-white p-6 rounded-b-lg shadow-md hidden">
+    <div class="flex justify-between items-center mb-4 border-b pb-2">
+      <span class="text-xs text-gray-500" id="userAccount">Petugas Logged In</span>
+      <button onclick="logout()" class="text-xs text-red-500 font-bold">Logout</button>
     </div>
-    <div>
-      <label class="block text-sm font-medium text-gray-700">Password</label>
-      <input type="password" id="password" value="123456" placeholder="••••••••" required class="w-full p-2 border rounded mt-1">
-    </div>
-    <button type="submit" id="btnLogin" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">MASUK</button>
-  </form>
-</div>
+
+    <h2 class="text-lg font-bold text-blue-700 mb-4">Form Pencatatan Meter</h2>
+
+    <form id="meterForm" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium">ID Pelanggan</label>
+        <input type="text" id="idPelanggan" required class="w-full p-2 border rounded">
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium">Nama Perusahaan / Consumer</label>
+        <input type="text" id="namaPerusahaan" required class="w-full p-2 border rounded">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Pembacaan Cycle (1 - 15)</label>
+        <input type="number" id="cycle" min="1" max="15" required class="w-full p-2 border rounded">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Stand Meter Air</label>
+        <input type="number" step="0.01" id="standMeter" required class="w-full p-2 border rounded">
+      </div>
+
+      <!-- INPUT FOTO 1: STAND METER -->
+      <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+        <label class="block text-sm font-bold text-blue-900 mb-1">1. Foto Stand Meter Air</label>
+        <input type="file" id="fotoMeter" accept="image/*" capture="environment" required class="w-full text-sm">
+      </div>
+
+      <!-- INPUT FOTO 2: LEMBARAN BERKAS & TTD PIC -->
+      <div class="p-3 bg-blue-50 border border-blue-200 rounded">
+        <label class="block text-sm font-bold text-blue-900 mb-1">2. Foto Berkas Cetak & TTD PIC</label>
+        <input type="file" id="fotoBerkas" accept="image/*" capture="environment" required class="w-full text-sm">
+      </div>
+
+      <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700">KIRIM DATA & LOKASI</button>
+    </form>
+  </div>
+
+  <script>
+    // MASUKKAN URL DAN KEY SUPABASE ANDA DI SINI
+    const SUPABASE_URL = "YOUR_SUPABASE_URL";
+    const SUPABASE_KEY = "YOUR_SUPABASE_KEY";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Cek Sesi Login saat halaman dibuka
+    async function checkSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('formSection').classList.remove('hidden');
+        document.getElementById('userAccount').innerText = session.user.email;
+      }
+    }
+
+    // Process Login Petugas
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnLogin');
+      btn.innerText = "Memproses...";
+      btn.disabled = true;
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        alert("Login Gagal: " + error.message);
+        btn.innerText = "MASUK";
+        btn.disabled = false;
+      } else {
+        checkSession();
+      }
+    });
+
+    async function logout() {
+      await supabase.auth.signOut();
+      location.reload();
+    }
+
+    // Helper Upload Foto ke Supabase Storage
+    async function uploadFile(fileInput, prefix) {
+      const file = fileInput.files[0];
+      const fileName = `${prefix}_${Date.now()}_${file.name}`;
+      
+      const { data, error } = await supabase.storage
+        .from('meter-proofs')
+        .upload(fileName, file);
+
+      if (error) throw error;
+      return `${SUPABASE_URL}/storage/v1/object/public/meter-proofs/${fileName}`;
+    }
+
+    // Process Submit Data
+    document.getElementById('meterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmit');
+      btn.innerText = "Mengambil Lokasi & Mengirim...";
+      btn.disabled = true;
+
+      // 1. Ambil Lokasi GPS Otomatis
+      if (!navigator.geolocation) {
+        alert("GPS tidak didukung oleh browser Anda.");
+        btn.disabled = false;
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const long = position.coords.longitude;
+
+        try {
+          // 2. Upload Kedua Foto
+          const urlFotoMeter = await uploadFile(document.getElementById('fotoMeter'), 'meter');
+          const urlFotoBerkas = await uploadFile(document.getElementById('fotoBerkas'), 'berkas');
+
+          // 3. Ambil User ID Petugas yang Login
+          const { data: { user } } = await supabase.auth.getUser();
+
+          // 4. Simpan Data ke Supabase Database
+          const { error } = await supabase.from('meter_readings').insert([{
+            petugas_id: user.id,
+            id_pelanggan: document.getElementById('idPelanggan').value,
+            nama_perusahaan: document.getElementById('namaPerusahaan').value,
+            cycle: parseInt(document.getElementById('cycle').value),
+            stand_meter: parseFloat(document.getElementById('standMeter').value),
+            latitude: lat,
+            longitude: long,
+            foto_meter_url: urlFotoMeter,
+            foto_berkas_url: urlFotoBerkas
+          }]);
+
+          if (error) throw error;
+
+          alert("Data pencatatan & lokasi berhasil dikirim!");
+          document.getElementById('meterForm').reset();
+        } catch (err) {
+          alert("Gagal mengirim data: " + err.message);
+        } finally {
+          btn.innerText = "KIRIM DATA & LOKASI";
+          btn.disabled = false;
+        }
+      }, (err) => {
+        alert("Akses Lokasi/GPS ditolak. Mohon aktifkan GPS HP Anda.");
+        btn.innerText = "KIRIM DATA & LOKASI";
+        btn.disabled = false;
+      }, { enableHighAccuracy: true });
+    });
+
+    checkSession();
+  </script>
+</body>
+</html>
