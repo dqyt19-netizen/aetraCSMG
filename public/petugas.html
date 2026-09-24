@@ -3,334 +3,502 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aetra - Portal Petugas Lapangan</title>
+  <title>Aetra Air Tangerang - Petugas</title>
+
+  <!-- Supabase JS SDK CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card-container {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      max-width: 900px;
+      overflow: hidden;
+    }
+    .header {
+      text-align: center;
+      padding: 20px;
+      border-bottom: 1px solid #eef0f3;
+    }
+    .header img {
+      max-height: 50px;
+    }
+    .main-content {
+      display: flex;
+      flex-direction: row;
+      min-height: 500px;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #fafbfc;
+      border-right: 1px solid #eef0f3;
+      padding: 20px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .profile-box {
+      background: #ffffff;
+      border: 1px solid #e0e6ed;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    .profile-box small {
+      color: #8c9ba5;
+      font-weight: bold;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+    .profile-box div {
+      color: #2b54d5;
+      font-weight: bold;
+      font-size: 13px;
+      word-break: break-all;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 15px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #334155;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .nav-btn.active {
+      background-color: #2563eb;
+      color: #ffffff;
+    }
+    .logout-btn {
+      margin-top: auto;
+      background-color: #fef2f2;
+      color: #ef4444;
+      border: 1px solid #fca5a5;
+    }
+    .content-body {
+      flex: 1;
+      padding: 25px;
+    }
+    /* Auth Form Styling */
+    .auth-container {
+      max-width: 380px;
+      margin: 60px auto;
+      padding: 30px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .form-group label span {
+      color: #ef4444;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      outline: none;
+    }
+    .file-upload-box {
+      background-color: #eff6ff;
+      border: 1px solid #dbeafe;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .file-upload-box label {
+      font-size: 13px;
+      font-weight: bold;
+      color: #1e40af;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .btn-submit {
+      width: 100%;
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-submit:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    /* Table Styling */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+    table th, table td {
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: left;
+    }
+    table th {
+      background-color: #f8fafc;
+      font-weight: bold;
+      color: #334155;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-2 sm:p-4">
+<body>
 
-  <!-- CONTAINER UTAMA -->
-  <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg border overflow-hidden">
-    
-    <!-- HEADER LOGO -->
-    <div class="flex justify-center items-center p-4 border-b bg-white">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/Logo_Aetra_Air_Tangerang.jpg" alt="Logo Aetra Air Tangerang" class="h-12 object-contain">
+  <!-- ================= SEKSI 1: LOGIN ================= -->
+  <div id="auth-section" class="auth-container">
+    <h2 style="margin-bottom: 20px; color: #1e293b;">Login Petugas</h2>
+    <form id="form-login">
+      <div class="form-group">
+        <label>Email Petugas</label>
+        <input type="email" id="login-email" placeholder="riri@aetra.co.id" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn-submit" style="margin-top: 10px;">MASUK</button>
+    </form>
+  </div>
+
+  <!-- ================= SEKSI 2: DASHBOARD PETUGAS ================= -->
+  <div id="app-section" class="card-container" style="display: none;">
+    <!-- Header -->
+    <div class="header">
+      <img src="https://via.placeholder.com/250x50?text=Logo+Aetra+Air+Tangerang" alt="Logo Aetra Air Tangerang" id="app-logo">
     </div>
 
-    <!-- SEKSI 1: FORM LOGIN PETUGAS -->
-    <div id="loginSection" class="p-6 max-w-md mx-auto">
-      <h2 class="text-xl font-bold text-gray-800 text-center mb-4">Login Petugas Meter</h2>
-      <form id="loginForm" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Email / ID Petugas</label>
-          <input type="email" id="emailPetugas" placeholder="contoh: udin@aetra.co.id" required class="w-full p-2.5 border rounded mt-1 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Password</label>
-          <input type="password" id="password" required class="w-full p-2.5 border rounded mt-1 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <button type="submit" id="btnLogin" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">MASUK</button>
-      </form>
-    </div>
-
-    <!-- SEKSI 2: DASHBOARD PETUGAS (LAYOUT SIDEBAR KIRI) -->
-    <div id="formSection" class="hidden flex flex-col md:flex-row min-h-[500px]">
-      
-      <!-- NAVIGASI SIDEBAR SISI KIRI (POIN 1) -->
-      <div class="w-full md:w-64 bg-gray-50 border-r border-gray-200 p-4 flex flex-col justify-between shrink-0 space-y-4">
-        <div class="space-y-4">
-          <!-- INFO USER -->
-          <div class="bg-white p-3 rounded-lg border">
-            <p class="text-[10px] text-gray-400 uppercase font-bold">Petugas Aktif</p>
-            <p class="text-xs font-bold text-blue-700 truncate" id="userAccount">Petugas</p>
-          </div>
-
-          <!-- TOMBOL MENU NAVIGASI KIRI -->
-          <nav class="space-y-2">
-            <button id="navInputBtn" onclick="switchTab('input')" class="w-full text-left px-4 py-3 rounded-lg text-sm font-bold bg-blue-600 text-white flex items-center space-x-2 transition">
-              <span>📝</span>
-              <span>Input Bacaan</span>
-            </button>
-            <button id="navHistoryBtn" onclick="switchTab('history')" class="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-200 flex items-center space-x-2 transition">
-              <span>📋</span>
-              <span>Data Hasil Baca</span>
-            </button>
-          </nav>
+    <!-- Main Body -->
+    <div class="main-content">
+      <!-- Sidebar Left -->
+      <div class="sidebar">
+        <div class="profile-box">
+          <small>PETUGAS AKTIF</small>
+          <div id="display-email">-</div>
         </div>
 
-        <!-- TOMBOL LOGOUT DI BAWAH SIDEBAR -->
-        <button onclick="logout()" class="w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 flex items-center space-x-2">
-          <span>🚪</span>
-          <span>Keluar / Logout</span>
+        <button id="btn-tab-input" class="nav-btn active" onclick="switchTab('input')">
+          📝 Input Bacaan
+        </button>
+        <button id="btn-tab-hasil" class="nav-btn" onclick="switchTab('hasil')">
+          📋 Data Hasil Baca
+        </button>
+
+        <button class="nav-btn logout-btn" onclick="logout()">
+          🚪 Keluar / Logout
         </button>
       </div>
 
-      <!-- KONTEN UTAMA (SISI KANAN) -->
-      <div class="flex-1 p-4 md:p-6 bg-white overflow-y-auto">
-        
-        <!-- PANEL 1: FORM INPUT BACAAN -->
-        <div id="panelInput" class="space-y-4 max-w-xl">
-          <h3 class="text-lg font-bold text-gray-800 border-b pb-2">Form Input Bacaan Meter</h3>
-
-          <form id="meterForm" class="space-y-4">
-            <div>
-              <label class="block text-xs font-bold text-gray-700 mb-1">ID Pelanggan <span class="text-red-500">*</span></label>
-              <input type="text" id="idPelanggan" required class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
-            
-            <div>
-              <label class="block text-xs font-bold text-gray-700 mb-1">Nama Perusahaan / Consumer <span class="text-red-500">*</span></label>
-              <input type="text" id="namaPerusahaan" required class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+      <!-- Content Area Right -->
+      <div class="content-body">
+        <!-- Tab 1: Form Input Bacaan -->
+        <div id="tab-input-container">
+          <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 20px;">Form Input Bacaan Meter</h2>
+          
+          <form id="form-input-bacaan">
+            <div class="form-group">
+              <label>ID Pelanggan <span>*</span></label>
+              <input type="text" id="customer_id" required>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">Cycle (1 - 15) <span class="text-red-500">*</span></label>
-                <input type="number" id="cycle" min="1" max="15" required class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+            <div class="form-group">
+              <label>Nama Perusahaan / Consumer <span>*</span></label>
+              <input type="text" id="company_name" required>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Cycle (1 - 15) <span>*</span></label>
+                <input type="number" id="cycle" min="1" max="15" required>
               </div>
-              <div>
-                <label class="block text-xs font-bold text-gray-700 mb-1">Stand Meter Air (m³) <span class="text-red-500">*</span></label>
-                <input type="number" step="0.01" id="standMeter" required class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+              <div class="form-group">
+                <label>Stand Meter Air (m³) <span>*</span></label>
+                <input type="number" step="0.01" id="stand_meter" required>
               </div>
             </div>
 
-            <!-- FOTO 1 -->
-            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <label class="block text-xs font-bold text-blue-900 mb-1">1. Foto Stand Meter Air <span class="text-red-500">*</span></label>
-              <input type="file" id="fotoMeter" accept="image/*" capture="environment" required class="w-full text-xs">
+            <div class="file-upload-box">
+              <label>1. Foto Stand Meter Air <span>*</span></label>
+              <input type="file" id="foto_stand_meter" accept="image/*" required>
             </div>
 
-            <!-- FOTO 2 -->
-            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <label class="block text-xs font-bold text-blue-900 mb-1">2. Foto Berkas Cetak & TTD PIC <span class="text-red-500">*</span></label>
-              <input type="file" id="fotoBerkas" accept="image/*" capture="environment" required class="w-full text-xs">
+            <div class="file-upload-box">
+              <label>2. Foto Berkas Cetak & TTD PIC <span>*</span></label>
+              <input type="file" id="foto_berkas" accept="image/*" required>
             </div>
 
-            <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">
+            <button type="submit" id="btn-submit-reading" class="btn-submit">
               KIRIM DATA & KOORDINAT GPS
             </button>
           </form>
         </div>
 
-        <!-- PANEL 2: TABEL DATA HASIL BACA -->
-        <div id="panelHistory" class="hidden space-y-4">
-          <div class="flex justify-between items-center border-b pb-2">
-            <h3 class="text-lg font-bold text-gray-800">Data Hasil Baca Petugas</h3>
-            <button onclick="loadHistoryData()" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 border rounded-lg font-semibold">🔄 Refresh Data</button>
-          </div>
-
-          <div class="overflow-x-auto border rounded-lg">
-            <table class="w-full text-left text-xs text-gray-600">
-              <thead class="bg-gray-100 text-gray-700 border-b">
-                <tr>
-                  <th class="p-3">ID Pelanggan</th>
-                  <th class="p-3">Perusahaan</th>
-                  <th class="p-3">Stand</th>
-                  <th class="p-3">Koordinat (Long, Lat)</th>
-                  <th class="p-3">Foto</th>
-                </tr>
-              </thead>
-              <tbody id="historyTableBody">
-                <tr>
-                  <td colspan="5" class="p-4 text-center text-gray-400">Memuat data...</td>
-                </tr>
-              </tbody>
-            </table>
+        <!-- Tab 2: Data Hasil Baca -->
+        <div id="tab-hasil-container" style="display: none;">
+          <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 15px;">Data Hasil Baca</h2>
+          <div id="table-wrapper">
+            <p style="color: #64748b;">Memuat data...</p>
           </div>
         </div>
-
       </div>
-
     </div>
-
   </div>
 
+  <!-- ================= SCRIPT INTEGRASI SUPABASE ================= -->
   <script>
-    // =========================================================================
-    // PASTIKAN KUNCI SUPABASE INI DIGANTI DENGAN MILIK ANDA
-    // =========================================================================
-    const SUPABASE_URL = "https://dntuitawhmpqkbepnmwk.supabase.co"; 
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY"; 
+    // 1. Inisialisasi Supabase Client
+    const SUPABASE_URL = 'https://dntuitawhmpqkbepnmwk.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY'; 
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let loggedInOfficer = null;
 
-    async function checkSession() {
-      try {
-        const { data: { session }, error } = await supabaseClient.auth.getSession();
-        if (error) throw error;
-        if (session) {
-          document.getElementById('loginSection').classList.add('hidden');
-          document.getElementById('formSection').classList.remove('hidden');
-          document.getElementById('userAccount').innerText = session.user.email;
-          loadHistoryData();
-        }
-      } catch (err) {
-        console.error("Session Error:", err);
-      }
-    }
-
-    // Fungsi Switch Navigasi Kiri
-    function switchTab(tabName) {
-      const panelInput = document.getElementById('panelInput');
-      const panelHistory = document.getElementById('panelHistory');
-      const navInputBtn = document.getElementById('navInputBtn');
-      const navHistoryBtn = document.getElementById('navHistoryBtn');
-
-      if (tabName === 'input') {
-        panelInput.classList.remove('hidden');
-        panelHistory.classList.add('hidden');
-        navInputBtn.className = "w-full text-left px-4 py-3 rounded-lg text-sm font-bold bg-blue-600 text-white flex items-center space-x-2 transition";
-        navHistoryBtn.className = "w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-200 flex items-center space-x-2 transition";
+    // 2. Cek Sesi Login saat Halaman Pertama Dimuat
+    async function checkAuthSession() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      if (session) {
+        loggedInOfficer = session.user;
+        document.getElementById('display-email').textContent = session.user.email;
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('app-section').style.display = 'block';
       } else {
-        panelInput.classList.add('hidden');
-        panelHistory.classList.remove('hidden');
-        navHistoryBtn.className = "w-full text-left px-4 py-3 rounded-lg text-sm font-bold bg-blue-600 text-white flex items-center space-x-2 transition";
-        navInputBtn.className = "w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-200 flex items-center space-x-2 transition";
-        loadHistoryData();
+        document.getElementById('auth-section').style.display = 'block';
+        document.getElementById('app-section').style.display = 'none';
       }
     }
 
-    // Login
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    // 3. Proses Login
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('btnLogin');
-      btn.innerText = "Memproses...";
-      btn.disabled = true;
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
 
-      const email = document.getElementById('emailPetugas').value;
-      const password = document.getElementById('password').value;
+      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
 
-      try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) {
-          alert("Gagal Login: " + error.message);
-          btn.innerText = "MASUK";
-          btn.disabled = false;
-        } else {
-          checkSession();
-        }
-      } catch (err) {
-        alert("Terjadi kesalahan sistem: " + err.message);
-        btn.innerText = "MASUK";
-        btn.disabled = false;
+      if (error) {
+        alert('Login Gagal: ' + error.message);
+      } else {
+        checkAuthSession();
       }
     });
 
+    // 4. Logout
     async function logout() {
-      await supabaseClient.auth.signOut();
+      await _supabase.auth.signOut();
       location.reload();
     }
 
-    // Helper Upload Foto
-    async function uploadFile(fileInput, prefix) {
-      const file = fileInput.files[0];
-      const fileName = `${prefix}_${Date.now()}_${file.name}`;
-      
-      const { data, error } = await supabaseClient.storage
-        .from('meter-proofs')
-        .upload(fileName, file);
+    // 5. Perpindahan Tab (Input <-> Hasil Baca)
+    function switchTab(tabName) {
+      const btnInput = document.getElementById('btn-tab-input');
+      const btnHasil = document.getElementById('btn-tab-hasil');
+      const tabInput = document.getElementById('tab-input-container');
+      const tabHasil = document.getElementById('tab-hasil-container');
 
-      if (error) throw error;
-      return `${SUPABASE_URL}/storage/v1/object/public/meter-proofs/${fileName}`;
+      if (tabName === 'input') {
+        btnInput.classList.add('active');
+        btnHasil.classList.remove('active');
+        tabInput.style.display = 'block';
+        tabHasil.style.display = 'none';
+      } else {
+        btnHasil.classList.add('active');
+        btnInput.classList.remove('active');
+        tabInput.style.display = 'none';
+        tabHasil.style.display = 'block';
+        loadDataHasilBaca();
+      }
     }
 
-    // Submit Data
-    document.getElementById('meterForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btnSubmit');
-      btn.innerText = "Mengambil GPS & Mengirim...";
-      btn.disabled = true;
+    // 6. Fungsi Ambil GPS
+    function getGPSLocation() {
+      return new Promise((resolve) => {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+            (err) => {
+              console.warn("GPS gagal/ditolak:", err.message);
+              resolve({ lat: null, lng: null });
+            }
+          );
+        } else {
+          resolve({ lat: null, lng: null });
+        }
+      });
+    }
 
-      if (!navigator.geolocation) {
-        alert("GPS tidak didukung oleh perangkat ini.");
-        btn.disabled = false;
-        return;
+    // 7. Fungsi Upload Foto ke Storage
+    async function uploadPhoto(fileInputId, pathPrefix) {
+      const fileInput = document.getElementById(fileInputId);
+      if (!fileInput.files || fileInput.files.length === 0) return null;
+
+      const file = fileInput.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${pathPrefix}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      const { error } = await _supabase.storage
+        .from('meter-photos')
+        .upload(fileName, file);
+
+      if (error) {
+        console.error('Upload Error:', error.message);
+        return null;
       }
 
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
+      const { data } = _supabase.storage.from('meter-photos').getPublicUrl(fileName);
+      return data.publicUrl;
+    }
 
-        try {
-          const urlFotoMeter = await uploadFile(document.getElementById('fotoMeter'), 'meter');
-          const urlFotoBerkas = await uploadFile(document.getElementById('fotoBerkas'), 'berkas');
-
-          const { data: { user } } = await supabaseClient.auth.getUser();
-
-          const { error } = await supabaseClient.from('meter_readings').insert([{
-            petugas_id: user.id,
-            id_pelanggan: document.getElementById('idPelanggan').value,
-            nama_perusahaan: document.getElementById('namaPerusahaan').value,
-            cycle: parseInt(document.getElementById('cycle').value),
-            stand_meter: parseFloat(document.getElementById('standMeter').value),
-            latitude: lat,
-            longitude: long,
-            foto_meter_url: urlFotoMeter,
-            foto_berkas_url: urlFotoBerkas
-          }]);
-
-          if (error) {
-            alert("Gagal Menyimpan ke Database:\n" + error.message + "\n\nSaran: Pastikan RLS di Supabase sudah di-Disable.");
-            throw error;
-          }
-
-          alert("Data & Koordinat GPS berhasil disimpan!");
-          document.getElementById('meterForm').reset();
-          switchTab('history');
-        } catch (err) {
-          console.error(err);
-        } finally {
-          btn.innerText = "KIRIM DATA & KOORDINAT GPS";
-          btn.disabled = false;
-        }
-      }, (err) => {
-        alert("Akses GPS ditolak/gagal. Mohon aktifkan izin lokasi HP Anda.");
-        btn.innerText = "KIRIM DATA & KOORDINAT GPS";
-        btn.disabled = false;
-      }, { enableHighAccuracy: true });
-    });
-
-    // Memuat Riwayat
-    async function loadHistoryData() {
-      const tableBody = document.getElementById('historyTableBody');
-      tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat data...</td></tr>';
+    // 8. Submit Form Bacaan Meter
+    document.getElementById('form-input-bacaan').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-reading');
+      btn.disabled = true;
+      btn.textContent = 'MENGIRIM DATA & GPS...';
 
       try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        const { data, error } = await supabaseClient
-          .from('meter_readings')
-          .select('*')
-          .eq('petugas_id', user.id)
-          .order('created_at', { ascending: false });
+        // Ambil GPS & Upload Foto secara bersamaan
+        const coords = await getGPSLocation();
+        const urlFotoMeter = await uploadPhoto('foto_stand_meter', 'stand_meter');
+        const urlFotoBerkas = await uploadPhoto('foto_berkas', 'berkas');
+
+        // Ambil ID Petugas dari Tabel officers
+        const { data: officerData } = await _supabase
+          .from('officers')
+          .select('id')
+          .eq('auth_id', loggedInOfficer.id)
+          .maybeSingle();
+
+        const payload = {
+          officer_id: officerData ? officerData.id : null,
+          customer_id: document.getElementById('customer_id').value,
+          company_name: document.getElementById('company_name').value,
+          cycle: parseInt(document.getElementById('cycle').value),
+          stand_meter: parseFloat(document.getElementById('stand_meter').value),
+          foto_stand_meter: urlFotoMeter,
+          foto_berkas: urlFotoBerkas,
+          latitude: coords.lat,
+          longitude: coords.lng
+        };
+
+        const { error } = await _supabase.from('meter_readings').insert([payload]);
 
         if (error) throw error;
 
-        if (!data || data.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Belum ada data yang dikerjakan.</td></tr>';
-          return;
-        }
+        alert('✅ Data hasil bacaan meter berhasil disimpan!');
+        document.getElementById('form-input-bacaan').reset();
 
-        tableBody.innerHTML = '';
-        data.forEach(item => {
-          tableBody.innerHTML += `
-            <tr class="border-b hover:bg-gray-50">
-              <td class="p-3 font-bold">${item.id_pelanggan}</td>
-              <td class="p-3">${item.nama_perusahaan}</td>
-              <td class="p-3">${item.stand_meter} m³</td>
-              <td class="p-3 font-mono text-[10px]">${item.longitude ? item.longitude.toFixed(5) : '-'}, ${item.latitude ? item.latitude.toFixed(5) : '-'}</td>
-              <td class="p-3">
-                <a href="${item.foto_meter_url}" target="_blank" class="text-blue-600 underline text-[10px]">Meter</a> | 
-                <a href="${item.foto_berkas_url}" target="_blank" class="text-blue-600 underline text-[10px]">Berkas</a>
-              </td>
-            </tr>
-          `;
-        });
       } catch (err) {
-        tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Gagal memuat: ${err.message}</td></tr>`;
+        alert('❌ Gagal menyimpan data: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'KIRIM DATA & KOORDINAT GPS';
       }
+    });
+
+    // 9. Load Tabel Data Hasil Baca
+    async function loadDataHasilBaca() {
+      const container = document.getElementById('table-wrapper');
+      container.innerHTML = '<p style="color: #64748b;">Memuat data...</p>';
+
+      const { data, error } = await _supabase
+        .from('meter_readings')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        container.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        container.innerHTML = '<p style="color: #64748b;">Belum ada data hasil baca.</p>';
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>ID Pelanggan</th>
+              <th>Perusahaan</th>
+              <th>Cycle</th>
+              <th>Stand Meter</th>
+              <th>Foto Stand</th>
+              <th>Foto Berkas</th>
+              <th>GPS</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      data.forEach(row => {
+        html += `
+          <tr>
+            <td>${new Date(row.created_at).toLocaleString('id-ID')}</td>
+            <td><b>${row.customer_id}</b></td>
+            <td>${row.company_name}</td>
+            <td>${row.cycle}</td>
+            <td>${row.stand_meter} m³</td>
+            <td>${row.foto_stand_meter ? `<a href="${row.foto_stand_meter}" target="_blank">Foto</a>` : '-'}</td>
+            <td>${row.foto_berkas ? `<a href="${row.foto_berkas}" target="_blank">Berkas</a>` : '-'}</td>
+            <td>${row.latitude ? `<a href="https://maps.google.com/?q=${row.latitude},${row.longitude}" target="_blank">Maps</a>` : '-'}</td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
     }
 
-    checkSession();
+    // Jalankan pemeriksaan sesi saat pertama kali dibuka
+    checkAuthSession();
   </script>
 </body>
 </html>
