@@ -46,12 +46,12 @@
       border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
       width: 100%;
-      max-width: 650px;
+      max-width: 700px;
       overflow: hidden;
       border: 1px solid var(--border-color);
     }
 
-    /* 1. Header Bar: Navigasi di Kiri, Logo di Kanan */
+    /* Header Bar: Navigasi di Kiri, Logo di Kanan */
     .header-bar {
       display: flex;
       justify-content: space-between;
@@ -68,7 +68,7 @@
       object-fit: contain;
     }
 
-    /* Tombol Navigasi Utama (Di Kiri) */
+    /* Tombol Navigasi Utama */
     .menu-trigger-btn {
       display: inline-flex;
       align-items: center;
@@ -89,7 +89,7 @@
       border-color: #cbd5e1;
     }
 
-    /* Menu Dropdown / Overlay Navigasi (Membuka ke arah Kiri) */
+    /* Menu Dropdown / Overlay Navigasi */
     .nav-dropdown {
       display: none;
       position: absolute;
@@ -170,7 +170,6 @@
       padding: 20px;
     }
 
-    /* Tampilan Auth / Login */
     .auth-box {
       padding: 10px 5px;
     }
@@ -223,31 +222,37 @@
       box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
     }
 
+    .form-control[readonly] {
+      background-color: #f1f5f9;
+      color: #64748b;
+    }
+
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
-    /* Upload Box */
-    .file-upload-box {
-      background-color: #f8fafc;
-      border: 1px dashed #cbd5e1;
+    /* File Upload Box Khusus Kamera Direct */
+    .camera-upload-box {
+      background-color: #f0f9ff;
+      border: 1px dashed #0284c7;
       padding: 12px 14px;
       border-radius: 8px;
       margin-bottom: 16px;
     }
 
-    .file-upload-box label {
+    .camera-upload-box label {
       font-size: 13px;
       font-weight: 600;
-      color: #334155;
+      color: #0369a1;
       display: block;
       margin-bottom: 6px;
     }
 
-    .file-upload-box input[type="file"] {
+    .camera-upload-box input[type="file"] {
       font-size: 12px;
+      width: 100%;
     }
 
     /* Map Styling */
@@ -289,7 +294,7 @@
       cursor: not-allowed;
     }
 
-    /* 2. Grouping & Table Styling */
+    /* Grouping & Table Styling */
     .officer-group {
       margin-bottom: 24px;
       border: 1px solid var(--border-color);
@@ -337,15 +342,15 @@
     }
 
     table th {
-      background-color: #ffffff;
+      background-color: #f8fafc;
       font-weight: 600;
       color: #475569;
       white-space: nowrap;
     }
 
     .img-preview {
-      width: 48px;
-      height: 48px;
+      width: 52px;
+      height: 52px;
       object-fit: cover;
       border-radius: 6px;
       border: 1px solid var(--border-color);
@@ -385,7 +390,7 @@
     
     <!-- HEADER BAR: Tombol Navigasi di Kiri, Logo di Kanan -->
     <div class="header-bar">
-      <!-- 1. Tombol Navigasi Utama (Di Kiri) -->
+      <!-- Tombol Navigasi Utama -->
       <div id="nav-wrapper" style="display: none;">
         <button class="menu-trigger-btn" onclick="toggleMenu()">
           <span>☰ Navigasi Menu</span>
@@ -409,7 +414,7 @@
         </div>
       </div>
 
-      <!-- Logo Aetra Air Tangerang (Di Kanan) -->
+      <!-- Logo Aetra Air Tangerang -->
       <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
@@ -442,7 +447,6 @@
           <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text-main);">Form Input Bacaan Meter</h2>
           
           <form id="form-input-bacaan">
-            <!-- Tanggal dan Waktu Pembacaan -->
             <div class="grid-2">
               <div class="form-group">
                 <label>Tanggal Baca <span>*</span></label>
@@ -456,7 +460,7 @@
 
             <div class="form-group">
               <label>ID Pelanggan <span>*</span></label>
-              <input type="text" id="customer_id" class="form-control" placeholder="Contoh: PLG-00123" required>
+              <input type="text" id="customer_id" class="form-control" placeholder="Contoh: PLG-00123" required onchange="simulateFetchLastMonthMeter()">
             </div>
 
             <div class="form-group">
@@ -469,20 +473,28 @@
                 <label>Cycle (1 - 15) <span>*</span></label>
                 <input type="number" id="cycle" class="form-control" min="1" max="15" placeholder="1" required>
               </div>
+
+              <!-- 3. BACAAN STAND BULAN LALU (Data Dummy Auto Fill) -->
               <div class="form-group">
-                <label>Stand Meter Air (m³) <span>*</span></label>
-                <input type="number" step="0.01" id="stand_meter" class="form-control" placeholder="0000.00" required>
+                <label>Stand Bulan Lalu (m³)</label>
+                <input type="number" id="stand_bulan_lalu" class="form-control" value="1250.00" readonly>
               </div>
             </div>
 
-            <div class="file-upload-box">
-              <label>1. Foto Stand Meter Air <span>*</span></label>
-              <input type="file" id="foto_stand_meter" accept="image/*" required />
+            <div class="form-group">
+              <label>Stand Meter Air Sekarang (m³) <span>*</span></label>
+              <input type="number" step="0.01" id="stand_meter" class="form-control" placeholder="0000.00" required>
             </div>
 
-            <div class="file-upload-box">
-              <label>2. Foto Berkas Cetak & TTD PIC <span>*</span></label>
-              <input type="file" id="foto_berkas" accept="image/*" required />
+            <!-- 1 & 2. AMBIL FOTO HANYA DARI KAMERA DIRECT (capture="environment") -->
+            <div class="camera-upload-box">
+              <label>📷 1. Ambil Foto Stand Meter (Wajib Kamera) <span>*</span></label>
+              <input type="file" id="foto_stand_meter" accept="image/*" capture="environment" required />
+            </div>
+
+            <div class="camera-upload-box">
+              <label>📷 2. Ambil Foto Berkas Cetak & TTD PIC (Wajib Kamera) <span>*</span></label>
+              <input type="file" id="foto_berkas" accept="image/*" capture="environment" required />
             </div>
 
             <!-- Map Picker Interaktif -->
@@ -512,7 +524,7 @@
     </div>
   </div>
 
-  <!-- JS INTEGRASI & LOGIKA MENU -->
+  <!-- JS INTEGRASI & LOGIKA STAMP -->
   <script>
     const SUPABASE_URL = 'https://dntuitawhmpqkbepnmwk.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY'; 
@@ -520,16 +532,14 @@
 
     let loggedInOfficer = null;
     let map, marker;
-    let selectedLat = null;
-    let selectedLng = null;
+    let selectedLat = -6.175392;
+    let selectedLng = 106.827153;
 
-    // Toggle Tampilan Dropdown Navigasi
     function toggleMenu() {
       const dropdown = document.getElementById('nav-dropdown');
       dropdown.classList.toggle('show');
     }
 
-    // Menutup menu jika mengeklik di luar area menu
     window.addEventListener('click', function(e) {
       const wrapper = document.getElementById('nav-wrapper');
       if (wrapper && !wrapper.contains(e.target)) {
@@ -537,23 +547,28 @@
       }
     });
 
-    // Set nilai default tanggal & waktu saat ini
     function setTodayDateTime() {
       const now = new Date();
       document.getElementById('reading_date').value = now.toISOString().split('T')[0];
       document.getElementById('reading_time').value = now.toTimeString().split(' ')[0].substring(0, 5);
     }
 
-    // Inisialisasi Peta
-    function initMapPicker() {
-      const defaultLat = -6.175392;
-      const defaultLng = 106.827153;
+    // Dummy Stand Meter Bulan Lalu berdasarkan ID Pelanggan
+    function simulateFetchLastMonthMeter() {
+      const id = document.getElementById('customer_id').value;
+      if(id) {
+        // Contoh angka acak dummy jika terisi
+        const dummyValue = (1000 + Math.floor(Math.random() * 500)).toFixed(2);
+        document.getElementById('stand_bulan_lalu').value = dummyValue;
+      }
+    }
 
+    function initMapPicker() {
       if (!map) {
-        map = L.map('map-picker').setView([defaultLat, defaultLng], 13);
+        map = L.map('map-picker').setView([selectedLat, selectedLng], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-        marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+        marker = L.marker([selectedLat, selectedLng], { draggable: true }).addTo(map);
 
         marker.on('dragend', function () {
           const latlng = marker.getLatLng();
@@ -636,17 +651,71 @@
       }
     }
 
-    async function uploadPhoto(fileInputId, pathPrefix) {
+    /* 2. FUNGSI MENAMBAHKAN TIMESTAMP WATERMARK KE DALAM GAMBAR */
+    function addTimestampWatermark(file, timestampText) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            // Gambar foto asli
+            ctx.drawImage(img, 0, 0);
+
+            // Tentukan ukuran font relatif
+            const fontSize = Math.max(16, Math.floor(img.width / 28));
+            ctx.font = `bold ${fontSize}px sans-serif`;
+
+            // Latar belakang transparan hitam di bagian bawah foto
+            const padding = fontSize * 0.8;
+            const bannerHeight = fontSize * 2.5 + padding;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+            ctx.fillRect(0, img.height - bannerHeight, img.width, bannerHeight);
+
+            // Teks Timestamp
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(timestampText.line1, padding, img.height - bannerHeight + fontSize + 4);
+            ctx.fillStyle = '#fde047'; // Warna kuning terang untuk koordinat GPS
+            ctx.fillText(timestampText.line2, padding, img.height - bannerHeight + (fontSize * 2) + 8);
+
+            // Export Canvas kembali ke Blob / File
+            canvas.toBlob((blob) => {
+              const watermarkedFile = new File([blob], file.name, { type: file.type });
+              resolve(watermarkedFile);
+            }, file.type, 0.92);
+          };
+        };
+      });
+    }
+
+    async function processAndUploadPhoto(fileInputId, pathPrefix, timeStr, lat, lng) {
       const fileInput = document.getElementById(fileInputId);
       if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
 
-      const file = fileInput.files[0];
-      const fileExt = file.name.split('.').pop();
+      const originalFile = fileInput.files[0];
+
+      // Format timestamp Tgl/Waktu & LongLat
+      const timestampText = {
+        line1: `🕒 Waktu Baca: ${timeStr}`,
+        line2: `📍 GPS: Lat ${lat.toFixed(6)}, Lng ${lng.toFixed(6)}`
+      };
+
+      // Proses Stamp Teks pada Gambar
+      const watermarkedFile = await addTimestampWatermark(originalFile, timestampText);
+
+      const fileExt = originalFile.name.split('.').pop();
       const fileName = `${pathPrefix}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
       const { error } = await _supabase.storage
         .from('meter-photos')
-        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+        .upload(fileName, watermarkedFile, { cacheControl: '3600', upsert: false });
 
       if (error) return null;
 
@@ -661,11 +730,16 @@
       e.preventDefault();
       const btn = document.getElementById('btn-submit-reading');
       btn.disabled = true;
-      btn.textContent = 'MENGIRIM DATA...';
+      btn.textContent = 'MENAMBAHKAN TIMESTAMP & MENGIRIM...';
 
       try {
-        const urlFotoMeter = await uploadPhoto('foto_stand_meter', 'stand_meter');
-        const urlFotoBerkas = await uploadPhoto('foto_berkas', 'berkas');
+        const readingDate = document.getElementById('reading_date').value;
+        const readingTime = document.getElementById('reading_time').value;
+        const formattedTimeStr = `${readingDate} ${readingTime}`;
+
+        // Proses Stamp Timestamp & Upload Kamera
+        const urlFotoMeter = await processAndUploadPhoto('foto_stand_meter', 'stand_meter', formattedTimeStr, selectedLat, selectedLng);
+        const urlFotoBerkas = await processAndUploadPhoto('foto_berkas', 'berkas', formattedTimeStr, selectedLat, selectedLng);
 
         const { data: officerData } = await _supabase
           .from('officers')
@@ -673,16 +747,17 @@
           .eq('auth_id', loggedInOfficer.id)
           .maybeSingle();
 
-        const readingDate = document.getElementById('reading_date').value;
-        const readingTime = document.getElementById('reading_time').value;
         const combinedTimestamp = new Date(`${readingDate}T${readingTime}`).toISOString();
+        const standLaluVal = parseFloat(document.getElementById('stand_bulan_lalu').value) || 0;
+        const standSekarangVal = parseFloat(document.getElementById('stand_meter').value) || 0;
 
         const payload = {
           officer_id: officerData ? officerData.id : null,
           customer_id: document.getElementById('customer_id').value,
           company_name: document.getElementById('company_name').value,
           cycle: parseInt(document.getElementById('cycle').value),
-          stand_meter: parseFloat(document.getElementById('stand_meter').value),
+          stand_bulan_lalu: standLaluVal,
+          stand_meter: standSekarangVal,
           foto_stand_meter: urlFotoMeter,
           foto_berkas: urlFotoBerkas,
           latitude: selectedLat,
@@ -693,7 +768,7 @@
         const { error } = await _supabase.from('meter_readings').insert([payload]);
         if (error) throw error;
 
-        alert('✅ Data hasil bacaan meter berhasil disimpan!');
+        alert('✅ Data hasil bacaan meter berhasil disimpan lengkap dengan timestamp foto!');
         document.getElementById('form-input-bacaan').reset();
         setTodayDateTime();
 
@@ -705,7 +780,7 @@
       }
     });
 
-    // 2 & 3. Grouping Berdasarkan Nama Petugas + Kolom Latitude & Longitude
+    // LOAD HASIL BACAAN GROUPED BY OFFICER
     async function loadDataHasilBaca() {
       const container = document.getElementById('grouped-data-container');
       container.innerHTML = '<p style="color: var(--text-muted); padding: 12px; font-size: 13px;">Memuat data...</p>';
@@ -725,7 +800,6 @@
         return;
       }
 
-      // Grouping data berdasarkan email / nama petugas
       const grouped = {};
       data.forEach(row => {
         const officerName = row.officers ? row.officers.email : 'Petugas Tidak Teridentifikasi';
@@ -737,7 +811,6 @@
 
       let html = '';
 
-      // Render setiap group petugas
       for (const [officer, items] of Object.entries(grouped)) {
         html += `
           <div class="officer-group">
@@ -753,7 +826,9 @@
                     <th>ID Pelanggan</th>
                     <th>Perusahaan</th>
                     <th>Cycle</th>
-                    <th>Stand Meter</th>
+                    <th>Stand Bln Lalu</th>
+                    <th>Stand Sekrg</th>
+                    <th>Pemakaian</th>
                     <th>Latitude</th>
                     <th>Longitude</th>
                     <th>Foto Stand</th>
@@ -767,6 +842,8 @@
         items.forEach(row => {
           const latVal = row.latitude ? row.latitude.toFixed(6) : '-';
           const lngVal = row.longitude ? row.longitude.toFixed(6) : '-';
+          const standLalu = row.stand_bulan_lalu ?? 1250.00;
+          const usage = (row.stand_meter - standLalu).toFixed(2);
 
           const fotoStandHtml = row.foto_stand_meter 
             ? `<a href="${row.foto_stand_meter}" target="_blank"><img src="${row.foto_stand_meter}" class="img-preview" alt="Foto Stand"></a>` 
@@ -786,7 +863,9 @@
               <td><b>${row.customer_id}</b></td>
               <td>${row.company_name}</td>
               <td>${row.cycle}</td>
-              <td>${row.stand_meter} m³</td>
+              <td style="color: var(--text-muted);">${standLalu} m³</td>
+              <td><b>${row.stand_meter} m³</b></td>
+              <td style="color: var(--primary-color); font-weight:700;">${usage > 0 ? usage : 0} m³</td>
               <td><span class="coord-badge">${latVal}</span></td>
               <td><span class="coord-badge">${lngVal}</span></td>
               <td>${fotoStandHtml}</td>
