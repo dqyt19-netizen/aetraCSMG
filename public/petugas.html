@@ -26,7 +26,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       width: 100%;
-      max-width: 900px;
+      max-width: 1100px; /* Diperlebar sedikit agar peta & foto muat rapi */
       overflow: hidden;
     }
     .header {
@@ -98,6 +98,7 @@
     .content-body {
       flex: 1;
       padding: 25px;
+      overflow-x: auto;
     }
     /* Auth Form Styling */
     .auth-container {
@@ -180,12 +181,33 @@
     table th, table td {
       border: 1px solid #e2e8f0;
       padding: 10px;
-      text-align: left;
+      text-align: center;
+      vertical-align: middle;
     }
     table th {
       background-color: #f8fafc;
       font-weight: bold;
       color: #334155;
+    }
+
+    /* Thumbnail Gambar & Embed Map */
+    .img-preview {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .img-preview:hover {
+      transform: scale(1.08);
+    }
+    .map-frame {
+      width: 150px;
+      height: 100px;
+      border: none;
+      border-radius: 6px;
     }
   </style>
 </head>
@@ -374,33 +396,33 @@
 
     // 7. Fungsi Upload Foto ke Storage
     async function uploadPhoto(fileInputId, pathPrefix) {
-  const fileInput = document.getElementById(fileInputId);
-  if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
+      const fileInput = document.getElementById(fileInputId);
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
 
-  const file = fileInput.files[0];
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${pathPrefix}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const file = fileInput.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${pathPrefix}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-  // Upload file ke Storage Supabase
-  const { data, error } = await _supabase.storage
-    .from('meter-photos')
-    .upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: false
-    });
+      // Upload file ke Storage Supabase
+      const { data, error } = await _supabase.storage
+        .from('meter-photos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-  if (error) {
-    console.error(`Gagal upload ${fileInputId}:`, error.message);
-    return null;
-  }
+      if (error) {
+        console.error(`Gagal upload ${fileInputId}:`, error.message);
+        return null;
+      }
 
-  // Ambil URL Publik
-  const { data: publicUrlData } = _supabase.storage
-    .from('meter-photos')
-    .getPublicUrl(fileName);
+      // Ambil URL Publik
+      const { data: publicUrlData } = _supabase.storage
+        .from('meter-photos')
+        .getPublicUrl(fileName);
 
-  return publicUrlData.publicUrl;
-}
+      return publicUrlData.publicUrl;
+    }
 
     // 8. Submit Form Bacaan Meter
     document.getElementById('form-input-bacaan').addEventListener('submit', async (e) => {
@@ -449,7 +471,7 @@
       }
     });
 
-    // 9. Load Tabel Data Hasil Baca
+    // 9. Load Tabel Data Hasil Baca (Diperbarui dengan Preview Gambar & Maps Embed)
     async function loadDataHasilBaca() {
       const container = document.getElementById('table-wrapper');
       container.innerHTML = '<p style="color: #64748b;">Memuat data...</p>';
@@ -480,13 +502,28 @@
               <th>Stand Meter</th>
               <th>Foto Stand</th>
               <th>Foto Berkas</th>
-              <th>GPS</th>
+              <th>Lokasi GPS</th>
             </tr>
           </thead>
           <tbody>
       `;
 
       data.forEach(row => {
+        // Thumbnail Foto Stand Meter
+        const fotoStandHtml = row.foto_stand_meter 
+          ? `<a href="${row.foto_stand_meter}" target="_blank" title="Klik untuk memperbesar"><img src="${row.foto_stand_meter}" class="img-preview" alt="Foto Stand"></a>` 
+          : '-';
+
+        // Thumbnail Foto Berkas
+        const fotoBerkasHtml = row.foto_berkas 
+          ? `<a href="${row.foto_berkas}" target="_blank" title="Klik untuk memperbesar"><img src="${row.foto_berkas}" class="img-preview" alt="Foto Berkas"></a>` 
+          : '-';
+
+        // Embed Google Maps Interaktif
+        const mapHtml = (row.latitude && row.longitude)
+          ? `<iframe class="map-frame" src="https://maps.google.com/maps?q=${row.latitude},${row.longitude}&z=15&output=embed" loading="lazy"></iframe>`
+          : '-';
+
         html += `
           <tr>
             <td>${new Date(row.created_at).toLocaleString('id-ID')}</td>
@@ -494,9 +531,9 @@
             <td>${row.company_name}</td>
             <td>${row.cycle}</td>
             <td>${row.stand_meter} m³</td>
-            <td>${row.foto_stand_meter ? `<a href="${row.foto_stand_meter}" target="_blank">Foto</a>` : '-'}</td>
-            <td>${row.foto_berkas ? `<a href="${row.foto_berkas}" target="_blank">Berkas</a>` : '-'}</td>
-            <td>${row.latitude ? `<a href="https://maps.google.com/?q=${row.latitude},${row.longitude}" target="_blank">Maps</a>` : '-'}</td>
+            <td>${fotoStandHtml}</td>
+            <td>${fotoBerkasHtml}</td>
+            <td>${mapHtml}</td>
           </tr>
         `;
       });
