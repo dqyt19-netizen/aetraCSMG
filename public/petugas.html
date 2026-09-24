@@ -13,343 +13,468 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
+    :root {
+      --primary-color: #0284c7;
+      --primary-hover: #0369a1;
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --danger-color: #ef4444;
+    }
+
     * {
       box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
     }
+
     body {
-      background-color: #f4f6f9;
+      background-color: var(--bg-color);
+      color: var(--text-main);
       display: flex;
       justify-content: center;
-      padding: 15px;
-    }
-    .card-container {
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      width: 100%;
-      max-width: 1000px;
-      overflow: hidden;
-    }
-    .header {
-      text-align: center;
-      padding: 20px;
-      border-bottom: 1px solid #eef0f3;
-    }
-    .header img {
-      max-height: 50px;
-    }
-    .main-content {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 16px;
     }
 
-    /* 1 & 2. Tampilan Navigasi Ringkas Berupa Tombol Responsif HP */
-    .top-nav {
+    .app-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      width: 100%;
+      max-width: 600px; /* Ukuran proporsional & nyaman diakses lewat HP/Tablet */
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Header Ringkas & Rapi */
+    .header-bar {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
       justify-content: space-between;
       align-items: center;
-      background: #fafbfc;
-      padding: 12px 15px;
-      border-radius: 10px;
-      border: 1px solid #eef0f3;
-      margin-bottom: 20px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: #ffffff;
+      position: relative;
     }
-    .nav-group {
-      display: flex;
+
+    .header-bar img {
+      height: 36px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* 1. Tombol Navigasi Utama */
+    .menu-trigger-btn {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
-    }
-    .nav-btn {
+      background: #f8fafc;
+      border: 1px solid var(--border-color);
       padding: 8px 14px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      background: #ffffff;
-      color: #334155;
-      font-weight: bold;
-      font-size: 13px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
       cursor: pointer;
-      transition: all 0.2s;
-    }
-    .nav-btn.active {
-      background-color: #2563eb;
-      color: #ffffff;
-      border-color: #2563eb;
-    }
-    .logout-btn {
-      background-color: #fef2f2;
-      color: #ef4444;
-      border-color: #fca5a5;
-    }
-    .user-info {
-      font-size: 12px;
-      font-weight: bold;
-      color: #2563eb;
+      transition: all 0.2s ease;
     }
 
-    /* 2. Style Login yang Konsisten dengan Index */
-    .auth-container {
-      max-width: 900px;
-      width: 100%;
-      margin: 20px auto;
+    .menu-trigger-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    /* Menu Dropdown / Overlay Navigasi */
+    .nav-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 20px;
+      width: 260px;
       background: #ffffff;
+      border: 1px solid var(--border-color);
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      overflow: hidden;
-    }
-    .auth-box {
-      max-width: 400px;
-      margin: 0 auto;
-      padding: 30px 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      padding: 8px;
     }
 
-    .form-group {
-      margin-bottom: 15px;
-      text-align: left;
+    .nav-dropdown.show {
+      display: block;
     }
+
+    .user-profile-item {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 6px;
+    }
+
+    .user-profile-item .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    .user-profile-item .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    .nav-item-btn {
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s;
+    }
+
+    .nav-item-btn:hover {
+      background: #f8fafc;
+    }
+
+    .nav-item-btn.active {
+      background: #eff6ff;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .nav-item-btn.logout {
+      color: var(--danger-color);
+      margin-top: 4px;
+      border-top: 1px solid var(--border-color);
+      border-radius: 0 0 8px 8px;
+      padding-top: 12px;
+    }
+
+    /* Container Konten */
+    .content-body {
+      padding: 20px;
+    }
+
+    /* Tampilan Auth / Login Konsisten */
+    .auth-box {
+      padding: 10px 5px;
+    }
+
+    .auth-title {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .auth-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    /* Styling Form Proporsional */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
     .form-group label {
       display: block;
       font-size: 13px;
-      font-weight: bold;
+      font-weight: 600;
       color: #334155;
       margin-bottom: 6px;
     }
+
     .form-group label span {
-      color: #ef4444;
+      color: var(--danger-color);
     }
-    input[type="text"],
-    input[type="number"],
-    input[type="email"],
-    input[type="password"],
-    input[type="date"],
-    input[type="time"] {
+
+    .form-control {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
       font-size: 14px;
       outline: none;
+      background: #ffffff;
+      transition: border-color 0.2s;
     }
-    .file-upload-box {
-      background-color: #eff6ff;
-      border: 1px solid #dbeafe;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 15px;
+
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
     }
-    .file-upload-box label {
-      font-size: 13px;
-      font-weight: bold;
-      color: #1e40af;
-      display: block;
-      margin-bottom: 8px;
-    }
-    .btn-submit {
-      width: 100%;
-      background-color: #2563eb;
-      color: #ffffff;
-      border: none;
-      padding: 14px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .btn-submit:disabled {
-      background-color: #94a3b8;
-      cursor: not-allowed;
-    }
+
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
+      gap: 12px;
     }
 
-    /* 4. Map Picker Interaktif */
+    /* Upload Box */
+    .file-upload-box {
+      background-color: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .file-upload-box label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .file-upload-box input[type="file"] {
+      font-size: 12px;
+    }
+
+    /* Map Styling */
     #map-picker {
-      height: 220px;
+      height: 200px;
       width: 100%;
       border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      margin-top: 5px;
-      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
+      margin-top: 6px;
+    }
+
+    .coords-info {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* Button Action */
+    .btn-primary {
+      width: 100%;
+      background-color: var(--primary-color);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-primary:disabled {
+      background-color: #94a3b8;
+      cursor: not-allowed;
     }
 
     /* Table Styling */
     .table-responsive {
       overflow-x: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
       font-size: 13px;
+      background: #ffffff;
     }
+
     table th, table td {
-      border: 1px solid #e2e8f0;
-      padding: 10px;
-      text-align: center;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
       vertical-align: middle;
     }
+
     table th {
       background-color: #f8fafc;
-      font-weight: bold;
-      color: #334155;
+      font-weight: 600;
+      color: #475569;
+      white-space: nowrap;
     }
+
     .img-preview {
-      width: 70px;
-      height: 70px;
+      width: 50px;
+      height: 50px;
       object-fit: cover;
       border-radius: 6px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border-color);
     }
+
     .map-frame {
-      width: 140px;
-      height: 90px;
+      width: 120px;
+      height: 70px;
       border: none;
       border-radius: 6px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 480px) {
       .grid-2 {
         grid-template-columns: 1fr;
       }
-      .top-nav {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .nav-group {
-        width: 100%;
-      }
-      .nav-group .nav-btn {
-        flex: 1;
+      .app-card {
+        border-radius: 12px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- ================= SEKSI 1: LOGIN ================= -->
-  <div id="auth-section" class="auth-container">
-    <div class="header">
+  <div class="app-card">
+    
+    <!-- HEADER BAR -->
+    <div class="header-bar">
       <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
-    </div>
-    <div class="auth-box">
-      <h2 style="margin-bottom: 20px; color: #1e293b; text-align: center;">Login Petugas</h2>
-      <form id="form-login">
-        <div class="form-group">
-          <label>Email Petugas</label>
-          <input type="email" id="login-email" placeholder="petugas@aetra.co.id" required>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="login-password" placeholder="••••••••" required>
-        </div>
-        <button type="submit" class="btn-submit" style="margin-top: 10px;">MASUK</button>
-      </form>
-    </div>
-  </div>
+      
+      <!-- 1. Tombol Navigasi Utama (Hanya Tampil Saat Logged In) -->
+      <div id="nav-wrapper" style="display: none;">
+        <button class="menu-trigger-btn" onclick="toggleMenu()">
+          <span>☰ Navigasi Menu</span>
+        </button>
 
-  <!-- ================= SEKSI 2: DASHBOARD PETUGAS ================= -->
-  <div id="app-section" class="card-container" style="display: none;">
-    <!-- Header -->
-    <div class="header">
-      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
-    </div>
-
-    <div class="main-content">
-      <!-- 1. Navigasi Berupa Tombol Ringkas (Ramah HP) -->
-      <div class="top-nav">
-        <div class="nav-group">
-          <button id="btn-tab-input" class="nav-btn active" onclick="switchTab('input')">📝 Input Bacaan</button>
-          <button id="btn-tab-hasil" class="nav-btn" onclick="switchTab('hasil')">📋 Hasil Baca All Petugas</button>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="user-info" id="display-email">-</span>
-          <button class="nav-btn logout-btn" onclick="logout()">🚪 Keluar</button>
-        </div>
-      </div>
-
-      <!-- Tab 1: Form Input Bacaan -->
-      <div id="tab-input-container">
-        <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 20px;">Form Input Bacaan Meter</h2>
-        
-        <form id="form-input-bacaan">
-          <!-- 3. Pilihan Tanggal dan Waktu Pembacaan -->
-          <div class="grid-2">
-            <div class="form-group">
-              <label>Tanggal Baca <span>*</span></label>
-              <input type="date" id="reading_date" required>
-            </div>
-            <div class="form-group">
-              <label>Waktu Pembacaan <span>*</span></label>
-              <input type="time" id="reading_time" required>
-            </div>
+        <!-- Dropdown Menu Opsi -->
+        <div class="nav-dropdown" id="nav-dropdown">
+          <div class="user-profile-item">
+            <div class="label">Petugas Aktif</div>
+            <div class="name" id="display-email">petugas@aetra.co.id</div>
           </div>
-
-          <div class="form-group">
-            <label>ID Pelanggan <span>*</span></label>
-            <input type="text" id="customer_id" required>
-          </div>
-
-          <div class="form-group">
-            <label>Nama Perusahaan / Consumer <span>*</span></label>
-            <input type="text" id="company_name" required>
-          </div>
-
-          <div class="grid-2">
-            <div class="form-group">
-              <label>Cycle (1 - 15) <span>*</span></label>
-              <input type="number" id="cycle" min="1" max="15" required>
-            </div>
-            <div class="form-group">
-              <label>Stand Meter Air (m³) <span>*</span></label>
-              <input type="number" step="0.01" id="stand_meter" required>
-            </div>
-          </div>
-
-          <div class="file-upload-box">
-            <label>1. Foto Stand Meter Air <span>*</span></label>
-            <input type="file" id="foto_stand_meter" accept="image/*" required />
-          </div>
-
-          <div class="file-upload-box">
-            <label>2. Foto Berkas Cetak & TTD PIC <span>*</span></label>
-            <input type="file" id="foto_berkas" accept="image/*" required />
-          </div>
-
-          <!-- 4. Peta Interaktif untuk Adjust Lokasi Petugas -->
-          <div class="form-group">
-            <label>Penyesuaian Lokasi GPS (Geser Pin Peta Jika Perlu) <span>*</span></label>
-            <div id="map-picker"></div>
-            <small style="color: #64748b; font-size: 11px;">Koordinat Terpilih: <span id="coords-text">Mendeteksi lokasi GPS...</span></small>
-          </div>
-
-          <button type="submit" id="btn-submit-reading" class="btn-submit">
-            KIRIM DATA BACAAN
+          <button id="btn-menu-input" class="nav-item-btn active" onclick="switchTab('input')">
+            📝 Input Bacaan
           </button>
-        </form>
+          <button id="btn-menu-hasil" class="nav-item-btn" onclick="switchTab('hasil')">
+            📋 Hasil Bacaan All Petugas
+          </button>
+          <button class="nav-item-btn logout" onclick="logout()">
+            🚪 Keluar / Logout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-body">
+      <!-- ================= SEKSI 1: FORM LOGIN ================= -->
+      <div id="auth-section">
+        <div class="auth-box">
+          <div class="auth-title">Login Petugas</div>
+          <div class="auth-subtitle">Masukkan akun petugas untuk mencatat bacaan meter</div>
+          
+          <form id="form-login">
+            <div class="form-group">
+              <label>Email Petugas</label>
+              <input type="email" id="login-email" class="form-control" placeholder="petugas@aetra.co.id" required>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-primary" style="margin-top: 10px;">MASUK</button>
+          </form>
+        </div>
       </div>
 
-      <!-- Tab 2: Data Hasil Baca -->
-      <div id="tab-hasil-container" style="display: none;">
-        <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 5px;">Data Hasil Baca Seluruh Petugas</h2>
-        <p style="font-size: 12px; color: #64748b; margin-bottom: 15px;">Semua petugas dapat melihat hasil baca petugas lainnya.</p>
+      <!-- ================= SEKSI 2: DASHBOARD PETUGAS ================= -->
+      <div id="app-section" style="display: none;">
         
-        <div class="table-responsive" id="table-wrapper">
-          <p style="color: #64748b;">Memuat data...</p>
+        <!-- TAB 1: FORM INPUT BACAAN -->
+        <div id="tab-input-container">
+          <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text-main);">Form Input Bacaan Meter</h2>
+          
+          <form id="form-input-bacaan">
+            <!-- Tanggal dan Waktu Pembacaan -->
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Tanggal Baca <span>*</span></label>
+                <input type="date" id="reading_date" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label>Waktu Pembacaan <span>*</span></label>
+                <input type="time" id="reading_time" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>ID Pelanggan <span>*</span></label>
+              <input type="text" id="customer_id" class="form-control" placeholder="Contoh: PLG-00123" required>
+            </div>
+
+            <div class="form-group">
+              <label>Nama Perusahaan / Consumer <span>*</span></label>
+              <input type="text" id="company_name" class="form-control" placeholder="Contoh: PT. Sumber Makmur" required>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label>Cycle (1 - 15) <span>*</span></label>
+                <input type="number" id="cycle" class="form-control" min="1" max="15" placeholder="1" required>
+              </div>
+              <div class="form-group">
+                <label>Stand Meter Air (m³) <span>*</span></label>
+                <input type="number" step="0.01" id="stand_meter" class="form-control" placeholder="0000.00" required>
+              </div>
+            </div>
+
+            <div class="file-upload-box">
+              <label>1. Foto Stand Meter Air <span>*</span></label>
+              <input type="file" id="foto_stand_meter" accept="image/*" required />
+            </div>
+
+            <div class="file-upload-box">
+              <label>2. Foto Berkas Cetak & TTD PIC <span>*</span></label>
+              <input type="file" id="foto_berkas" accept="image/*" required />
+            </div>
+
+            <!-- Map Picker Interaktif -->
+            <div class="form-group">
+              <label>Penyesuaian Lokasi GPS (Geser Pin Peta) <span>*</span></label>
+              <div id="map-picker"></div>
+              <span class="coords-info">Koordinat: <strong id="coords-text">Mendeteksi lokasi...</strong></span>
+            </div>
+
+            <button type="submit" id="btn-submit-reading" class="btn-primary" style="margin-top: 8px;">
+              KIRIM DATA BACAAN
+            </button>
+          </form>
         </div>
+
+        <!-- TAB 2: DATA HASIL BACA -->
+        <div id="tab-hasil-container" style="display: none;">
+          <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text-main);">Hasil Bacaan Seluruh Petugas</h2>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Setiap petugas dapat memantau hasil baca petugas lainnya.</p>
+          
+          <div class="table-responsive" id="table-wrapper">
+            <p style="color: var(--text-muted); padding: 12px; font-size: 13px;">Memuat data...</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <!-- ================= SCRIPT INTEGRASI SUPABASE & MAP ================= -->
+  <!-- JS INTEGRASI & LOGIKA MENU -->
   <script>
     const SUPABASE_URL = 'https://dntuitawhmpqkbepnmwk.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY'; 
@@ -360,27 +485,39 @@
     let selectedLat = null;
     let selectedLng = null;
 
-    // Set nilai default tanggal & waktu hari ini
+    // Toggle Tampilan Dropdown Navigasi
+    function toggleMenu() {
+      const dropdown = document.getElementById('nav-dropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    // Menutup menu jika mengeklik di luar area menu
+    window.addEventListener('click', function(e) {
+      const wrapper = document.getElementById('nav-wrapper');
+      if (wrapper && !wrapper.contains(e.target)) {
+        document.getElementById('nav-dropdown').classList.remove('show');
+      }
+    });
+
+    // Set nilai default tanggal & waktu saat ini
     function setTodayDateTime() {
       const now = new Date();
       document.getElementById('reading_date').value = now.toISOString().split('T')[0];
       document.getElementById('reading_time').value = now.toTimeString().split(' ')[0].substring(0, 5);
     }
 
-    // Inisialisasi Map Picker
+    // Inisialisasi Peta
     function initMapPicker() {
       const defaultLat = -6.175392;
       const defaultLng = 106.827153;
 
       if (!map) {
         map = L.map('map-picker').setView([defaultLat, defaultLng], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
         marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
 
-        marker.on('dragend', function (e) {
+        marker.on('dragend', function () {
           const latlng = marker.getLatLng();
           selectedLat = latlng.lat;
           selectedLng = latlng.lng;
@@ -388,7 +525,6 @@
         });
       }
 
-      // Minta GPS pengguna
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition((pos) => {
           selectedLat = pos.coords.latitude;
@@ -410,11 +546,13 @@
         document.getElementById('display-email').textContent = session.user.email;
         document.getElementById('auth-section').style.display = 'none';
         document.getElementById('app-section').style.display = 'block';
+        document.getElementById('nav-wrapper').style.display = 'block';
         setTodayDateTime();
         initMapPicker();
       } else {
         document.getElementById('auth-section').style.display = 'block';
         document.getElementById('app-section').style.display = 'none';
+        document.getElementById('nav-wrapper').style.display = 'none';
       }
     }
 
@@ -438,8 +576,10 @@
     }
 
     function switchTab(tabName) {
-      const btnInput = document.getElementById('btn-tab-input');
-      const btnHasil = document.getElementById('btn-tab-hasil');
+      document.getElementById('nav-dropdown').classList.remove('show');
+      
+      const btnInput = document.getElementById('btn-menu-input');
+      const btnHasil = document.getElementById('btn-menu-hasil');
       const tabInput = document.getElementById('tab-input-container');
       const tabHasil = document.getElementById('tab-hasil-container');
 
@@ -470,10 +610,7 @@
         .from('meter-photos')
         .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
-      if (error) {
-        console.error(`Gagal upload ${fileInputId}:`, error.message);
-        return null;
-      }
+      if (error) return null;
 
       const { data: publicUrlData } = _supabase.storage
         .from('meter-photos')
@@ -516,7 +653,6 @@
         };
 
         const { error } = await _supabase.from('meter_readings').insert([payload]);
-
         if (error) throw error;
 
         alert('✅ Data hasil bacaan meter berhasil disimpan!');
@@ -531,29 +667,22 @@
       }
     });
 
-    // 5. Tampilan Hasil Bacaan Seluruh Petugas
     async function loadDataHasilBaca() {
       const container = document.getElementById('table-wrapper');
-      container.innerHTML = '<p style="color: #64748b;">Memuat data...</p>';
+      container.innerHTML = '<p style="color: var(--text-muted); padding: 12px; font-size: 13px;">Memuat data...</p>';
 
-      // Mengambil seluruh data hasil bacaan (termasuk nama petugas yang menginputnya)
       const { data, error } = await _supabase
         .from('meter_readings')
-        .select(`
-          *,
-          officers (
-            email
-          )
-        `)
+        .select(`*, officers ( email )`)
         .order('created_at', { ascending: false });
 
       if (error) {
-        container.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+        container.innerHTML = `<p style="color:red; padding: 12px;">Error: ${error.message}</p>`;
         return;
       }
 
       if (!data || data.length === 0) {
-        container.innerHTML = '<p style="color: #64748b;">Belum ada data hasil baca.</p>';
+        container.innerHTML = '<p style="color: var(--text-muted); padding: 12px; font-size: 13px;">Belum ada data hasil baca.</p>';
         return;
       }
 
@@ -591,8 +720,8 @@
 
         html += `
           <tr>
-            <td>${new Date(row.created_at).toLocaleString('id-ID')}</td>
-            <td><small style="color:#2563eb; font-weight:bold;">${emailPetugas}</small></td>
+            <td style="white-space: nowrap;">${new Date(row.created_at).toLocaleString('id-ID')}</td>
+            <td><strong style="color:var(--primary-color);">${emailPetugas}</strong></td>
             <td><b>${row.customer_id}</b></td>
             <td>${row.company_name}</td>
             <td>${row.cycle}</td>
