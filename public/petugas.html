@@ -7,123 +7,138 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-2 sm:p-4">
 
-  <div class="w-full max-w-2xl bg-white rounded-lg shadow-md p-6 border">
+  <!-- CONTAINER UTAMA -->
+  <div class="w-full max-w-5xl bg-white rounded-xl shadow-lg border overflow-hidden">
     
     <!-- HEADER LOGO -->
-    <div class="flex justify-center mb-4 pb-4 border-b">
-      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang" class="h-16 object-contain">
+    <div class="flex justify-center items-center p-4 border-b bg-white">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/Logo_Aetra_Air_Tangerang.jpg" alt="Logo Aetra Air Tangerang" class="h-12 object-contain">
     </div>
 
     <!-- SEKSI 1: FORM LOGIN PETUGAS -->
-    <div id="loginSection">
+    <div id="loginSection" class="p-6 max-w-md mx-auto">
       <h2 class="text-xl font-bold text-gray-800 text-center mb-4">Login Petugas Meter</h2>
       <form id="loginForm" class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Email / ID Petugas</label>
-          <input type="email" id="emailPetugas" placeholder="contoh: udin@aetra.co.id" required class="w-full p-2 border rounded mt-1 bg-white">
+          <input type="email" id="emailPetugas" placeholder="contoh: udin@aetra.co.id" required class="w-full p-2.5 border rounded mt-1 bg-white focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">Password</label>
-          <input type="password" id="password" required class="w-full p-2 border rounded mt-1">
+          <input type="password" id="password" required class="w-full p-2.5 border rounded mt-1 focus:ring-2 focus:ring-blue-500 outline-none">
         </div>
-        <button type="submit" id="btnLogin" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition">MASUK</button>
+        <button type="submit" id="btnLogin" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">MASUK</button>
       </form>
     </div>
 
-    <!-- SEKSI 2: DASHBOARD PETUGAS (PANEL MENU & FORM) -->
-    <div id="formSection" class="hidden space-y-6">
+    <!-- SEKSI 2: DASHBOARD PETUGAS (LAYOUT SIDEBAR KIRI) -->
+    <div id="formSection" class="hidden flex flex-col md:flex-row min-h-[500px]">
       
-      <!-- NAVIGASI & STATUS AKUN -->
-      <div class="flex flex-wrap justify-between items-center bg-gray-50 p-3 rounded border gap-2">
-        <div>
-          <p class="text-xs text-gray-500">Status Sesi:</p>
-          <p class="text-xs font-bold text-blue-700" id="userAccount">Petugas Logged In</p>
+      <!-- NAVIGASI SIDEBAR SISI KIRI (POIN 1) -->
+      <div class="w-full md:w-64 bg-gray-50 border-r border-gray-200 p-4 flex flex-col justify-between shrink-0 space-y-4">
+        <div class="space-y-4">
+          <!-- INFO USER -->
+          <div class="bg-white p-3 rounded-lg border">
+            <p class="text-[10px] text-gray-400 uppercase font-bold">Petugas Aktif</p>
+            <p class="text-xs font-bold text-blue-700 truncate" id="userAccount">Petugas</p>
+          </div>
+
+          <!-- TOMBOL MENU NAVIGASI KIRI -->
+          <nav class="space-y-2">
+            <button id="navInputBtn" onclick="switchTab('input')" class="w-full text-left px-4 py-3 rounded-lg text-sm font-bold bg-blue-600 text-white flex items-center space-x-2 transition">
+              <span>📝</span>
+              <span>Input Bacaan</span>
+            </button>
+            <button id="navHistoryBtn" onclick="switchTab('history')" class="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-200 flex items-center space-x-2 transition">
+              <span>📋</span>
+              <span>Data Hasil Baca</span>
+            </button>
+          </nav>
         </div>
-        <button onclick="logout()" class="text-xs text-red-600 font-bold bg-red-50 border border-red-200 px-3 py-1.5 rounded hover:bg-red-100">
-          Logout
+
+        <!-- TOMBOL LOGOUT DI BAWAH SIDEBAR -->
+        <button onclick="logout()" class="w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 flex items-center space-x-2">
+          <span>🚪</span>
+          <span>Keluar / Logout</span>
         </button>
       </div>
 
-      <!-- TAB PANEL NAVIGASI (POIN 1) -->
-      <div class="flex border-b border-gray-200">
-        <button id="tabInputBtn" onclick="switchTab('input')" class="py-2 px-4 text-sm font-bold border-b-2 border-blue-600 text-blue-600">
-          📝 Form Input Bacaan
-        </button>
-        <button id="tabHistoryBtn" onclick="switchTab('history')" class="py-2 px-4 text-sm font-bold text-gray-500 hover:text-blue-600">
-          📋 Data Hasil Baca Saya
-        </button>
-      </div>
+      <!-- KONTEN UTAMA (SISI KANAN) -->
+      <div class="flex-1 p-4 md:p-6 bg-white overflow-y-auto">
+        
+        <!-- PANEL 1: FORM INPUT BACAAN -->
+        <div id="panelInput" class="space-y-4 max-w-xl">
+          <h3 class="text-lg font-bold text-gray-800 border-b pb-2">Form Input Bacaan Meter</h3>
 
-      <!-- PANEL 1: FORM INPUT BACAAN (POIN 2: WAJIB DIISI / REQUIRED) -->
-      <div id="panelInput" class="space-y-4">
-        <h3 class="text-md font-bold text-gray-800">Input Pencatatan Meter Baru</h3>
+          <form id="meterForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">ID Pelanggan <span class="text-red-500">*</span></label>
+              <input type="text" id="idPelanggan" required class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            
+            <div>
+              <label class="block text-xs font-bold text-gray-700 mb-1">Nama Perusahaan / Consumer <span class="text-red-500">*</span></label>
+              <input type="text" id="namaPerusahaan" required class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
 
-        <form id="meterForm" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium">ID Pelanggan <span class="text-red-500">*</span></label>
-            <input type="text" id="idPelanggan" required class="w-full p-2 border rounded">
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium">Nama Perusahaan / Consumer <span class="text-red-500">*</span></label>
-            <input type="text" id="namaPerusahaan" required class="w-full p-2 border rounded">
-          </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Cycle (1 - 15) <span class="text-red-500">*</span></label>
+                <input type="number" id="cycle" min="1" max="15" required class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Stand Meter Air (m³) <span class="text-red-500">*</span></label>
+                <input type="number" step="0.01" id="standMeter" required class="w-full p-2.5 border rounded focus:ring-2 focus:ring-blue-500 outline-none">
+              </div>
+            </div>
 
-          <div>
-            <label class="block text-sm font-medium">Pembacaan Cycle (1 - 15) <span class="text-red-500">*</span></label>
-            <input type="number" id="cycle" min="1" max="15" required class="w-full p-2 border rounded">
-          </div>
+            <!-- FOTO 1 -->
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <label class="block text-xs font-bold text-blue-900 mb-1">1. Foto Stand Meter Air <span class="text-red-500">*</span></label>
+              <input type="file" id="fotoMeter" accept="image/*" capture="environment" required class="w-full text-xs">
+            </div>
 
-          <div>
-            <label class="block text-sm font-medium">Stand Meter Air (m³) <span class="text-red-500">*</span></label>
-            <input type="number" step="0.01" id="standMeter" required class="w-full p-2 border rounded">
-          </div>
+            <!-- FOTO 2 -->
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <label class="block text-xs font-bold text-blue-900 mb-1">2. Foto Berkas Cetak & TTD PIC <span class="text-red-500">*</span></label>
+              <input type="file" id="fotoBerkas" accept="image/*" capture="environment" required class="w-full text-xs">
+            </div>
 
-          <!-- INPUT FOTO 1 -->
-          <div class="p-3 bg-blue-50 border border-blue-200 rounded">
-            <label class="block text-sm font-bold text-blue-900 mb-1">1. Foto Stand Meter Air <span class="text-red-500">*</span></label>
-            <input type="file" id="fotoMeter" accept="image/*" capture="environment" required class="w-full text-sm">
-          </div>
-
-          <!-- INPUT FOTO 2 -->
-          <div class="p-3 bg-blue-50 border border-blue-200 rounded">
-            <label class="block text-sm font-bold text-blue-900 mb-1">2. Foto Berkas Cetak & TTD PIC <span class="text-red-500">*</span></label>
-            <input type="file" id="fotoBerkas" accept="image/*" capture="environment" required class="w-full text-sm">
-          </div>
-
-          <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700 transition">
-            KIRIM DATA & KOORDINAT GPS
-          </button>
-        </form>
-      </div>
-
-      <!-- PANEL 2: TABEL DATA HASIL BACA TERKERJAKAN (POIN 1 & 3) -->
-      <div id="panelHistory" class="hidden space-y-4">
-        <div class="flex justify-between items-center">
-          <h3 class="text-md font-bold text-gray-800">Riwayat Hasil Bacaan</h3>
-          <button onclick="loadHistoryData()" class="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 border rounded">🔄 Refresh Data</button>
+            <button type="submit" id="btnSubmit" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">
+              KIRIM DATA & KOORDINAT GPS
+            </button>
+          </form>
         </div>
 
-        <div class="overflow-x-auto border rounded">
-          <table class="w-full text-left text-xs text-gray-600">
-            <thead class="bg-gray-100 text-gray-700 border-b">
-              <tr>
-                <th class="p-2">ID Pelanggan</th>
-                <th class="p-2">Perusahaan</th>
-                <th class="p-2">Stand</th>
-                <th class="p-2">Koordinat (Long, Lat)</th>
-                <th class="p-2">Foto</th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody">
-              <tr>
-                <td colspan="5" class="p-4 text-center text-gray-400">Memuat data...</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- PANEL 2: TABEL DATA HASIL BACA -->
+        <div id="panelHistory" class="hidden space-y-4">
+          <div class="flex justify-between items-center border-b pb-2">
+            <h3 class="text-lg font-bold text-gray-800">Data Hasil Baca Petugas</h3>
+            <button onclick="loadHistoryData()" class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1.5 border rounded-lg font-semibold">🔄 Refresh Data</button>
+          </div>
+
+          <div class="overflow-x-auto border rounded-lg">
+            <table class="w-full text-left text-xs text-gray-600">
+              <thead class="bg-gray-100 text-gray-700 border-b">
+                <tr>
+                  <th class="p-3">ID Pelanggan</th>
+                  <th class="p-3">Perusahaan</th>
+                  <th class="p-3">Stand</th>
+                  <th class="p-3">Koordinat (Long, Lat)</th>
+                  <th class="p-3">Foto</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="5" class="p-4 text-center text-gray-400">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+
       </div>
 
     </div>
@@ -132,14 +147,13 @@
 
   <script>
     // =========================================================================
-    // ISI DENGAN SUPABASE_URL DAN SUPABASE_KEY ANDA
+    // PASTIKAN KUNCI SUPABASE INI DIGANTI DENGAN MILIK ANDA
     // =========================================================================
     const SUPABASE_URL = "https://lfqhhyaxctbfaxjjytdz.supabase.co"; 
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmcWhoeWF4Y3RiZmF4amp5dGR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNjE4MTYsImV4cCI6MjEwNTczNzgxNn0.uungyF3lq6-XH8lxW6SLeJDkTh7_eW0F1ss0Qzc3f0A"; 
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Dapatkan Akun Terverifikasi
     async function checkSession() {
       try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -148,35 +162,35 @@
           document.getElementById('loginSection').classList.add('hidden');
           document.getElementById('formSection').classList.remove('hidden');
           document.getElementById('userAccount').innerText = session.user.email;
-          loadHistoryData(); // Otomatis muat data riwayat saat login
+          loadHistoryData();
         }
       } catch (err) {
         console.error("Session Error:", err);
       }
     }
 
-    // Fungsi Switch Tab Panel
+    // Fungsi Switch Navigasi Kiri
     function switchTab(tabName) {
       const panelInput = document.getElementById('panelInput');
       const panelHistory = document.getElementById('panelHistory');
-      const tabInputBtn = document.getElementById('tabInputBtn');
-      const tabHistoryBtn = document.getElementById('tabHistoryBtn');
+      const navInputBtn = document.getElementById('navInputBtn');
+      const navHistoryBtn = document.getElementById('navHistoryBtn');
 
       if (tabName === 'input') {
         panelInput.classList.remove('hidden');
         panelHistory.classList.add('hidden');
-        tabInputBtn.className = "py-2 px-4 text-sm font-bold border-b-2 border-blue-600 text-blue-600";
-        tabHistoryBtn.className = "py-2 px-4 text-sm font-bold text-gray-500 hover:text-blue-600";
+        navInputBtn.className = "w-full text-left px-4 py-3 rounded-lg text-sm font-bold bg-blue-600 text-white flex items-center space-x-2 transition";
+        navHistoryBtn.className = "w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-200 flex items-center space-x-2 transition";
       } else {
         panelInput.classList.add('hidden');
         panelHistory.classList.remove('hidden');
-        tabHistoryBtn.className = "py-2 px-4 text-sm font-bold border-b-2 border-blue-600 text-blue-600";
-        tabInputBtn.className = "py-2 px-4 text-sm font-bold text-gray-500 hover:text-blue-600";
+        navHistoryBtn.className = "w-full text-left px-4 py-3 rounded-lg text-sm font-bold bg-blue-600 text-white flex items-center space-x-2 transition";
+        navInputBtn.className = "w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-gray-600 hover:bg-gray-200 flex items-center space-x-2 transition";
         loadHistoryData();
       }
     }
 
-    // Login Process
+    // Login
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btnLogin');
@@ -207,7 +221,7 @@
       location.reload();
     }
 
-    // Upload Foto
+    // Helper Upload Foto
     async function uploadFile(fileInput, prefix) {
       const file = fileInput.files[0];
       const fileName = `${prefix}_${Date.now()}_${file.name}`;
@@ -220,11 +234,11 @@
       return `${SUPABASE_URL}/storage/v1/object/public/meter-proofs/${fileName}`;
     }
 
-    // Process Submit Data & GPS
+    // Submit Data
     document.getElementById('meterForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btnSubmit');
-      btn.innerText = "Mengambil Lokasi & Mengirim...";
+      btn.innerText = "Mengambil GPS & Mengirim...";
       btn.disabled = true;
 
       if (!navigator.geolocation) {
@@ -255,25 +269,28 @@
             foto_berkas_url: urlFotoBerkas
           }]);
 
-          if (error) throw error;
+          if (error) {
+            alert("Gagal Menyimpan ke Database:\n" + error.message + "\n\nSaran: Pastikan RLS di Supabase sudah di-Disable.");
+            throw error;
+          }
 
           alert("Data & Koordinat GPS berhasil disimpan!");
           document.getElementById('meterForm').reset();
-          switchTab('history'); // Pindah otomatis ke tab riwayat
+          switchTab('history');
         } catch (err) {
-          alert("Gagal mengirim data: " + err.message);
+          console.error(err);
         } finally {
           btn.innerText = "KIRIM DATA & KOORDINAT GPS";
           btn.disabled = false;
         }
       }, (err) => {
-        alert("Gagal membaca GPS. Aktifkan Izin Lokasi di browser/HP Anda.");
+        alert("Akses GPS ditolak/gagal. Mohon aktifkan izin lokasi HP Anda.");
         btn.innerText = "KIRIM DATA & KOORDINAT GPS";
         btn.disabled = false;
       }, { enableHighAccuracy: true });
     });
 
-    // Memuat Data Riwayat Bacaan Petugas
+    // Memuat Riwayat
     async function loadHistoryData() {
       const tableBody = document.getElementById('historyTableBody');
       tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Memuat data...</td></tr>';
@@ -288,7 +305,7 @@
 
         if (error) throw error;
 
-        if (data.length === 0) {
+        if (!data || data.length === 0) {
           tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-400">Belum ada data yang dikerjakan.</td></tr>';
           return;
         }
@@ -297,11 +314,11 @@
         data.forEach(item => {
           tableBody.innerHTML += `
             <tr class="border-b hover:bg-gray-50">
-              <td class="p-2 font-bold">${item.id_pelanggan}</td>
-              <td class="p-2">${item.nama_perusahaan}</td>
-              <td class="p-2">${item.stand_meter} m³</td>
-              <td class="p-2 font-mono text-[10px]">${item.longitude.toFixed(5)}, ${item.latitude.toFixed(5)}</td>
-              <td class="p-2">
+              <td class="p-3 font-bold">${item.id_pelanggan}</td>
+              <td class="p-3">${item.nama_perusahaan}</td>
+              <td class="p-3">${item.stand_meter} m³</td>
+              <td class="p-3 font-mono text-[10px]">${item.longitude ? item.longitude.toFixed(5) : '-'}, ${item.latitude ? item.latitude.toFixed(5) : '-'}</td>
+              <td class="p-3">
                 <a href="${item.foto_meter_url}" target="_blank" class="text-blue-600 underline text-[10px]">Meter</a> | 
                 <a href="${item.foto_berkas_url}" target="_blank" class="text-blue-600 underline text-[10px]">Berkas</a>
               </td>
@@ -309,7 +326,7 @@
           `;
         });
       } catch (err) {
-        tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Error: ${err.message}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Gagal memuat: ${err.message}</td></tr>`;
       }
     }
 
