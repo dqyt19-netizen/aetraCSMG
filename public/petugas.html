@@ -393,7 +393,7 @@
       <!-- Tombol Navigasi Utama -->
       <div id="nav-wrapper" style="display: none;">
         <button class="menu-trigger-btn" onclick="toggleMenu()">
-          <span>☰ Menu</span>
+          <span>☰ Navigasi Menu</span>
         </button>
 
         <!-- Dropdown Menu Opsi -->
@@ -469,14 +469,32 @@
             </div>
 
             <div class="grid-2">
+              <!-- DROPDOWN LIST CYCLE (1 - 15) -->
               <div class="form-group">
-                <label>Cycle (1 - 15) <span>*</span></label>
-                <input type="number" id="cycle" class="form-control" min="1" max="15" placeholder="1" required>
+                <label>Cycle <span>*</span></label>
+                <select id="cycle" class="form-control" required>
+                  <option value="" disabled selected>-- Pilih Cycle --</option>
+                  <option value="1">Cycle 1</option>
+                  <option value="2">Cycle 2</option>
+                  <option value="3">Cycle 3</option>
+                  <option value="4">Cycle 4</option>
+                  <option value="5">Cycle 5</option>
+                  <option value="6">Cycle 6</option>
+                  <option value="7">Cycle 7</option>
+                  <option value="8">Cycle 8</option>
+                  <option value="9">Cycle 9</option>
+                  <option value="10">Cycle 10</option>
+                  <option value="11">Cycle 11</option>
+                  <option value="12">Cycle 12</option>
+                  <option value="13">Cycle 13</option>
+                  <option value="14">Cycle 14</option>
+                  <option value="15">Cycle 15</option>
+                </select>
               </div>
 
-              <!-- 3. BACAAN STAND BULAN LALU (Data Dummy Auto Fill) -->
+              <!-- STAND BULAN LALU -->
               <div class="form-group">
-                <label>Stand Meter Air Terakhir (m³)</label>
+                <label>Stand Bulan Lalu (m³)</label>
                 <input type="number" id="stand_bulan_lalu" class="form-control" value="1250.00" readonly>
               </div>
             </div>
@@ -486,14 +504,14 @@
               <input type="number" step="0.01" id="stand_meter" class="form-control" placeholder="0000.00" required>
             </div>
 
-            <!-- 1 & 2. AMBIL FOTO HANYA DARI KAMERA DIRECT (capture="environment") -->
+            <!-- AMBIL FOTO HANYA DARI KAMERA DIRECT (capture="environment") -->
             <div class="camera-upload-box">
-              <label>📷 1. Foto Stand Meter (Wajib Kamera) <span>*</span></label>
+              <label>📷 1. Ambil Foto Stand Meter (Wajib Kamera) <span>*</span></label>
               <input type="file" id="foto_stand_meter" accept="image/*" capture="environment" required />
             </div>
 
             <div class="camera-upload-box">
-              <label>📷 2. Foto Bukti Pencatatan Meter (Wajib Kamera) <span>*</span></label>
+              <label>📷 2. Ambil Foto Berkas Cetak & TTD PIC (Wajib Kamera) <span>*</span></label>
               <input type="file" id="foto_berkas" accept="image/*" capture="environment" required />
             </div>
 
@@ -557,7 +575,6 @@
     function simulateFetchLastMonthMeter() {
       const id = document.getElementById('customer_id').value;
       if(id) {
-        // Contoh angka acak dummy jika terisi
         const dummyValue = (1000 + Math.floor(Math.random() * 500)).toFixed(2);
         document.getElementById('stand_bulan_lalu').value = dummyValue;
       }
@@ -651,7 +668,7 @@
       }
     }
 
-    /* 2. FUNGSI MENAMBAHKAN TIMESTAMP WATERMARK KE DALAM GAMBAR */
+    /* FUNGSI MENAMBAHKAN TIMESTAMP WATERMARK KE DALAM GAMBAR */
     function addTimestampWatermark(file, timestampText) {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -669,7 +686,7 @@
             // Gambar foto asli
             ctx.drawImage(img, 0, 0);
 
-            // Tentukan ukuran font relatif
+            // Ukuran font relatif
             const fontSize = Math.max(16, Math.floor(img.width / 28));
             ctx.font = `bold ${fontSize}px sans-serif`;
 
@@ -682,7 +699,7 @@
             // Teks Timestamp
             ctx.fillStyle = '#ffffff';
             ctx.fillText(timestampText.line1, padding, img.height - bannerHeight + fontSize + 4);
-            ctx.fillStyle = '#fde047'; // Warna kuning terang untuk koordinat GPS
+            ctx.fillStyle = '#fde047'; // Kuning terang untuk GPS
             ctx.fillText(timestampText.line2, padding, img.height - bannerHeight + (fontSize * 2) + 8);
 
             // Export Canvas kembali ke Blob / File
