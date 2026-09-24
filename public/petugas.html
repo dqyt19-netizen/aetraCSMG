@@ -7,6 +7,10 @@
 
   <!-- Supabase JS SDK CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Leaflet CSS & JS (Untuk Peta Adjust Lokasi Petugas) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     * {
@@ -19,14 +23,14 @@
       background-color: #f4f6f9;
       display: flex;
       justify-content: center;
-      padding: 20px;
+      padding: 15px;
     }
     .card-container {
       background: #ffffff;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       width: 100%;
-      max-width: 1100px; /* Diperlebar sedikit agar peta & foto muat rapi */
+      max-width: 1000px;
       overflow: hidden;
     }
     .header {
@@ -39,77 +43,70 @@
     }
     .main-content {
       display: flex;
-      flex-direction: row;
-      min-height: 500px;
-    }
-    .sidebar {
-      width: 250px;
-      background-color: #fafbfc;
-      border-right: 1px solid #eef0f3;
-      padding: 20px 15px;
-      display: flex;
       flex-direction: column;
-      gap: 15px;
+      padding: 20px;
     }
-    .profile-box {
-      background: #ffffff;
-      border: 1px solid #e0e6ed;
-      padding: 12px;
-      border-radius: 8px;
+
+    /* 1 & 2. Tampilan Navigasi Ringkas Berupa Tombol Responsif HP */
+    .top-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafbfc;
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: 1px solid #eef0f3;
+      margin-bottom: 20px;
     }
-    .profile-box small {
-      color: #8c9ba5;
-      font-weight: bold;
-      font-size: 10px;
-      text-transform: uppercase;
-    }
-    .profile-box div {
-      color: #2b54d5;
-      font-weight: bold;
-      font-size: 13px;
-      word-break: break-all;
+    .nav-group {
+      display: flex;
+      gap: 8px;
     }
     .nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 15px;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
+      padding: 8px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
       color: #334155;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
-      text-align: left;
-      width: 100%;
       transition: all 0.2s;
     }
     .nav-btn.active {
       background-color: #2563eb;
       color: #ffffff;
+      border-color: #2563eb;
     }
     .logout-btn {
-      margin-top: auto;
       background-color: #fef2f2;
       color: #ef4444;
-      border: 1px solid #fca5a5;
+      border-color: #fca5a5;
     }
-    .content-body {
-      flex: 1;
-      padding: 25px;
-      overflow-x: auto;
+    .user-info {
+      font-size: 12px;
+      font-weight: bold;
+      color: #2563eb;
     }
-    /* Auth Form Styling */
+
+    /* 2. Style Login yang Konsisten dengan Index */
     .auth-container {
-      max-width: 380px;
-      margin: 60px auto;
-      padding: 30px;
+      max-width: 900px;
+      width: 100%;
+      margin: 20px auto;
       background: #ffffff;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
     }
+    .auth-box {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
     .form-group {
       margin-bottom: 15px;
       text-align: left;
@@ -127,7 +124,9 @@
     input[type="text"],
     input[type="number"],
     input[type="email"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="date"],
+    input[type="time"] {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid #cbd5e1;
@@ -171,7 +170,21 @@
       grid-template-columns: 1fr 1fr;
       gap: 15px;
     }
+
+    /* 4. Map Picker Interaktif */
+    #map-picker {
+      height: 220px;
+      width: 100%;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+
     /* Table Styling */
+    .table-responsive {
+      overflow-x: auto;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -189,25 +202,34 @@
       font-weight: bold;
       color: #334155;
     }
-
-    /* Thumbnail Gambar & Embed Map */
     .img-preview {
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       object-fit: cover;
       border-radius: 6px;
       border: 1px solid #cbd5e1;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .img-preview:hover {
-      transform: scale(1.08);
     }
     .map-frame {
-      width: 150px;
-      height: 100px;
+      width: 140px;
+      height: 90px;
       border: none;
       border-radius: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .top-nav {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .nav-group {
+        width: 100%;
+      }
+      .nav-group .nav-btn {
+        flex: 1;
+      }
     }
   </style>
 </head>
@@ -215,113 +237,172 @@
 
   <!-- ================= SEKSI 1: LOGIN ================= -->
   <div id="auth-section" class="auth-container">
-    <h2 style="margin-bottom: 20px; color: #1e293b;">Login Petugas</h2>
-    <form id="form-login">
-      <div class="form-group">
-        <label>Email Petugas</label>
-        <input type="email" id="login-email" placeholder="riri@aetra.co.id" required>
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" required>
-      </div>
-      <button type="submit" class="btn-submit" style="margin-top: 10px;">MASUK</button>
-    </form>
+    <div class="header">
+      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
+    </div>
+    <div class="auth-box">
+      <h2 style="margin-bottom: 20px; color: #1e293b; text-align: center;">Login Petugas</h2>
+      <form id="form-login">
+        <div class="form-group">
+          <label>Email Petugas</label>
+          <input type="email" id="login-email" placeholder="petugas@aetra.co.id" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-submit" style="margin-top: 10px;">MASUK</button>
+      </form>
+    </div>
   </div>
 
   <!-- ================= SEKSI 2: DASHBOARD PETUGAS ================= -->
   <div id="app-section" class="card-container" style="display: none;">
     <!-- Header -->
     <div class="header">
-      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang" id="app-logo">
+      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
-    <!-- Main Body -->
     <div class="main-content">
-      <!-- Sidebar Left -->
-      <div class="sidebar">
-        <div class="profile-box">
-          <small>PETUGAS AKTIF</small>
-          <div id="display-email">-</div>
+      <!-- 1. Navigasi Berupa Tombol Ringkas (Ramah HP) -->
+      <div class="top-nav">
+        <div class="nav-group">
+          <button id="btn-tab-input" class="nav-btn active" onclick="switchTab('input')">📝 Input Bacaan</button>
+          <button id="btn-tab-hasil" class="nav-btn" onclick="switchTab('hasil')">📋 Hasil Baca All Petugas</button>
         </div>
-
-        <button id="btn-tab-input" class="nav-btn active" onclick="switchTab('input')">
-          📝 Input Bacaan
-        </button>
-        <button id="btn-tab-hasil" class="nav-btn" onclick="switchTab('hasil')">
-          📋 Data Hasil Baca
-        </button>
-
-        <button class="nav-btn logout-btn" onclick="logout()">
-          🚪 Keluar / Logout
-        </button>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="user-info" id="display-email">-</span>
+          <button class="nav-btn logout-btn" onclick="logout()">🚪 Keluar</button>
+        </div>
       </div>
 
-      <!-- Content Area Right -->
-      <div class="content-body">
-        <!-- Tab 1: Form Input Bacaan -->
-        <div id="tab-input-container">
-          <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 20px;">Form Input Bacaan Meter</h2>
-          
-          <form id="form-input-bacaan">
+      <!-- Tab 1: Form Input Bacaan -->
+      <div id="tab-input-container">
+        <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 20px;">Form Input Bacaan Meter</h2>
+        
+        <form id="form-input-bacaan">
+          <!-- 3. Pilihan Tanggal dan Waktu Pembacaan -->
+          <div class="grid-2">
             <div class="form-group">
-              <label>ID Pelanggan <span>*</span></label>
-              <input type="text" id="customer_id" required>
+              <label>Tanggal Baca <span>*</span></label>
+              <input type="date" id="reading_date" required>
             </div>
-
             <div class="form-group">
-              <label>Nama Perusahaan / Consumer <span>*</span></label>
-              <input type="text" id="company_name" required>
+              <label>Waktu Pembacaan <span>*</span></label>
+              <input type="time" id="reading_time" required>
             </div>
-
-            <div class="grid-2">
-              <div class="form-group">
-                <label>Cycle (1 - 15) <span>*</span></label>
-                <input type="number" id="cycle" min="1" max="15" required>
-              </div>
-              <div class="form-group">
-                <label>Stand Meter Air (m³) <span>*</span></label>
-                <input type="number" step="0.01" id="stand_meter" required>
-              </div>
-            </div>
-
-            <div class="file-upload-box">
-              <label>1. Foto Stand Meter Air <span>*</span></label>
-              <input type="file" id="foto_stand_meter" accept="image/*" required />
-            </div>
-
-            <div class="file-upload-box">
-              <label>2. Foto Berkas Cetak & TTD PIC <span>*</span></label>
-              <input type="file" id="foto_berkas" accept="image/*" required />
-            </div>
-
-            <button type="submit" id="btn-submit-reading" class="btn-submit">
-              KIRIM DATA & KOORDINAT GPS
-            </button>
-          </form>
-        </div>
-
-        <!-- Tab 2: Data Hasil Baca -->
-        <div id="tab-hasil-container" style="display: none;">
-          <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 15px;">Data Hasil Baca</h2>
-          <div id="table-wrapper">
-            <p style="color: #64748b;">Memuat data...</p>
           </div>
+
+          <div class="form-group">
+            <label>ID Pelanggan <span>*</span></label>
+            <input type="text" id="customer_id" required>
+          </div>
+
+          <div class="form-group">
+            <label>Nama Perusahaan / Consumer <span>*</span></label>
+            <input type="text" id="company_name" required>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Cycle (1 - 15) <span>*</span></label>
+              <input type="number" id="cycle" min="1" max="15" required>
+            </div>
+            <div class="form-group">
+              <label>Stand Meter Air (m³) <span>*</span></label>
+              <input type="number" step="0.01" id="stand_meter" required>
+            </div>
+          </div>
+
+          <div class="file-upload-box">
+            <label>1. Foto Stand Meter Air <span>*</span></label>
+            <input type="file" id="foto_stand_meter" accept="image/*" required />
+          </div>
+
+          <div class="file-upload-box">
+            <label>2. Foto Berkas Cetak & TTD PIC <span>*</span></label>
+            <input type="file" id="foto_berkas" accept="image/*" required />
+          </div>
+
+          <!-- 4. Peta Interaktif untuk Adjust Lokasi Petugas -->
+          <div class="form-group">
+            <label>Penyesuaian Lokasi GPS (Geser Pin Peta Jika Perlu) <span>*</span></label>
+            <div id="map-picker"></div>
+            <small style="color: #64748b; font-size: 11px;">Koordinat Terpilih: <span id="coords-text">Mendeteksi lokasi GPS...</span></small>
+          </div>
+
+          <button type="submit" id="btn-submit-reading" class="btn-submit">
+            KIRIM DATA BACAAN
+          </button>
+        </form>
+      </div>
+
+      <!-- Tab 2: Data Hasil Baca -->
+      <div id="tab-hasil-container" style="display: none;">
+        <h2 style="font-size: 18px; color: #1e293b; margin-bottom: 5px;">Data Hasil Baca Seluruh Petugas</h2>
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 15px;">Semua petugas dapat melihat hasil baca petugas lainnya.</p>
+        
+        <div class="table-responsive" id="table-wrapper">
+          <p style="color: #64748b;">Memuat data...</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ================= SCRIPT INTEGRASI SUPABASE ================= -->
+  <!-- ================= SCRIPT INTEGRASI SUPABASE & MAP ================= -->
   <script>
-    // 1. Inisialisasi Supabase Client
     const SUPABASE_URL = 'https://dntuitawhmpqkbepnmwk.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY'; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let loggedInOfficer = null;
+    let map, marker;
+    let selectedLat = null;
+    let selectedLng = null;
 
-    // 2. Cek Sesi Login saat Halaman Pertama Dimuat
+    // Set nilai default tanggal & waktu hari ini
+    function setTodayDateTime() {
+      const now = new Date();
+      document.getElementById('reading_date').value = now.toISOString().split('T')[0];
+      document.getElementById('reading_time').value = now.toTimeString().split(' ')[0].substring(0, 5);
+    }
+
+    // Inisialisasi Map Picker
+    function initMapPicker() {
+      const defaultLat = -6.175392;
+      const defaultLng = 106.827153;
+
+      if (!map) {
+        map = L.map('map-picker').setView([defaultLat, defaultLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19
+        }).addTo(map);
+
+        marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+        marker.on('dragend', function (e) {
+          const latlng = marker.getLatLng();
+          selectedLat = latlng.lat;
+          selectedLng = latlng.lng;
+          document.getElementById('coords-text').textContent = `${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;
+        });
+      }
+
+      // Minta GPS pengguna
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          selectedLat = pos.coords.latitude;
+          selectedLng = pos.coords.longitude;
+          const userLatLng = [selectedLat, selectedLng];
+
+          map.setView(userLatLng, 16);
+          marker.setLatLng(userLatLng);
+          document.getElementById('coords-text').textContent = `${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;
+          setTimeout(() => map.invalidateSize(), 300);
+        });
+      }
+    }
+
     async function checkAuthSession() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (session) {
@@ -329,19 +410,20 @@
         document.getElementById('display-email').textContent = session.user.email;
         document.getElementById('auth-section').style.display = 'none';
         document.getElementById('app-section').style.display = 'block';
+        setTodayDateTime();
+        initMapPicker();
       } else {
         document.getElementById('auth-section').style.display = 'block';
         document.getElementById('app-section').style.display = 'none';
       }
     }
 
-    // 3. Proses Login
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
 
-      const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+      const { error } = await _supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
         alert('Login Gagal: ' + error.message);
@@ -350,13 +432,11 @@
       }
     });
 
-    // 4. Logout
     async function logout() {
       await _supabase.auth.signOut();
       location.reload();
     }
 
-    // 5. Perpindahan Tab (Input <-> Hasil Baca)
     function switchTab(tabName) {
       const btnInput = document.getElementById('btn-tab-input');
       const btnHasil = document.getElementById('btn-tab-hasil');
@@ -368,6 +448,7 @@
         btnHasil.classList.remove('active');
         tabInput.style.display = 'block';
         tabHasil.style.display = 'none';
+        setTimeout(() => map.invalidateSize(), 200);
       } else {
         btnHasil.classList.add('active');
         btnInput.classList.remove('active');
@@ -377,24 +458,6 @@
       }
     }
 
-    // 6. Fungsi Ambil GPS
-    function getGPSLocation() {
-      return new Promise((resolve) => {
-        if ("geolocation" in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-            (err) => {
-              console.warn("GPS gagal/ditolak:", err.message);
-              resolve({ lat: null, lng: null });
-            }
-          );
-        } else {
-          resolve({ lat: null, lng: null });
-        }
-      });
-    }
-
-    // 7. Fungsi Upload Foto ke Storage
     async function uploadPhoto(fileInputId, pathPrefix) {
       const fileInput = document.getElementById(fileInputId);
       if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
@@ -403,20 +466,15 @@
       const fileExt = file.name.split('.').pop();
       const fileName = `${pathPrefix}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      // Upload file ke Storage Supabase
-      const { data, error } = await _supabase.storage
+      const { error } = await _supabase.storage
         .from('meter-photos')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
+        .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
       if (error) {
         console.error(`Gagal upload ${fileInputId}:`, error.message);
         return null;
       }
 
-      // Ambil URL Publik
       const { data: publicUrlData } = _supabase.storage
         .from('meter-photos')
         .getPublicUrl(fileName);
@@ -424,25 +482,25 @@
       return publicUrlData.publicUrl;
     }
 
-    // 8. Submit Form Bacaan Meter
     document.getElementById('form-input-bacaan').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-submit-reading');
       btn.disabled = true;
-      btn.textContent = 'MENGIRIM DATA & GPS...';
+      btn.textContent = 'MENGIRIM DATA...';
 
       try {
-        // Ambil GPS & Upload Foto secara bersamaan
-        const coords = await getGPSLocation();
         const urlFotoMeter = await uploadPhoto('foto_stand_meter', 'stand_meter');
         const urlFotoBerkas = await uploadPhoto('foto_berkas', 'berkas');
 
-        // Ambil ID Petugas dari Tabel officers
         const { data: officerData } = await _supabase
           .from('officers')
           .select('id')
           .eq('auth_id', loggedInOfficer.id)
           .maybeSingle();
+
+        const readingDate = document.getElementById('reading_date').value;
+        const readingTime = document.getElementById('reading_time').value;
+        const combinedTimestamp = new Date(`${readingDate}T${readingTime}`).toISOString();
 
         const payload = {
           officer_id: officerData ? officerData.id : null,
@@ -452,8 +510,9 @@
           stand_meter: parseFloat(document.getElementById('stand_meter').value),
           foto_stand_meter: urlFotoMeter,
           foto_berkas: urlFotoBerkas,
-          latitude: coords.lat,
-          longitude: coords.lng
+          latitude: selectedLat,
+          longitude: selectedLng,
+          created_at: combinedTimestamp
         };
 
         const { error } = await _supabase.from('meter_readings').insert([payload]);
@@ -462,23 +521,30 @@
 
         alert('✅ Data hasil bacaan meter berhasil disimpan!');
         document.getElementById('form-input-bacaan').reset();
+        setTodayDateTime();
 
       } catch (err) {
         alert('❌ Gagal menyimpan data: ' + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'KIRIM DATA & KOORDINAT GPS';
+        btn.textContent = 'KIRIM DATA BACAAN';
       }
     });
 
-    // 9. Load Tabel Data Hasil Baca (Diperbarui dengan Preview Gambar & Maps Embed)
+    // 5. Tampilan Hasil Bacaan Seluruh Petugas
     async function loadDataHasilBaca() {
       const container = document.getElementById('table-wrapper');
       container.innerHTML = '<p style="color: #64748b;">Memuat data...</p>';
 
+      // Mengambil seluruh data hasil bacaan (termasuk nama petugas yang menginputnya)
       const { data, error } = await _supabase
         .from('meter_readings')
-        .select('*')
+        .select(`
+          *,
+          officers (
+            email
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -495,31 +561,30 @@
         <table>
           <thead>
             <tr>
-              <th>Waktu</th>
+              <th>Waktu Baca</th>
+              <th>Petugas</th>
               <th>ID Pelanggan</th>
               <th>Perusahaan</th>
               <th>Cycle</th>
               <th>Stand Meter</th>
               <th>Foto Stand</th>
               <th>Foto Berkas</th>
-              <th>Lokasi GPS</th>
+              <th>Lokasi Maps</th>
             </tr>
           </thead>
           <tbody>
       `;
 
       data.forEach(row => {
-        // Thumbnail Foto Stand Meter
+        const emailPetugas = row.officers ? row.officers.email : 'Petugas';
         const fotoStandHtml = row.foto_stand_meter 
-          ? `<a href="${row.foto_stand_meter}" target="_blank" title="Klik untuk memperbesar"><img src="${row.foto_stand_meter}" class="img-preview" alt="Foto Stand"></a>` 
+          ? `<a href="${row.foto_stand_meter}" target="_blank"><img src="${row.foto_stand_meter}" class="img-preview" alt="Foto Stand"></a>` 
           : '-';
 
-        // Thumbnail Foto Berkas
         const fotoBerkasHtml = row.foto_berkas 
-          ? `<a href="${row.foto_berkas}" target="_blank" title="Klik untuk memperbesar"><img src="${row.foto_berkas}" class="img-preview" alt="Foto Berkas"></a>` 
+          ? `<a href="${row.foto_berkas}" target="_blank"><img src="${row.foto_berkas}" class="img-preview" alt="Foto Berkas"></a>` 
           : '-';
 
-        // Embed Google Maps Interaktif
         const mapHtml = (row.latitude && row.longitude)
           ? `<iframe class="map-frame" src="https://maps.google.com/maps?q=${row.latitude},${row.longitude}&z=15&output=embed" loading="lazy"></iframe>`
           : '-';
@@ -527,6 +592,7 @@
         html += `
           <tr>
             <td>${new Date(row.created_at).toLocaleString('id-ID')}</td>
+            <td><small style="color:#2563eb; font-weight:bold;">${emailPetugas}</small></td>
             <td><b>${row.customer_id}</b></td>
             <td>${row.company_name}</td>
             <td>${row.cycle}</td>
@@ -542,7 +608,6 @@
       container.innerHTML = html;
     }
 
-    // Jalankan pemeriksaan sesi saat pertama kali dibuka
     checkAuthSession();
   </script>
 </body>
