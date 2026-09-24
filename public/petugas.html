@@ -46,12 +46,12 @@
       border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
       width: 100%;
-      max-width: 600px; /* Ukuran proporsional & nyaman diakses lewat HP/Tablet */
+      max-width: 650px;
       overflow: hidden;
       border: 1px solid var(--border-color);
     }
 
-    /* Header Ringkas & Rapi */
+    /* 1. Header Bar: Navigasi di Kiri, Logo di Kanan */
     .header-bar {
       display: flex;
       justify-content: space-between;
@@ -68,7 +68,7 @@
       object-fit: contain;
     }
 
-    /* 1. Tombol Navigasi Utama */
+    /* Tombol Navigasi Utama (Di Kiri) */
     .menu-trigger-btn {
       display: inline-flex;
       align-items: center;
@@ -89,12 +89,12 @@
       border-color: #cbd5e1;
     }
 
-    /* Menu Dropdown / Overlay Navigasi */
+    /* Menu Dropdown / Overlay Navigasi (Membuka ke arah Kiri) */
     .nav-dropdown {
       display: none;
       position: absolute;
       top: calc(100% + 8px);
-      right: 20px;
+      left: 20px;
       width: 260px;
       background: #ffffff;
       border: 1px solid var(--border-color);
@@ -170,7 +170,7 @@
       padding: 20px;
     }
 
-    /* Tampilan Auth / Login Konsisten */
+    /* Tampilan Auth / Login */
     .auth-box {
       padding: 10px 5px;
     }
@@ -289,17 +289,43 @@
       cursor: not-allowed;
     }
 
-    /* Table Styling */
+    /* 2. Grouping & Table Styling */
+    .officer-group {
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .officer-group-header {
+      background-color: #f8fafc;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary-color);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .officer-badge {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+    }
+
     .table-responsive {
       overflow-x: auto;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 12px;
       background: #ffffff;
     }
 
@@ -311,25 +337,36 @@
     }
 
     table th {
-      background-color: #f8fafc;
+      background-color: #ffffff;
       font-weight: 600;
       color: #475569;
       white-space: nowrap;
     }
 
     .img-preview {
-      width: 50px;
-      height: 50px;
+      width: 48px;
+      height: 48px;
       object-fit: cover;
       border-radius: 6px;
       border: 1px solid var(--border-color);
     }
 
     .map-frame {
-      width: 120px;
-      height: 70px;
+      width: 110px;
+      height: 65px;
       border: none;
       border-radius: 6px;
+    }
+
+    .coord-badge {
+      font-family: monospace;
+      font-size: 11px;
+      background: #f1f5f9;
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: #334155;
+      display: inline-block;
+      white-space: nowrap;
     }
 
     @media (max-width: 480px) {
@@ -346,11 +383,9 @@
 
   <div class="app-card">
     
-    <!-- HEADER BAR -->
+    <!-- HEADER BAR: Tombol Navigasi di Kiri, Logo di Kanan -->
     <div class="header-bar">
-      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
-      
-      <!-- 1. Tombol Navigasi Utama (Hanya Tampil Saat Logged In) -->
+      <!-- 1. Tombol Navigasi Utama (Di Kiri) -->
       <div id="nav-wrapper" style="display: none;">
         <button class="menu-trigger-btn" onclick="toggleMenu()">
           <span>☰ Navigasi Menu</span>
@@ -373,6 +408,9 @@
           </button>
         </div>
       </div>
+
+      <!-- Logo Aetra Air Tangerang (Di Kanan) -->
+      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
     <div class="content-body">
@@ -463,9 +501,9 @@
         <!-- TAB 2: DATA HASIL BACA -->
         <div id="tab-hasil-container" style="display: none;">
           <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text-main);">Hasil Bacaan Seluruh Petugas</h2>
-          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Setiap petugas dapat memantau hasil baca petugas lainnya.</p>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Data dikelompokkan berdasarkan nama petugas yang mencatat.</p>
           
-          <div class="table-responsive" id="table-wrapper">
+          <div id="grouped-data-container">
             <p style="color: var(--text-muted); padding: 12px; font-size: 13px;">Memuat data...</p>
           </div>
         </div>
@@ -667,8 +705,9 @@
       }
     });
 
+    // 2 & 3. Grouping Berdasarkan Nama Petugas + Kolom Latitude & Longitude
     async function loadDataHasilBaca() {
-      const container = document.getElementById('table-wrapper');
+      const container = document.getElementById('grouped-data-container');
       container.innerHTML = '<p style="color: var(--text-muted); padding: 12px; font-size: 13px;">Memuat data...</p>';
 
       const { data, error } = await _supabase
@@ -686,54 +725,85 @@
         return;
       }
 
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>Waktu Baca</th>
-              <th>Petugas</th>
-              <th>ID Pelanggan</th>
-              <th>Perusahaan</th>
-              <th>Cycle</th>
-              <th>Stand Meter</th>
-              <th>Foto Stand</th>
-              <th>Foto Berkas</th>
-              <th>Lokasi Maps</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
+      // Grouping data berdasarkan email / nama petugas
+      const grouped = {};
       data.forEach(row => {
-        const emailPetugas = row.officers ? row.officers.email : 'Petugas';
-        const fotoStandHtml = row.foto_stand_meter 
-          ? `<a href="${row.foto_stand_meter}" target="_blank"><img src="${row.foto_stand_meter}" class="img-preview" alt="Foto Stand"></a>` 
-          : '-';
-
-        const fotoBerkasHtml = row.foto_berkas 
-          ? `<a href="${row.foto_berkas}" target="_blank"><img src="${row.foto_berkas}" class="img-preview" alt="Foto Berkas"></a>` 
-          : '-';
-
-        const mapHtml = (row.latitude && row.longitude)
-          ? `<iframe class="map-frame" src="https://maps.google.com/maps?q=${row.latitude},${row.longitude}&z=15&output=embed" loading="lazy"></iframe>`
-          : '-';
-
-        html += `
-          <tr>
-            <td style="white-space: nowrap;">${new Date(row.created_at).toLocaleString('id-ID')}</td>
-            <td><strong style="color:var(--primary-color);">${emailPetugas}</strong></td>
-            <td><b>${row.customer_id}</b></td>
-            <td>${row.company_name}</td>
-            <td>${row.cycle}</td>
-            <td>${row.stand_meter} m³</td>
-            <td>${fotoStandHtml}</td>
-            <td>${fotoBerkasHtml}</td>
-            <td>${mapHtml}</td>
-          </tr>
-        `;
+        const officerName = row.officers ? row.officers.email : 'Petugas Tidak Teridentifikasi';
+        if (!grouped[officerName]) {
+          grouped[officerName] = [];
+        }
+        grouped[officerName].push(row);
       });
 
-      html += '</tbody></table>';
+      let html = '';
+
+      // Render setiap group petugas
+      for (const [officer, items] of Object.entries(grouped)) {
+        html += `
+          <div class="officer-group">
+            <div class="officer-group-header">
+              <span>👤 ${officer}</span>
+              <span class="officer-badge">${items.length} Data</span>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Waktu Baca</th>
+                    <th>ID Pelanggan</th>
+                    <th>Perusahaan</th>
+                    <th>Cycle</th>
+                    <th>Stand Meter</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                    <th>Foto Stand</th>
+                    <th>Foto Berkas</th>
+                    <th>Peta</th>
+                  </tr>
+                </thead>
+                <tbody>
+        `;
+
+        items.forEach(row => {
+          const latVal = row.latitude ? row.latitude.toFixed(6) : '-';
+          const lngVal = row.longitude ? row.longitude.toFixed(6) : '-';
+
+          const fotoStandHtml = row.foto_stand_meter 
+            ? `<a href="${row.foto_stand_meter}" target="_blank"><img src="${row.foto_stand_meter}" class="img-preview" alt="Foto Stand"></a>` 
+            : '-';
+
+          const fotoBerkasHtml = row.foto_berkas 
+            ? `<a href="${row.foto_berkas}" target="_blank"><img src="${row.foto_berkas}" class="img-preview" alt="Foto Berkas"></a>` 
+            : '-';
+
+          const mapHtml = (row.latitude && row.longitude)
+            ? `<iframe class="map-frame" src="https://maps.google.com/maps?q=${row.latitude},${row.longitude}&z=15&output=embed" loading="lazy"></iframe>`
+            : '-';
+
+          html += `
+            <tr>
+              <td style="white-space: nowrap;">${new Date(row.created_at).toLocaleString('id-ID')}</td>
+              <td><b>${row.customer_id}</b></td>
+              <td>${row.company_name}</td>
+              <td>${row.cycle}</td>
+              <td>${row.stand_meter} m³</td>
+              <td><span class="coord-badge">${latVal}</span></td>
+              <td><span class="coord-badge">${lngVal}</span></td>
+              <td>${fotoStandHtml}</td>
+              <td>${fotoBerkasHtml}</td>
+              <td>${mapHtml}</td>
+            </tr>
+          `;
+        });
+
+        html += `
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
       container.innerHTML = html;
     }
 
