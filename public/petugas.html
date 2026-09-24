@@ -265,12 +265,12 @@
 
             <div class="file-upload-box">
               <label>1. Foto Stand Meter Air <span>*</span></label>
-              <input type="file" id="foto_stand_meter" accept="image/*" required>
+              <input type="file" id="foto_stand_meter" accept="image/*" required />
             </div>
 
             <div class="file-upload-box">
               <label>2. Foto Berkas Cetak & TTD PIC <span>*</span></label>
-              <input type="file" id="foto_berkas" accept="image/*" required>
+              <input type="file" id="foto_berkas" accept="image/*" required />
             </div>
 
             <button type="submit" id="btn-submit-reading" class="btn-submit">
@@ -374,25 +374,33 @@
 
     // 7. Fungsi Upload Foto ke Storage
     async function uploadPhoto(fileInputId, pathPrefix) {
-      const fileInput = document.getElementById(fileInputId);
-      if (!fileInput.files || fileInput.files.length === 0) return null;
+  const fileInput = document.getElementById(fileInputId);
+  if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
 
-      const file = fileInput.files[0];
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${pathPrefix}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+  const file = fileInput.files[0];
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${pathPrefix}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      const { error } = await _supabase.storage
-        .from('meter-photos')
-        .upload(fileName, file);
+  // Upload file ke Storage Supabase
+  const { data, error } = await _supabase.storage
+    .from('meter-photos')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
 
-      if (error) {
-        console.error('Upload Error:', error.message);
-        return null;
-      }
+  if (error) {
+    console.error(`Gagal upload ${fileInputId}:`, error.message);
+    return null;
+  }
 
-      const { data } = _supabase.storage.from('meter-photos').getPublicUrl(fileName);
-      return data.publicUrl;
-    }
+  // Ambil URL Publik
+  const { data: publicUrlData } = _supabase.storage
+    .from('meter-photos')
+    .getPublicUrl(fileName);
+
+  return publicUrlData.publicUrl;
+}
 
     // 8. Submit Form Bacaan Meter
     document.getElementById('form-input-bacaan').addEventListener('submit', async (e) => {
