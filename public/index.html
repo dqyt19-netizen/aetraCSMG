@@ -3,31 +3,156 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aetra Meter Reading Portal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Key Account Meter Reading Portal</title>
+
+  <style>
+    /* =========================================================
+       1. CSS VARIABLES & BASE STYLES
+       ========================================================= */
+    :root {
+      --primary-color: #0284c7;
+      --primary-hover: #0369a1;
+      --dark-color: #1e293b;
+      --dark-hover: #0f172a;
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    /* =========================================================
+       2. TAMPILAN KARTU PORTAL (LANDING CARD)
+       ========================================================= */
+    .app-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 20px 16px 20px;
+      background: #ffffff;
+    }
+
+    .header-bar img {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* =========================================================
+       3. KONTEN & TOMBOL NAVIGASI ROLES
+       ========================================================= */
+    .content-body {
+      padding: 0 24px 28px 24px;
+      text-align: center;
+    }
+
+    .portal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 6px;
+    }
+
+    .portal-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .action-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-portal {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      text-align: center;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-portal:active {
+      transform: scale(0.98);
+    }
+
+    .btn-petugas {
+      background-color: var(--primary-color);
+      color: #ffffff;
+    }
+
+    .btn-petugas:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-admin {
+      background-color: var(--dark-color);
+      color: #ffffff;
+    }
+
+    .btn-admin:hover {
+      background-color: var(--dark-hover);
+    }
+  </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-  <div class="bg-white p-8 rounded-lg shadow-md text-center max-w-sm w-full space-y-4">
-    
-    <!-- LOGO AETRA AIR TANGERANG -->
-    <div class="flex justify-center mb-2">
-      <img 
-        src="logoaetra.jpg" 
-        alt="Logo Aetra Air Tangerang" 
-        class="h-16 object-contain"
-      >
+<body>
+
+  <div class="app-card">
+    <!-- Header Logo Aetra -->
+    <div class="header-bar">
+      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
-    <h1 class="text-xl font-bold text-blue-600">Aetra Meter System</h1>
-    <p class="text-gray-500 text-sm">Pilih halaman sesuai peran Anda:</p>
-    
-    <a href="/petugas.html" class="block w-full bg-blue-600 text-white py-2.5 rounded font-semibold hover:bg-blue-700 transition duration-200">
-      Masuk Aplikasi Petugas
-    </a>
-    <a href="/admin.html" class="block w-full bg-gray-800 text-white py-2.5 rounded font-semibold hover:bg-gray-900 transition duration-200">
-      Masuk Dashboard Admin
-    </a>
-    
+    <!-- Konten Utama Pilih Akses Portal -->
+    <div class="content-body">
+      <h1 class="portal-title">Aetra Meter System</h1>
+      <p class="portal-subtitle">Pilih halaman sesuai peran Anda untuk melanjutkan:</p>
+
+      <div class="action-group">
+        <!-- Tombol Akses Petugas Lapangan -->
+        <a href="loginpetugas.html" class="btn-portal btn-petugas">
+          📱 Masuk Aplikasi Petugas
+        </a>
+
+        <!-- Tombol Akses Admin / Dashboard -->
+        <a href="admin.html" class="btn-portal btn-admin">
+          🖥️ Masuk Dashboard Admin
+        </a>
+      </div>
+    </div>
   </div>
+
 </body>
 </html>
