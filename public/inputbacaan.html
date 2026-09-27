@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aetra Air Tangerang - Form Input Bacaan</title>
 
+  <!-- Library Supabase & Leaflet Maps -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
+    /* =========================================================
+       1. CSS VARIABLES & RESET BASE
+       ========================================================= */
     :root {
       --primary-color: #0284c7;
       --primary-hover: #0369a1;
@@ -43,13 +47,17 @@
     input[type=number] {
       -moz-appearance: textfield;
     }
+
+    /* =========================================================
+       2. TAMPILAN KARTU UTAMA & HEADER NAVIGATION
+       ========================================================= */
     .app-card {
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       width: 100%;
       max-width: 700px;
-      overflow: hidden;
+      overflow: visible; /* Penting: Dibuat visible agar dropdown menu tidak terpotong */
       border: 1px solid var(--border-color);
     }
     .header-bar {
@@ -60,6 +68,8 @@
       border-bottom: 1px solid var(--border-color);
       background: #ffffff;
       position: relative;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
     }
     .header-bar img {
       height: 36px;
@@ -87,8 +97,8 @@
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      z-index: 9999; /* Dipasang tinggi agar melayang di atas konten lain */
       padding: 8px;
     }
     .nav-dropdown.show { display: block; }
@@ -136,6 +146,10 @@
       border-top: 1px solid var(--border-color);
       padding-top: 12px;
     }
+
+    /* =========================================================
+       3. FORMULIR INPUT & KOMPONEN LAINNYA
+       ========================================================= */
     .content-body { padding: 20px; }
     .form-group { margin-bottom: 16px; }
     .form-group label {
@@ -206,6 +220,7 @@
 <body>
 
   <div class="app-card">
+    <!-- Header dan Menu Navigasi Dropdown -->
     <div class="header-bar">
       <div id="nav-wrapper">
         <button class="menu-trigger-btn" onclick="toggleMenu()">
@@ -230,6 +245,7 @@
       <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
+    <!-- Isi Formulir Utama -->
     <div class="content-body">
       <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--text-main);">Form Input Bacaan Meter</h2>
       
@@ -313,19 +329,26 @@
   </div>
 
   <script>
+    /* =========================================================
+       1. INISIALISASI SUPABASE & VARIABEL GLOBAL
+       ========================================================= */
     const SUPABASE_URL = 'https://dntuitawhmpqkbepnmwk.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY'; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let loggedInUser = null;
     let map, marker;
-    let selectedLat = -6.175392;
+    let selectedLat = -6.175392; // Default koordinat
     let selectedLng = 106.827153;
 
+    /* =========================================================
+       2. KONTROL MENU DROPDOWN & UTILITY
+       ========================================================= */
     function toggleMenu() {
       document.getElementById('nav-dropdown').classList.toggle('show');
     }
 
+    // Menutup menu jika mengklik di luar area menu
     window.addEventListener('click', function(e) {
       const wrapper = document.getElementById('nav-wrapper');
       if (wrapper && !wrapper.contains(e.target)) {
@@ -347,12 +370,54 @@
       }
     }
 
+    /* =========================================================
+       3. PENGECEKAN STATUS LOKASI / GPS DI HP PETUGAS
+       ========================================================= */
+    function checkGPSPermission() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            // Jika lokasi berhasil didapat, perbarui posisi pin pada peta
+            selectedLat = position.coords.latitude;
+            selectedLng = position.coords.longitude;
+            const userLatLng = [selectedLat, selectedLng];
+
+            if (map && marker) {
+              map.setView(userLatLng, 16);
+              marker.setLatLng(userLatLng);
+              document.getElementById('coords-text').textContent = `${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;
+              setTimeout(() => map.invalidateSize(), 300);
+            }
+          },
+          (error) => {
+            // Memberikan notifikasi spesifik jika GPS mati atau ditolak
+            if (error.code === error.PERMISSION_DENIED) {
+              alert("⚠️ PERHATIAN:\n\nAkses lokasi ditolak. Harap izinkan akses lokasi pada browser Anda agar koordinat pencatatan meter akurat.");
+            } else if (error.code === error.POSITION_UNAVAILABLE || error.code === error.TIMEOUT) {
+              alert("📍 GPS TIDAK AKTIF:\n\nHarap hidupkan/aktifkan fitur Lokasi (GPS) di HP Anda untuk melanjutkan pencatatan meter.");
+            }
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        alert("Browser di perangkat Anda tidak mendukung pencatatan lokasi GPS.");
+      }
+    }
+
+    /* =========================================================
+       4. INITIALISASI PETA INTERAKTIF (LEAFLET)
+       ========================================================= */
     function initMapPicker() {
       if (!map) {
         map = L.map('map-picker').setView([selectedLat, selectedLng], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
         marker = L.marker([selectedLat, selectedLng], { draggable: true }).addTo(map);
 
+        // Jika pin digeser manual oleh petugas
         marker.on('dragend', function () {
           const latlng = marker.getLatLng();
           selectedLat = latlng.lat;
@@ -360,21 +425,11 @@
           document.getElementById('coords-text').textContent = `${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;
         });
       }
-
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition((pos) => {
-          selectedLat = pos.coords.latitude;
-          selectedLng = pos.coords.longitude;
-          const userLatLng = [selectedLat, selectedLng];
-
-          map.setView(userLatLng, 16);
-          marker.setLatLng(userLatLng);
-          document.getElementById('coords-text').textContent = `${selectedLat.toFixed(6)}, ${selectedLng.toFixed(6)}`;
-          setTimeout(() => map.invalidateSize(), 300);
-        });
-      }
     }
 
+    /* =========================================================
+       5. AUTENTIKASI SESSION CHECK
+       ========================================================= */
     async function checkAuthSession() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) {
@@ -384,6 +439,9 @@
         document.getElementById('display-email').textContent = session.user.email;
         setTodayDateTime();
         initMapPicker();
+        
+        // Minta/Cek lokasi GPS HP otomatis setelah login dikonfirmasi
+        checkGPSPermission();
       }
     }
 
@@ -392,6 +450,9 @@
       window.location.href = 'loginpetugas.html';
     }
 
+    /* =========================================================
+       6. OLAH FOTO: WATERMARK STAMP & UPLOAD SUPABASE STORAGE
+       ========================================================= */
     function addTimestampWatermark(file, timestampText) {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -407,6 +468,7 @@
 
             ctx.drawImage(img, 0, 0);
 
+            // Pengaturan ukuran font dan banner watermark
             const fontSize = Math.max(16, Math.floor(img.width / 28));
             ctx.font = `bold ${fontSize}px sans-serif`;
 
@@ -415,6 +477,7 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
             ctx.fillRect(0, img.height - bannerHeight, img.width, bannerHeight);
 
+            // Menulis teks tanggal dan koordinat GPS di atas foto
             ctx.fillStyle = '#ffffff';
             ctx.fillText(timestampText.line1, padding, img.height - bannerHeight + fontSize + 4);
             ctx.fillStyle = '#fde047';
@@ -456,6 +519,9 @@
       return publicUrlData.publicUrl;
     }
 
+    /* =========================================================
+       7. HANDLER SUBMIT FORM PENCATATAN
+       ========================================================= */
     document.getElementById('form-input-bacaan').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-submit-reading');
@@ -467,6 +533,7 @@
         const readingTime = document.getElementById('reading_time').value;
         const formattedTimeStr = `${readingDate} ${readingTime}`;
 
+        // Upload foto + stamp watermark
         const urlFotoMeter = await processAndUploadPhoto('foto_stand_meter', 'stand_meter', formattedTimeStr, selectedLat, selectedLng);
         const urlFotoBerkas = await processAndUploadPhoto('foto_berkas', 'berkas', formattedTimeStr, selectedLat, selectedLng);
 
@@ -498,6 +565,7 @@
       }
     });
 
+    // Jalankan pemeriksaan autentikasi dan inisialisasi awal
     checkAuthSession();
   </script>
 </body>
