@@ -3,20 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aetra Air Tangerang - Dashboard Admin Database</title>
+  <title>Dashboard Admin Database - Aetra Air Tangerang</title>
+  <!-- Pustaka Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root {
       --primary-color: #0284c7;
-      --primary-hover: #0369a1;
+      --dark-color: #1e293b;
+      --dark-hover: #0f172a;
       --bg-color: #f1f5f9;
       --card-bg: #ffffff;
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border-color: #e2e8f0;
       --danger-color: #ef4444;
-      --success-color: #10b981;
+      --danger-hover: #dc2626;
     }
 
     * {
@@ -29,7 +31,7 @@
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      padding: 20px;
+      padding: 24px;
     }
 
     .container {
@@ -37,10 +39,11 @@
       margin: 0 auto;
     }
 
-    .header-card {
+    /* Header Dashboard */
+    .dashboard-header {
       background: var(--card-bg);
       padding: 20px 24px;
-      border-radius: 16px;
+      border-radius: 12px;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       border: 1px solid var(--border-color);
       display: flex;
@@ -49,35 +52,36 @@
       margin-bottom: 24px;
     }
 
-    .header-title h1 {
+    .dashboard-title h1 {
       font-size: 20px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--dark-color);
+      margin-bottom: 4px;
     }
 
-    .header-title p {
+    .dashboard-title p {
       font-size: 13px;
       color: var(--text-muted);
-      margin-top: 2px;
     }
 
     .btn-logout {
-      background: #fee2e2;
+      background-color: #fee2e2;
       color: var(--danger-color);
-      border: none;
+      border: 1px solid #fecaca;
       padding: 8px 16px;
       border-radius: 8px;
-      font-size: 13px;
       font-weight: 600;
+      font-size: 13px;
       cursor: pointer;
       transition: background 0.2s;
     }
 
     .btn-logout:hover {
-      background: #fecaca;
+      background-color: var(--danger-color);
+      color: white;
     }
 
-    /* Statistik Cards */
+    /* Statistik Ringkas */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -87,308 +91,330 @@
 
     .stat-card {
       background: var(--card-bg);
-      padding: 16px 20px;
+      padding: 20px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
-    .stat-label {
+    .stat-card h3 {
       font-size: 12px;
-      font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
     }
 
-    .stat-value {
+    .stat-card .value {
       font-size: 24px;
       font-weight: 700;
       color: var(--primary-color);
-      margin-top: 6px;
     }
 
-    /* Filter & Search Bar */
-    .filter-card {
+    /* Baris Pencarian & Filter */
+    .filter-section {
       background: var(--card-bg);
-      padding: 16px 20px;
+      padding: 16px;
       border-radius: 12px;
       border: 1px solid var(--border-color);
-      margin-bottom: 20px;
       display: flex;
       gap: 12px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
-      align-items: center;
     }
 
-    .filter-card input, .filter-card select {
-      padding: 9px 12px;
+    .filter-section input, .filter-section select {
+      padding: 10px 14px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 14px;
       outline: none;
-      background: #f8fafc;
-      color: var(--text-main);
     }
 
-    .filter-card input {
+    .filter-section input {
       flex: 1;
       min-width: 220px;
     }
 
-    /* Tabel Data */
-    .table-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
+    .filter-section select {
+      min-width: 160px;
     }
 
-    .table-responsive {
+    /* Tabel Data */
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
       overflow-x: auto;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
+      text-align: left;
       font-size: 13px;
     }
 
-    table th, table td {
+    th {
+      background: #f8fafc;
+      color: var(--text-muted);
+      font-weight: 600;
       padding: 12px 16px;
       border-bottom: 1px solid var(--border-color);
-      text-align: left;
-      vertical-align: middle;
     }
 
-    table th {
-      background-color: #f8fafc;
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-cycle {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 4px 8px;
+      border-radius: 6px;
       font-weight: 600;
-      color: #475569;
-      white-space: nowrap;
+      font-size: 12px;
     }
 
-    table tr:hover {
-      background-color: #f8fafc;
-    }
-
-    .img-preview {
+    .thumbnail {
       width: 48px;
       height: 48px;
       object-fit: cover;
       border-radius: 6px;
       border: 1px solid var(--border-color);
-      transition: transform 0.2s;
     }
 
-    .img-preview:hover {
-      transform: scale(1.1);
-    }
-
-    .map-frame {
-      width: 100px;
-      height: 60px;
-      border: none;
-      border-radius: 6px;
-    }
-
-    .coord-badge {
-      font-family: monospace;
-      font-size: 11px;
+    .map-link {
+      display: inline-block;
+      padding: 6px 10px;
       background: #f1f5f9;
-      padding: 3px 6px;
-      border-radius: 4px;
-      color: #334155;
+      color: var(--dark-color);
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .map-link:hover {
+      background: #e2e8f0;
     }
 
     .empty-state {
       text-align: center;
       padding: 40px;
       color: var(--text-muted);
-      font-size: 14px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Header Admin -->
-    <div class="header-card">
-      <div class="header-title">
+    <!-- Header Dashboard -->
+    <div class="dashboard-header">
+      <div class="dashboard-title">
         <h1>Dashboard Admin Database</h1>
-        <p>Kelola dan pantau seluruh hasil inputan pembacaan meter petugas.</p>
+        <p>Kelola dan pantau seluruh hasil inputan pembacaan meter petugas lapangan.</p>
       </div>
-      <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
+      <button class="btn-logout" onclick="handleLogout()">Keluar</button>
     </div>
 
-    <!-- Statistik Ringkas -->
+    <!-- Statistik Card -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Total Data Masuk</div>
-        <div class="stat-value" id="stat-total">0</div>
+        <h3>Total Data Masuk</h3>
+        <div class="value" id="total-data">0</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Total Pelanggan Tercatat</div>
-        <div class="stat-value" id="stat-pelanggan">0</div>
+        <h3>Total Pelanggan Tercatat</h3>
+        <div class="value" id="total-pelanggan">0</div>
       </div>
     </div>
 
-    <!-- Filter & Search -->
-    <div class="filter-card">
-      <input type="text" id="search-input" placeholder="Cari ID Pelanggan atau Nama Perusahaan..." oninput="filterData()">
+    <!-- Filter & Pencarian -->
+    <div class="filter-section">
+      <input type="text" id="search-keyword" placeholder="Cari ID Pelanggan atau Nama Perusahaan..." oninput="filterData()">
+      
+      <select id="filter-petugas" onchange="filterData()">
+        <option value="">Semua Petugas</option>
+      </select>
+
       <select id="filter-cycle" onchange="filterData()">
         <option value="">Semua Cycle</option>
       </select>
     </div>
 
-    <!-- Tabel Data -->
-    <div class="table-card">
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Waktu Input</th>
-              <th>ID Pelanggan</th>
-              <th>Nama Perusahaan</th>
-              <th>Cycle</th>
-              <th>Stand Meter</th>
-              <th>Koordinat GPS</th>
-              <th>Foto Stand Meter</th>
-              <th>Foto Berkas</th>
-              <th>Lokasi Peta</th>
-            </tr>
-          </thead>
-          <tbody id="table-body">
-            <tr>
-              <td colspan="9" class="empty-state">Memuat data database...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- Tabel Data Utama -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Waktu Input</th>
+            <th>Petugas</th>
+            <th>ID Pelanggan</th>
+            <th>Nama Perusahaan</th>
+            <th>Cycle</th>
+            <th>Stand Meter</th>
+            <th>Koordinat GPS</th>
+            <th>Foto Meter</th>
+            <th>Foto Berkas</th>
+            <th>Aksi Peta</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <tr>
+            <td colspan="10" class="empty-state">Memuat data dari database...</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
   <script>
-    // Konfigurasi Supabase (gunakan kredensial yang sama)
-    const SUPABASE_URL = 'https://tcikpmtuxaxjfucwjrah.supabase.co'; 
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjaWtwbXR1eGF4amZ1Y3dqcmFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDc5MTUsImV4cCI6MjEwNjE4MzkxNX0.Tg75hNg6zzaRSJ-L5O3w9UtzQbyqBgjlMaLBGv_ANYc'; 
+    // Konfigurasi Supabase
+    const SUPABASE_URL = 'https://tcikpmtuxaxjfucwjrah.supabase.co';
+    const SUPABASE_KEY = 'KUNCI_ANON_PUBLIC_SUPABASE_ANDA'; // Ganti dengan anon key asli Anda
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let allData = [];
+    let allReadings = [];
 
-    async function checkAdminSession() {
+    // 1. Pengecekan Keamanan Akses (Hanya Admin yang boleh masuk)
+    async function checkAdminAccess() {
       const { data: { session } } = await _supabase.auth.getSession();
-      // Jika ingin membatasi khusus admin yang login, Anda bisa tambahkan validasi email di sini.
-      // Untuk saat ini, kita pastikan user sudah login terlebih dahulu.
-      if (!session) {
-        window.location.href = '/petugas/login.html';
-      } else {
-        loadAdminData();
-      }
-    }
-
-    async function logoutAdmin() {
-      await _supabase.auth.signOut();
-      window.location.href = '/petugas/login.html';
-    }
-
-    async function loadAdminData() {
-      const tableBody = document.getElementById('table-body');
       
+      if (!session) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const userRole = session.user.user_metadata?.role;
+      if (userRole !== 'admin') {
+        alert('Akses ditolak! Halaman ini khusus untuk Admin.');
+        await _supabase.auth.signOut();
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Jika lolos, ambil data
+      fetchReadings();
+    }
+
+    // 2. Ambil Data dari Tabel Supabase
+    async function fetchReadings() {
       const { data, error } = await _supabase
         .from('meter_readings')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
-        tableBody.innerHTML = `<tr><td colspan="9" class="empty-state" style="color:var(--danger-color);">Gagal memuat data: ${error.message}</td></tr>`;
+        console.error('Gagal mengambil data:', error);
+        document.getElementById('table-body').innerHTML = `<tr><td colspan="10" class="empty-state">Gagal memuat data: ${error.message}</td></tr>`;
         return;
       }
 
-      allData = data || [];
-      updateDashboardUI(allData);
-      populateCycleFilter(allData);
+      allReadings = data || [];
+      populateDropdowns(allReadings);
+      renderTable(allReadings);
+      updateStats(allReadings);
     }
 
-    function updateDashboardUI(dataList) {
-      const tableBody = document.getElementById('table-body');
-      
-      // Update Statistik
-      document.getElementById('stat-total').textContent = dataList.length;
-      // Hitung total ID pelanggan unik
-      const uniquePelanggan = new Set(dataList.map(item => item.id_pelanggan)).size;
-      document.getElementById('stat-pelanggan').textContent = uniquePelanggan;
+    // 3. Isi Opsi Dropdown Filter Otomatis
+    function populateDropdowns(data) {
+      const petugasSet = new Set();
+      const cycleSet = new Set();
 
-      if (dataList.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="9" class="empty-state">Belum ada data rekaman meter yang tersedia.</td></tr>`;
+      data.forEach(item => {
+        if (item.petugas_email) petugasSet.add(item.petugas_email);
+        if (item.cycle) cycleSet.add(item.cycle);
+      });
+
+      const petugasSelect = document.getElementById('filter-petugas');
+      petugasSelect.innerHTML = '<option value="">Semua Petugas</option>';
+      petugasSet.forEach(email => {
+        petugasSelect.innerHTML += `<option value="${email}">${email}</option>`;
+      });
+
+      const cycleSelect = document.getElementById('filter-cycle');
+      cycleSelect.innerHTML = '<option value="">Semua Cycle</option>';
+      cycleSet.forEach(cycle => {
+        cycleSelect.innerHTML += `<option value="${cycle}">${cycle}</option>`;
+      });
+    }
+
+    // 4. Render Data ke Tabel HTML
+    function renderTable(data) {
+      const tbody = document.getElementById('table-body');
+      
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="empty-state">Tidak ada data bacaan meter ditemukan.</td></tr>`;
         return;
       }
 
-      let html = '';
-      dataList.forEach(row => {
-        const latVal = row.latitude ? Number(row.latitude).toFixed(6) : '-';
-        const lngVal = row.longitude ? Number(row.longitude).toFixed(6) : '-';
-
-        const fotoStandHtml = row.foto_stand_meter_url 
-          ? `<a href="${row.foto_stand_meter_url}" target="_blank"><img src="${row.foto_stand_meter_url}" class="img-preview" alt="Stand Meter"></a>` 
+      tbody.innerHTML = data.map(item => {
+        const waktu = new Date(item.created_at).toLocaleString('id-ID');
+        const fotoMeter = item.foto_meter_url ? `<img src="${item.foto_meter_url}" class="thumbnail" alt="Meter">` : '-';
+        const fotoBerkas = item.foto_berkas_url ? `<img src="${item.foto_berkas_url}" class="thumbnail" alt="Berkas">` : '-';
+        const koordinat = (item.latitude && item.longitude) ? `${item.latitude}, ${item.longitude}` : '-';
+        const mapLink = (item.latitude && item.longitude) 
+          ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="map-link">📍 Buka Peta</a>` 
           : '-';
 
-        const fotoBerkasHtml = row.foto_berkas_url 
-          ? `<a href="${row.foto_berkas_url}" target="_blank"><img src="${row.foto_berkas_url}" class="img-preview" alt="Berkas"></a>` 
-          : '-';
-
-        const mapHtml = (row.latitude && row.longitude)
-          ? `<iframe class="map-frame" src="https://maps.google.com/maps?q=${row.latitude},${row.longitude}&z=15&output=embed" loading="lazy"></iframe>`
-          : '-';
-
-        html += `
+        return `
           <tr>
-            <td style="white-space: nowrap;">${new Date(row.created_at).toLocaleString('id-ID')}</td>
-            <td><b>${row.id_pelanggan || '-'}</b></td>
-            <td>${row.nama_perusahaan || '-'}</td>
-            <td><span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:6px; font-weight:600;">${row.cycle || '-'}</span></td>
-            <td><b>${row.stand_meter || '0'} m³</b></td>
-            <td><span class="coord-badge">${latVal}, ${lngVal}</span></td>
-            <td>${fotoStandHtml}</td>
-            <td>${fotoBerkasHtml}</td>
-            <td>${mapHtml}</td>
+            <td>${waktu}</td>
+            <td><strong>${item.petugas_email || 'Sistem'}</strong></td>
+            <td><strong>${item.id_pelanggan || '-'}</strong></td>
+            <td>${item.nama_perusahaan || '-'}</td>
+            <td><span class="badge-cycle">${item.cycle || '-'}</span></td>
+            <td><strong>${item.stand_meter ?? '-'} m³</strong></td>
+            <td><small>${koordinat}</small></td>
+            <td>${fotoMeter}</td>
+            <td>${fotoBerkas}</td>
+            <td>${mapLink}</td>
           </tr>
         `;
-      });
-
-      tableBody.innerHTML = html;
+      }).join('');
     }
 
-    function populateCycleFilter(dataList) {
-      const cycleSelect = document.getElementById('filter-cycle');
-      const cycles = [...new Set(dataList.map(item => item.cycle))].filter(Boolean);
-      
-      let options = '<option value="">Semua Cycle</option>';
-      cycles.forEach(c => {
-        options += `<option value="${c}">Cycle ${c}</option>`;
-      });
-      cycleSelect.innerHTML = options;
+    // 5. Update Statistik Ringkas
+    function updateStats(data) {
+      document.getElementById('total-data').textContent = data.length;
+      const uniquePelanggan = new Set(data.map(i => i.id_pelanggan)).size;
+      document.getElementById('total-pelanggan').textContent = uniquePelanggan;
     }
 
+    // 6. Filter Data Berdasarkan Pencarian & Dropdown
     function filterData() {
-      const keyword = document.getElementById('search-input').value.toLowerCase();
+      const keyword = document.getElementById('search-keyword').value.toLowerCase();
+      const selectedPetugas = document.getElementById('filter-petugas').value;
       const selectedCycle = document.getElementById('filter-cycle').value;
 
-      const filtered = allData.filter(item => {
-        const matchKeyword = (
-          (item.id_pelanggan && item.id_pelanggan.toLowerCase().includes(keyword)) ||
-          (item.nama_perusahaan && item.nama_perusahaan.toLowerCase().includes(keyword))
-        );
-        const matchCycle = selectedCycle === "" || item.cycle === selectedCycle;
+      const filtered = allReadings.filter(item => {
+        const matchKeyword = (item.id_pelanggan && item.id_pelanggan.toLowerCase().includes(keyword)) ||
+                             (item.nama_perusahaan && item.nama_perusahaan.toLowerCase().includes(keyword));
+        const matchPetugas = selectedPetugas === '' || item.petugas_email === selectedPetugas;
+        const matchCycle = selectedCycle === '' || item.cycle === selectedCycle;
 
-        return matchKeyword && matchCycle;
+        return matchKeyword && matchPetugas && matchCycle;
       });
 
-      updateDashboardUI(filtered);
+      renderTable(filtered);
     }
 
-    // Jalankan pemeriksaan sesi saat halaman dibuka
-    checkAdminSession();
+    // 7. Fungsi Keluar (Logout)
+    async function handleLogout() {
+      await _supabase.auth.signOut();
+      window.location.href = 'login.html';
+    }
+
+    // Jalankan pemeriksaan akses saat halaman dibuka
+    checkAdminAccess();
   </script>
 </body>
 </html>
