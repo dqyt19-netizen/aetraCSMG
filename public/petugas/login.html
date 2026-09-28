@@ -104,6 +104,25 @@
       margin-top: 12px;
       display: none;
     }
+
+    /* Styling Tautan Kembali ke Halaman Utama */
+    .back-home {
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .back-home a {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .back-home a:hover {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -131,6 +150,11 @@
       <button type="submit" class="btn-submit" id="btn-login">Masuk</button>
       <div class="error-msg" id="error-msg"></div>
     </form>
+
+    <!-- Menu Kembali ke Halaman Utama -->
+    <div class="back-home">
+      <a href="../index.html">← Kembali ke Halaman Utama</a>
+    </div>
   </div>
 
   <script>
