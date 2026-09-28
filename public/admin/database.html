@@ -6,6 +6,8 @@
     <title>Database & Input Cycle - Aetra Air Tangerang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Pustaka SheetJS untuk membaca file Excel langsung di browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         function switchTab(tabId) {
             document.getElementById('content-pelanggan').classList.add('hidden');
@@ -27,9 +29,42 @@
                 document.getElementById('tab-jadwal').className = "px-4 py-2 bg-blue-50 text-blue-700 font-semibold text-xs rounded-xl flex items-center space-x-2 border border-blue-200 transition";
             }
         }
+
+        // Fungsi untuk menangani pemilihan file Excel dari komputer
+        function handleExcelUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Ambil sheet pertama
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    // Konversi ke JSON
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    alert(`Berhasil membaca file "${file.name}"!\nDitemukan ${jsonData.length} baris data industri.`);
+                    console.log("Data Excel:", jsonData);
+                    
+                    // Di sini Anda bisa menambahkan logika untuk memasukkan data ke tabel/database lokal
+                } catch (error) {
+                    alert("Terjadi kesalahan saat membaca file Excel. Pastikan format file benar.");
+                    console.error(error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
     </script>
 </head>
 <body class="bg-slate-50 font-sans antialiased">
+    <!-- Input File Tersembunyi untuk Memilih File dari Komputer -->
+    <input type="file" id="excelFilePicker" accept=".xlsx, .xls" class="hidden" onchange="handleExcelUpload(event)">
+
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
         <aside class="w-64 bg-blue-950 text-white flex flex-col justify-between hidden md:flex">
@@ -86,7 +121,7 @@
                     <!-- Dropdown 1: Cycle -->
                     <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 font-medium">
                         <option>Semua Cycle (1-15)</option>
-                        <option selected>Cycle 5</option>
+                        <option selected>Cycle 2</option>
                         <script>
                             for(let i=1; i<=15; i++) document.write(`<option>Cycle ${i}</option>`);
                         </script>
@@ -94,7 +129,7 @@
                     <!-- Dropdown 2: Kelas Pelanggan -->
                     <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 font-medium">
                         <option>Semua Kelas</option>
-                        <option selected>Premium</option>
+                        <option>Premium</option>
                         <option>Platinum</option>
                         <option>Gold</option>
                         <option>Silver</option>
@@ -145,7 +180,8 @@
                                 <i class="fa-solid fa-database text-blue-900 text-lg"></i>
                                 <h2 class="font-bold text-slate-800 text-sm">Manajemen & Master Data List Industri per Cycle</h2>
                             </div>
-                            <button class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-sm transition">
+                            <!-- Tombol Impor Excel yang memicu file picker laptop -->
+                            <button onclick="document.getElementById('excelFilePicker').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-sm transition cursor-pointer">
                                 <i class="fa-solid fa-file-excel"></i><span>Impor Excel (.xlsx, .xls)</span>
                             </button>
                         </div>
@@ -250,7 +286,7 @@
                                 <h2 class="font-bold text-slate-800 text-sm">Manajemen Petugas Pembaca Meter Lapangan</h2>
                             </div>
                             <div class="flex space-x-2">
-                                <button class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-sm transition">
+                                <button onclick="document.getElementById('excelFilePicker').click()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-sm transition cursor-pointer">
                                     <i class="fa-solid fa-file-excel"></i><span>Impor Petugas Excel (.xlsx)</span>
                                 </button>
                                 <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl flex items-center space-x-1.5 transition">
@@ -267,7 +303,6 @@
                             <strong>Catatan Pembagian Tugas:</strong> <i>Pak Solihin & Pak Kabul</i> bertindak sebagai <strong>Admin Meter Reading</strong> di kantor yang bertugas menginput cycle dan mengelola list industri. Pembaca meter fisik di lapangan dilakukan oleh petugas lapangan yang didaftarkan pada halaman ini[cite: 9].
                         </div>
 
-                        <!-- Filter Kategori Petugas -->
                         <div class="flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-semibold mb-6">
                             <span class="text-slate-500">Filter Kategori:</span>
                             <button class="px-3 py-1 bg-blue-900 text-white rounded-lg shadow">Semua (0)</button>
@@ -275,7 +310,6 @@
                             <button class="px-3 py-1 bg-white text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200">Key Account (0)</button>
                         </div>
 
-                        <!-- Empty State Box -->
                         <div class="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
                             <div class="w-12 h-12 bg-blue-50 text-blue-900 rounded-full flex items-center justify-center mx-auto mb-3 text-lg">
                                 <i class="fa-solid fa-users"></i>
@@ -295,7 +329,7 @@
                                 <h2 class="font-bold text-slate-800 text-sm">Jadwal & Plotting Matriks Kalender Cycle (1 Tahun)</h2>
                             </div>
                             <div class="flex space-x-2">
-                                <button class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-xl font-semibold flex items-center space-x-2">
+                                <button onclick="document.getElementById('excelFilePicker').click()" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-xl font-semibold flex items-center space-x-2 cursor-pointer">
                                     <i class="fa-solid fa-file-excel"></i><span>Impor Matriks Excel 1 Thn</span>
                                 </button>
                                 <button class="bg-slate-100 text-slate-700 text-xs px-3 py-2 rounded-xl font-semibold flex items-center space-x-1.5">
@@ -305,7 +339,6 @@
                         </div>
                         <p class="text-xs text-slate-500 mb-6">Otomatisasi plotting tanggal pembacaan tiap cycle per bulan dari spreadsheet Excel matriks 1 tahun[cite: 10].</p>
 
-                        <!-- Calendar Header & Navigation -->
                         <div class="border border-slate-200 rounded-xl p-4 bg-white shadow-sm overflow-x-auto">
                             <div class="flex justify-between items-center mb-4">
                                 <span class="font-bold text-xs text-slate-700 bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">Matriks Plotting Jadwal Cycle 1 Tahun (Tanggal 1–31)</span>
@@ -329,70 +362,7 @@
                                         }
                                     </script>
                                 </tr>
-                                <tr class="hover:bg-slate-50">
-                                    <td class="border font-semibold p-1.5 text-blue-800 bg-slate-50">Cycle 2</td>
-                                    <script>
-                                        for(let i=1; i<=31; i++) {
-                                            let bg = (i===6 || i===13 || i===20 || i===27)?'bg-red-600 text-white':(i===8)?'bg-yellow-400 font-bold text-black':(i===9)?'bg-blue-500 text-white':(i===10)?'bg-amber-900 text-white':'';
-                                            document.write(`<td class="border p-1 ${bg}">${i===8?'2':''}</td>`);
-                                        }
-                                    </script>
-                                </tr>
                             </table>
-                            
-                            <!-- Legend -->
-                            <div class="flex flex-wrap items-center gap-4 mt-4 text-[11px] text-slate-600 border-t border-slate-100 pt-3">
-                                <span class="font-bold text-slate-700">KETERANGAN WARNA WORKFLOW:</span>
-                                <div class="flex items-center space-x-1.5"><span class="w-3 h-3 bg-purple-600 rounded"></span><span>Pra-Baca</span></div>
-                                <div class="flex items-center space-x-1.5"><span class="w-3 h-3 bg-yellow-400 rounded"></span><span>Hari H Pembacaan Meter (Nomor Cycle)</span></div>
-                                <div class="flex items-center space-x-1.5"><span class="w-3 h-3 bg-blue-500 rounded"></span><span>Verifikasi Stand</span></div>
-                                <div class="flex items-center space-x-1.5"><span class="w-3 h-3 bg-amber-900 rounded"></span><span>Billing / Invoicing</span></div>
-                                <div class="flex items-center space-x-1.5"><span class="w-3 h-3 bg-red-600 rounded"></span><span>Hari Minggu / Libur</span></div>
-                            </div>
-                        </div>
-
-                        <!-- Table Rincian Tanggal Pembacaan Tiap Cycle -->
-                        <div class="mt-6">
-                            <h3 class="font-bold text-slate-800 text-xs mb-1">Daftar Rincian Tanggal Pembacaan Tiap Cycle</h3>
-                            <p class="text-[10px] text-slate-500 mb-3">Menampilkan Hari H baca meter, rentang tanggal verifikasi, serta petugas lapangan penanggungjawab[cite: 11].</p>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs">
-                                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px]">
-                                        <tr>
-                                            <th class="p-2.5 rounded-l-lg">Nama Cycle</th>
-                                            <th class="p-2.5">Hari H Baca Meter</th>
-                                            <th class="p-2.5">Rentang Tanggal</th>
-                                            <th class="p-2.5">Petugas Pembaca Lapangan</th>
-                                            <th class="p-2.5">Industri Terdaftar</th>
-                                            <th class="p-2.5">Status Siklus</th>
-                                            <th class="p-2.5">Catatan Wilayah</th>
-                                            <th class="p-2.5 rounded-r-lg text-center">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100 text-slate-700">
-                                        <tr>
-                                            <td class="p-2.5 font-bold text-blue-700">Cycle 4</td>
-                                            <td class="p-2.5"><span class="bg-yellow-400 font-bold px-1.5 py-0.5 rounded text-[10px]">10 Tanggal 10</span></td>
-                                            <td class="p-2.5">10 Sep 2026 - 11 Sep 2026</td>
-                                            <td class="p-2.5 text-slate-400 italic">Belum Ditugaskan</td>
-                                            <td class="p-2.5 font-semibold">2</td>
-                                            <td class="p-2.5"><span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] rounded border">Terjadwal</span></td>
-                                            <td class="p-2.5 text-slate-500">Balaraja Industrial Estate</td>
-                                            <td class="p-2.5 text-center"><button class="text-blue-600 hover:text-blue-800 font-medium"><i class="fa-solid fa-pen-to-square mr-1"></i> Ubah</button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="p-2.5 font-bold text-blue-700">Cycle 5</td>
-                                            <td class="p-2.5"><span class="bg-yellow-400 font-bold px-1.5 py-0.5 rounded text-[10px]">11 Tanggal 11</span></td>
-                                            <td class="p-2.5">11 Sep 2026 - 12 Sep 2026</td>
-                                            <td class="p-2.5 text-slate-400 italic">Belum Ditugaskan</td>
-                                            <td class="p-2.5 font-semibold">2</td>
-                                            <td class="p-2.5"><span class="px-2 py-0.5 bg-amber-50 text-amber-700 text-[10px] rounded border border-amber-200">Sedang Berjalan</span></td>
-                                            <td class="p-2.5 text-slate-500">Daan Mogot & Cikupa Mas</td>
-                                            <td class="p-2.5 text-center"><button class="text-blue-600 hover:text-blue-800 font-medium"><i class="fa-solid fa-pen-to-square mr-1"></i> Ubah</button></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
                     </div>
                 </div>
