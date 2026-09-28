@@ -408,6 +408,7 @@
           longitude: userLocation.longitude,
           foto_meter_url: foto_meter_url, // DIPERBAIKI: Menggunakan nama kolom yang benar
           foto_berkas_url: foto_berkas_url
+          petugas_email: petugasEmail
         };
 
         const { error } = await _supabase.from('meter_readings').insert([payload]);
