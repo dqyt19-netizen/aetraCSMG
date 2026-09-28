@@ -1,378 +1,209 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Database & Input Cycle - SIMBA-IN</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            aetra: {
-              blue: '#0055A5',
-              darkblue: '#003E78',
-              orange: '#E86216'
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database & Input Cycle - Aetra Air Tangerang</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased">
-  <div class="flex h-screen overflow-hidden">
-    
-    <!-- SIDEBAR NAVIGASI -->
-    <aside class="w-64 bg-aetra-darkblue text-slate-200 flex flex-col justify-between p-4 shrink-0 h-full">
-      <div>
-        <!-- BRAND LOGO AETRA -->
-        <div class="bg-white rounded-xl p-3 mb-6 flex items-center justify-center gap-2 shadow-sm">
-          <div class="w-8 h-8 bg-aetra-blue rounded-lg flex items-center justify-center text-white font-extrabold text-lg">a</div>
-          <div class="leading-none">
-            <span class="font-extrabold text-aetra-blue text-lg tracking-tight">aetra</span>
-            <span class="block text-[9px] font-bold text-slate-400 tracking-wider">AIR TANGERANG</span>
-          </div>
-        </div>
-
-        <!-- LIST MENU NAVIGASI -->
-        <nav class="space-y-1.5">
-          <a href="./database.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold bg-aetra-orange text-white shadow-md">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-            Database & Input Cycle
-          </a>
-          
-          <a href="./monitoring.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-            Monitoring Pembacaan Cycle
-          </a>
-
-          <a href="./verifikasi.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            Verifikasi Reading
-          </a>
-
-          <a href="./billing.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            Billing & Invoicing
-          </a>
-
-          <a href="./audit.html" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            Log Audit & Aktivitas
-          </a>
-        </nav>
-      </div>
-
-      <!-- FOOTER SIDEBAR -->
-      <div class="pt-4 border-t border-blue-800/60 text-[10px] text-blue-200">
-        <div class="flex items-center gap-1.5 font-medium mb-1">
-          <span>🏢</span> Unit Pelayanan Industri
-        </div>
-        <p class="text-slate-400">PT Aetra Air Tangerang © 2026</p>
-      </div>
-    </aside>
-
-    <!-- AREA KONTEN UTAMA -->
-    <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
-      
-      <!-- TOPBAR / HEADER TOP -->
-      <header class="bg-white border-b px-6 py-3 flex justify-between items-center sticky top-0 z-20 gap-4">
-        <div class="flex items-center gap-3 flex-1 max-w-xl">
-          <div class="relative w-full">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
-            <input id="searchInput" type="text" placeholder="Cari ID Pelanggan atau Nama Industri..." oninput="refreshData()" class="w-full pl-9 pr-4 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-aetra-blue" />
-          </div>
-          
-          <select id="cycleFilterTop" class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium">
-            <option>Cycle 5</option>
-          </select>
-
-          <select class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium">
-            <option>Premium</option>
-          </select>
-
-          <select class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium">
-            <option>Maret 2026</option>
-          </select>
-        </div>
-
-        <div class="flex items-center gap-3 text-xs">
-          <button class="px-3 py-1.5 border rounded-xl flex items-center gap-1.5 text-slate-600 font-medium">
-            🌙 Mode Gelap
-          </button>
-          
-          <div class="px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl font-bold text-[11px] flex items-center gap-1">
-            🗄️ Supabase: <span class="text-amber-500">● Config</span>
-          </div>
-
-          <div class="text-right leading-tight">
-            <div id="clockDisplay" class="font-bold text-slate-700">🕒 22:05:07</div>
-            <div class="text-[10px] text-slate-400">Senin, 28 September 2026</div>
-          </div>
-
-          <div class="flex items-center gap-2 border-l pl-3">
-            <div class="w-8 h-8 rounded-full bg-aetra-orange text-white font-bold flex items-center justify-center text-xs">PY</div>
+<body class="bg-slate-50 font-sans antialiased">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-blue-950 text-white flex flex-col justify-between hidden md:flex">
             <div>
-              <p class="font-bold text-xs text-slate-800">Pak Yaya</p>
-              <p class="text-[10px] text-slate-400">Tim Billing & Invoicing</p>
+                <div class="p-4 bg-white m-4 rounded-xl flex items-center space-x-3">
+                    <img src="../logoaetra.jpg" alt="Logo Aetra" class="h-8 w-auto">
+                    <div>
+                        <h1 class="text-xs font-bold text-blue-950 leading-tight">aetra</h1>
+                        <p class="text-[9px] text-slate-500 tracking-wider">AIR TANGERANG</p>
+                    </div>
+                </div>
+                <nav class="mt-4 space-y-1 px-3">
+                    <a href="database.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-orange-600 text-white font-medium text-sm shadow-md">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Database & Input Cycle</span>
+                    </a>
+                    <a href="monitoring.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-blue-900 text-sm font-medium transition">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Monitoring Pembacaan Cycle</span>
+                    </a>
+                    <a href="verifikasi.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-blue-900 text-sm font-medium transition">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Verifikasi Reading</span>
+                    </a>
+                    <a href="billinginvoice.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-blue-900 text-sm font-medium transition">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>Billing & Invoicing</span>
+                    </a>
+                    <a href="log.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-blue-900 text-sm font-medium transition">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Log Audit & Aktivitas</span>
+                    </a>
+                </nav>
             </div>
-            <a href="../index.html" class="ml-2 px-2.5 py-1 bg-rose-50 text-rose-600 rounded-lg font-bold text-[11px] hover:bg-rose-100 transition">➡️ Keluar</a>
-          </div>
-        </div>
-      </header>
-
-      <!-- MAIN CONTENT -->
-      <main class="p-6 space-y-6">
-        
-        <!-- SUB-HEADER TABS -->
-        <div class="flex gap-2">
-          <button class="px-4 py-2 bg-white text-aetra-blue font-bold rounded-xl shadow-sm border text-xs flex items-center gap-2">
-            🏢 Daftar Pelanggan Industri (30)
-          </button>
-          <button class="px-4 py-2 bg-slate-200/60 text-slate-600 font-semibold rounded-xl text-xs flex items-center gap-2 hover:bg-slate-200">
-            👥 Section Pembaca Meter (0)
-          </button>
-          <button class="px-4 py-2 bg-slate-200/60 text-slate-600 font-semibold rounded-xl text-xs flex items-center gap-2 hover:bg-slate-200">
-            📅 Jadwal & Tanggal Cycle (15 Cycle)
-          </button>
-        </div>
-
-        <!-- FORM MASTER DATA INDUSTRI -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative">
-          <div class="flex justify-between items-start mb-4">
-            <div>
-              <h2 class="font-extrabold text-aetra-darkblue text-base flex items-center gap-2">
-                🏢 Manajemen & Master Data List Industri per Cycle
-              </h2>
-              <p class="text-xs text-slate-400 mt-0.5">Tambahkan akun industri baru ke dalam database pencatatan meter atau impor secara massal dari Excel.</p>
+            <div class="p-4 border-t border-blue-900 text-xs text-slate-400">
+                <p class="font-semibold text-slate-300">Unit Pelayanan Industri</p>
+                <p class="text-[10px] mt-1">PT Aetra Air Tangerang © 2026</p>
             </div>
+        </aside>
 
-            <label class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-              📥 Impor Excel (.xlsx, .xls)
-              <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importExcel(event)">
-            </label>
-          </div>
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+            <!-- Top Navbar -->
+            <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-20">
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-search text-xs"></i>
+                        </span>
+                        <input type="text" placeholder="Cari ID Pelanggan atau Nama Industri..." class="pl-9 pr-4 py-1.5 text-xs bg-slate-100 rounded-full border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-72">
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3 text-xs">
+                    <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 font-medium"><option>Cycle 5</option></select>
+                    <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 font-medium"><option>Premium</option></select>
+                    <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 font-medium"><option>Maret 2026</option></select>
+                    <button class="flex items-center space-x-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 font-medium">
+                        <i class="fa-solid fa-database"></i><span>Supabase: Config</span>
+                    </button>
+                    <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
+                        <div class="w-7 h-7 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-xs">PY</div>
+                        <div>
+                            <p class="font-bold text-slate-800 leading-none">Pak Yaya</p>
+                            <p class="text-[10px] text-slate-500">Tim Billing & Invoicing</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
 
-          <!-- INPUT FORM -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">ID Pelanggan</label>
-              <input id="inputNewId" type="text" placeholder="Contoh: IND-1011" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white" />
+            <!-- Content Body -->
+            <div class="p-6 space-y-6">
+                <!-- Sub Tabs Navigation -->
+                <div class="flex space-x-2 border-b border-slate-200 pb-3">
+                    <button class="px-4 py-2 bg-blue-50 text-blue-700 font-semibold text-xs rounded-xl flex items-center space-x-2 border border-blue-200">
+                        <i class="fa-solid fa-users"></i><span>Daftar Pelanggan Industri (30)</span>
+                    </button>
+                    <button class="px-4 py-2 bg-white text-slate-600 hover:bg-slate-100 font-medium text-xs rounded-xl flex items-center space-x-2 border border-slate-200">
+                        <i class="fa-solid fa-gauge"></i><span>Section Pembaca Meter (0)</span>
+                    </button>
+                    <button class="px-4 py-2 bg-white text-slate-600 hover:bg-slate-100 font-medium text-xs rounded-xl flex items-center space-x-2 border border-slate-200">
+                        <i class="fa-solid fa-calendar-days"></i><span>Jadwal & Tanggal Cycle (15 Cycle)</span>
+                    </button>
+                </div>
+
+                <!-- Input Card Form -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-database text-blue-900 text-lg"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Manajemen & Master Data List Industri per Cycle</h2>
+                        </div>
+                        <button class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-sm transition">
+                            <i class="fa-solid fa-file-excel"></i><span>Impor Excel (.xlsx, .xls)</span>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-5">Tambahkan akun industri baru ke dalam database pencatatan meter atau impor secara massal dari Excel.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">ID Pelanggan</label>
+                            <input type="text" placeholder="Contoh: IND-1011" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Nama Perusahaan Industri</label>
+                            <input type="text" placeholder="PT Contoh Industri Tbk" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Email Industri</label>
+                            <input type="email" placeholder="finance@contoh.co.id" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Pilih Cycle (1–15)</label>
+                            <select class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none"><option>Cycle 1</option></select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Kelas Pelanggan</label>
+                            <select class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none"><option>Gold</option></select>
+                        </div>
+                    </div>
+                    <div class="mt-5 flex justify-end">
+                        <button class="bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-md transition">
+                            + Simpan ke Database Cycle
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bottom Sections: Distribution & Readiness List -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Target Distribution -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <i class="fa-solid fa-chart-bar text-blue-900"></i>
+                            <h3 class="font-bold text-slate-800 text-xs uppercase">Distribusi Target per Cycle</h3>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mb-4">Kepadatan target pelanggan industri yang tersebar pada Cycle 1 hingga 15.</p>
+                        <div class="space-y-2">
+                            <!-- Loop sample bar -->
+                            <div class="flex items-center justify-between text-xs text-slate-600">
+                                <span class="w-16">Cycle 1</span>
+                                <div class="flex-1 mx-2 bg-blue-900 h-3 rounded-full"></div>
+                                <span class="font-bold">2</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-slate-600">
+                                <span class="w-16">Cycle 2</span>
+                                <div class="flex-1 mx-2 bg-blue-900 h-3 rounded-full"></div>
+                                <span class="font-bold">2</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-slate-600">
+                                <span class="w-16">Cycle 3</span>
+                                <div class="flex-1 mx-2 bg-blue-900 h-3 rounded-full"></div>
+                                <span class="font-bold">2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table Readiness List -->
+                    <div class="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-xs">Daftar Kesiapan Pencatatan Meter per Cycle</h3>
+                                <p class="text-[10px] text-slate-500">Daftar industri yang tergabung dalam jadwal pembacaan operasional.</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-600">Total Terdaftar: <strong class="text-blue-900">38</strong></span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-100 text-slate-600 uppercase text-[10px]">
+                                    <tr>
+                                        <th class="p-2.5 rounded-l-lg"><input type="checkbox"></th>
+                                        <th class="p-2.5">ID Pelanggan</th>
+                                        <th class="p-2.5">Nama Perusahaan Industri</th>
+                                        <th class="p-2.5">Cycle</th>
+                                        <th class="p-2.5">Kelas</th>
+                                        <th class="p-2.5">Status Workflow</th>
+                                        <th class="p-2.5 rounded-r-lg text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                    <tr>
+                                        <td class="p-2.5"><input type="checkbox"></td>
+                                        <td class="p-2.5 font-bold text-orange-600">IND-1001</td>
+                                        <td class="p-2.5 font-medium">PT Krakatau Steel Industry<br><span class="text-[10px] text-slate-400 font-normal">billing@krakatau.co.id</span></td>
+                                        <td class="p-2.5 font-semibold text-blue-700">Cycle 1</td>
+                                        <td class="p-2.5">Gold</td>
+                                        <td class="p-2.5"><span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200">Verified</span></td>
+                                        <td class="p-2.5 text-center"><button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Nama Perusahaan Industri</label>
-              <input id="inputNewName" type="text" placeholder="PT Contoh Industri Tbk" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white" />
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Email Industri</label>
-              <input id="inputNewEmail" type="email" placeholder="finance@contoh.co.id" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white" />
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Pilih Cycle (1–15)</label>
-              <select id="inputNewCycle" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white font-medium"></select>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Kelas Pelanggan</label>
-              <select id="inputNewKelas" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white font-medium">
-                <option value="Gold">Gold</option>
-                <option value="Premium">Premium</option>
-                <option value="Platinum">Platinum</option>
-              </select>
-            </div>
-
-            <div class="flex items-end">
-              <button onclick="addNewIndustry()" class="w-full py-2.5 bg-aetra-orange text-white font-bold text-xs rounded-xl hover:bg-orange-600 transition flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/20">
-                ➕ Simpan ke Database Cycle
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- TWO COLUMN SECTION (DISTRIBUSI TARGET & TABEL PENCATATAN) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          <!-- LEFT COLUMN: DISTRIBUSI TARGET -->
-          <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div>
-              <h3 class="font-extrabold text-aetra-darkblue text-xs uppercase tracking-wide flex items-center gap-2">
-                📊 Distribusi Target per Cycle
-              </h3>
-              <p class="text-[11px] text-slate-400 mt-1">Kepadatan target pelanggan industri yang tersebar pada Cycle 1 hingga 15.</p>
-            </div>
-
-            <div id="cycleDistributionList" class="space-y-1.5 text-xs font-semibold">
-              <!-- Rendered via Javascript -->
-            </div>
-          </div>
-
-          <!-- RIGHT COLUMN: DAFTAR KESIAPAN PENCATATAN METER -->
-          <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-            <div class="flex justify-between items-center">
-              <div>
-                <h3 class="font-extrabold text-aetra-darkblue text-sm">Daftar Kesiapan Pencatatan Meter per Cycle</h3>
-                <p class="text-[11px] text-slate-400">Daftar industri yang tergabung dalam jadwal pembacaan operasional.</p>
-              </div>
-              <span class="text-xs font-bold text-slate-400">Total Terdaftar: <strong class="text-aetra-blue">30</strong></span>
-            </div>
-
-            <div class="flex items-center gap-3 bg-slate-50 p-2.5 rounded-xl text-xs">
-              <span class="font-bold text-slate-500">Filter Tampilan:</span>
-              <select class="px-2.5 py-1 border rounded-lg bg-white font-medium"><option>Semua Cycle</option></select>
-              <select class="px-2.5 py-1 border rounded-lg bg-white font-medium"><option>Semua Kelas</option></select>
-            </div>
-
-            <div class="overflow-x-auto border border-slate-100 rounded-xl">
-              <table class="w-full text-left text-xs">
-                <thead>
-                  <tr class="bg-slate-50 text-slate-500 uppercase font-extrabold text-[10px] border-b">
-                    <th class="p-3 w-8 text-center"><input type="checkbox" /></th>
-                    <th class="p-3">ID Pelanggan</th>
-                    <th class="p-3">Nama Perusahaan Industri</th>
-                    <th class="p-3">Cycle</th>
-                    <th class="p-3">Kelas</th>
-                    <th class="p-3">Status Workflow</th>
-                    <th class="p-3 text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="dbTable" class="divide-y divide-slate-100 font-medium"></tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-
-      </main>
+        </main>
     </div>
-  </div>
-
-  <script>
-    let dataIndustri = JSON.parse(localStorage.getItem('aetra_industri_data')) || [
-      { id: 'IND-1001', nama: 'PT Krakatau Steel Industry', email: 'billing@krakatau.co.id', cycle: 'Cycle 1', kelas: 'Gold', status: 'Verified' },
-      { id: 'IND-1002', nama: 'PT Indah Kiat Pulp & Paper', email: 'finance@indahkiat.co.id', cycle: 'Cycle 1', kelas: 'Premium', status: 'Invoiced' },
-      { id: 'IND-1003', nama: 'PT Gajah Tunggal Tbk', email: 'acc@gajahtunggal.co.id', cycle: 'Cycle 2', kelas: 'Platinum', status: 'Pending Verification' },
-      { id: 'IND-1004', nama: 'PT Torabika Eka Semesta (Mayora Group)', email: 'utility.finance@mayora.co.id', cycle: 'Cycle 2', kelas: 'Premium', status: 'Verified' },
-      { id: 'IND-1005', nama: 'PT Ching Luh Indonesia', email: 'tax.billing@chingluh.co.id', cycle: 'Cycle 3', kelas: 'Gold', status: 'Pending Verification' }
-    ];
-
-    document.addEventListener("DOMContentLoaded", () => {
-      let selectCycle = document.getElementById('inputNewCycle');
-      selectCycle.innerHTML = '';
-      for(let i=1; i<=15; i++) {
-        selectCycle.innerHTML += `<option value="Cycle ${i}">Cycle ${i}</option>`;
-      }
-      renderDistribution();
-      renderDB();
-      startClock();
-    });
-
-    function startClock() {
-      setInterval(() => {
-        const now = new Date();
-        document.getElementById('clockDisplay').innerText = '🕒 ' + now.toTimeString().split(' ')[0];
-      }, 1000);
-    }
-
-    function renderDistribution() {
-      let listEl = document.getElementById('cycleDistributionList');
-      listEl.innerHTML = '';
-      for(let i=1; i<=15; i++) {
-        listEl.innerHTML += `
-          <div class="flex items-center gap-3">
-            <span class="w-14 text-slate-500 font-medium">Cycle ${i}</span>
-            <div class="flex-1 bg-slate-100 h-3 rounded-full overflow-hidden">
-              <div class="bg-aetra-blue h-full rounded-full" style="width: 85%;"></div>
-            </div>
-            <span class="w-4 text-right font-bold text-slate-600">2</span>
-          </div>
-        `;
-      }
-    }
-
-    function renderDB() {
-      let tbody = document.getElementById('dbTable');
-      tbody.innerHTML = '';
-      dataIndustri.forEach(i => {
-        let statusBadge = 'bg-slate-100 text-slate-600';
-        if(i.status === 'Verified') statusBadge = 'bg-emerald-50 text-emerald-600 font-bold';
-        if(i.status === 'Invoiced') statusBadge = 'bg-blue-50 text-blue-600 font-bold';
-        if(i.status === 'Pending Verification') statusBadge = 'bg-amber-50 text-amber-600 font-bold';
-
-        tbody.innerHTML += `
-          <tr class="hover:bg-slate-50/80 transition">
-            <td class="p-3 text-center"><input type="checkbox" /></td>
-            <td class="p-3 font-bold font-mono text-aetra-orange">${i.id}</td>
-            <td class="p-3">
-              <p class="font-bold text-slate-800">${i.nama}</p>
-              <p class="text-[10px] text-slate-400 font-normal">${i.email}</p>
-            </td>
-            <td class="p-3 font-semibold text-aetra-blue">${i.cycle}</td>
-            <td class="p-3 text-slate-600">${i.kelas}</td>
-            <td class="p-3"><span class="px-2.5 py-1 rounded-full text-[9px] ${statusBadge}">${i.status}</span></td>
-            <td class="p-3 text-center">
-              <button onclick="hapusData('${i.id}')" class="text-rose-500 hover:text-rose-700 transition">🗑️</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function addNewIndustry() {
-      let id = document.getElementById('inputNewId').value;
-      let nama = document.getElementById('inputNewName').value;
-      let email = document.getElementById('inputNewEmail').value;
-      let cycle = document.getElementById('inputNewCycle').value;
-      let kelas = document.getElementById('inputNewKelas').value;
-
-      if(!id || !nama) return alert("Mohon isi ID dan Nama Perusahaan!");
-
-      dataIndustri.push({ id, nama, email, cycle, kelas, status: 'Pending Verification' });
-      saveAndRefresh();
-    }
-
-    function hapusData(id) {
-      if(confirm(`Apakah Anda yakin ingin menghapus ${id}?`)) {
-        dataIndustri = dataIndustri.filter(i => i.id !== id);
-        saveAndRefresh();
-      }
-    }
-
-    function importExcel(e) {
-      let reader = new FileReader();
-      reader.onload = (evt) => {
-        let wb = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
-        let data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-        data.forEach(item => {
-          dataIndustri.push({
-            id: String(item.ID || 'IND-' + Math.floor(Math.random()*1000)),
-            nama: String(item.Nama || 'Industri Impor'),
-            email: String(item.Email || 'finance@import.co.id'),
-            cycle: 'Cycle 1',
-            kelas: 'Gold',
-            status: 'Pending Verification'
-          });
-        });
-        saveAndRefresh();
-      };
-      reader.readAsArrayBuffer(e.target.files[0]);
-    }
-
-    function saveAndRefresh() {
-      localStorage.setItem('aetra_industri_data', JSON.stringify(dataIndustri));
-      renderDB();
-    }
-  </script>
 </body>
 </html>
