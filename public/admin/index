@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetra Air Tangerang - Key Account Meter System (Admin)</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .sidebar-active {
+      background-color: #ea580c; /* Orange active highlight */
+      color: #ffffff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans antialiased text-slate-800 flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR LEFT -->
+  <aside class="w-64 bg-[#083c6c] text-white flex flex-col justify-between flex-shrink-0">
+    <div>
+      <!-- LOGO -->
+      <div class="p-4 bg-white m-3 rounded-xl flex items-center justify-center shadow-sm">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-water text-cyan-600 text-3xl"></i>
+          <div>
+            <h1 class="text-xl font-black text-[#083c6c] tracking-tight leading-none">aetra</h1>
+            <p class="text-[10px] text-cyan-600 font-semibold tracking-widest uppercase">AIR TANGERANG</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENU NAVIGASI -->
+      <nav class="mt-4 px-2 space-y-1">
+        <button onclick="switchTab('database')" id="nav-database" class="w-full text-left px-4 py-3 rounded-lg text-sm flex items-center space-x-3 transition sidebar-active">
+          <i class="fa-solid fa-database w-5"></i>
+          <span>Database & Input Cycle</span>
+        </button>
+
+        <button onclick="switchTab('monitoring')" id="nav-monitoring" class="w-full text-left px-4 py-3 rounded-lg text-sm flex items-center space-x-3 text-slate-300 hover:bg-[#0c4a85] transition">
+          <i class="fa-solid fa-chart-line w-5"></i>
+          <span>Monitoring Pembacaan Cycle</span>
+        </button>
+
+        <button onclick="switchTab('verifikasi')" id="nav-verifikasi" class="w-full text-left px-4 py-3 rounded-lg text-sm flex items-center space-x-3 text-slate-300 hover:bg-[#0c4a85] transition">
+          <i class="fa-solid fa-circle-check w-5"></i>
+          <span>Verifikasi Reading</span>
+        </button>
+
+        <button onclick="switchTab('billing')" id="nav-billing" class="w-full text-left px-4 py-3 rounded-lg text-sm flex items-center space-x-3 text-slate-300 hover:bg-[#0c4a85] transition">
+          <i class="fa-solid fa-file-invoice-dollar w-5"></i>
+          <span>Billing & Invoicing</span>
+        </button>
+
+        <button onclick="switchTab('audit')" id="nav-audit" class="w-full text-left px-4 py-3 rounded-lg text-sm flex items-center space-x-3 text-slate-300 hover:bg-[#0c4a85] transition">
+          <i class="fa-solid fa-clock-rotate-left w-5"></i>
+          <span>Log Audit & Aktivitas</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- FOOTER SIDEBAR -->
+    <div class="p-4 border-t border-slate-700/50 text-[11px] text-slate-400">
+      <div class="flex items-center space-x-2 mb-1">
+        <i class="fa-solid fa-building text-slate-400"></i>
+        <span>Unit Pelayanan Industri</span>
+      </div>
+      <p>PT Aetra Air Tangerang &copy; 2026</p>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <div class="flex-1 flex flex-col h-full overflow-hidden">
+
+    <!-- TOP HEADER / BAR -->
+    <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-xs">
+      <!-- Search Input -->
+      <div class="relative w-80">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+        <input type="text" placeholder="Cari ID Pelanggan atau Nama Industri..." class="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <!-- Header Controls / Profile -->
+      <div class="flex items-center space-x-4">
+        <select class="border border-slate-300 text-xs rounded-lg px-3 py-1.5 bg-white text-slate-700">
+          <option>Cycle 1</option>
+          <option>Cycle 2</option>
+        </select>
+        <select class="border border-slate-300 text-xs rounded-lg px-3 py-1.5 bg-white text-slate-700">
+          <option>Semua Kelas</option>
+        </select>
+        <select class="border border-slate-300 text-xs rounded-lg px-3 py-1.5 bg-white text-slate-700">
+          <option>Semua Bulan (1 Tahun)</option>
+        </select>
+
+        <button class="text-xs bg-slate-100 border border-slate-300 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-regular fa-moon"></i>
+          <span>Mode Gelap</span>
+        </button>
+
+        <div class="text-right text-[11px] text-slate-500 border-l pl-4 border-slate-200">
+          <div class="font-semibold text-slate-700 flex items-center justify-end space-x-1">
+            <i class="fa-regular fa-clock"></i>
+            <span>19:48:13</span>
+          </div>
+          <div>Senin, 28 September 2026</div>
+        </div>
+
+        <!-- User Profile -->
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs">
+            PY
+          </div>
+          <div class="text-xs">
+            <div class="font-bold text-slate-800">Pak Yaya</div>
+            <div class="text-[10px] text-slate-500">Tim Billing & Invoicing</div>
+          </div>
+        </div>
+
+        <a href="index.html" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg flex items-center space-x-1">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Keluar</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY (SCROLLABLE) -->
+    <main class="flex-1 overflow-y-auto p-6 bg-slate-100 space-y-6">
+
+      <!-- ================= 1. TAB DATABASE & INPUT CYCLE ================= -->
+      <div id="tab-database" class="space-y-6">
+        <!-- Sub-tabs -->
+        <div class="flex space-x-2 border-b border-slate-200 pb-2">
+          <button class="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Daftar Pelanggan Industri (30)</button>
+          <button class="px-4 py-2 text-slate-500 hover:bg-slate-200 text-xs font-semibold rounded-lg">Section Pembaca Meter (6)</button>
+          <button class="px-4 py-2 bg-white text-blue-600 border border-blue-200 shadow-sm text-xs font-semibold rounded-lg">Jadwal & Tanggal Cycle (15 Cycle)</button>
+        </div>
+
+        <!-- Kalender Header / Action -->
+        <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
+              <i class="fa-regular fa-calendar-days text-xl"></i>
+            </div>
+            <div>
+              <h2 class="font-bold text-sm text-slate-800">Jadwal & Plotting Matriks Kalender Cycle (1 Tahun)</h2>
+              <p class="text-xs text-slate-500">Otomatisasi plotting tanggal pembacaan tiap cycle per bulan dari spreadsheet Excel matriks 1 tahun.</p>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <button class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-lg font-medium flex items-center space-x-2">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>Impor Matriks Excel 1 Thn</span>
+            </button>
+            <button class="border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs px-4 py-2 rounded-lg font-medium flex items-center space-x-2">
+              <i class="fa-solid fa-download"></i>
+              <span>Unduh Template 1 Thn</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Matriks Kalender Pembacaan -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+            <div>
+              <h3 class="font-bold text-sm text-slate-800 flex items-center space-x-2">
+                <span>Matriks Plotting Jadwal Cycle 1 Tahun (Tanggal 1 - 31)</span>
+                <span class="bg-emerald-500 text-white text-[10px] px-2 py-0.5 rounded-full">Sep-26</span>
+              </h3>
+              <p class="text-xs text-slate-500">Format matriks kalender resmi operasional: siklus terplot otomatis per tanggal tiap bulannya.</p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button class="p-1.5 border rounded-lg text-slate-500 hover:bg-white"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+              <select class="border border-slate-300 text-xs rounded-lg px-3 py-1 bg-white font-medium">
+                <option>September 2026 (Sep-26)</option>
+              </select>
+              <button class="p-1.5 border rounded-lg text-slate-500 hover:bg-white"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+            </div>
+          </div>
+
+          <!-- Banner Kalender -->
+          <div class="bg-lime-500 text-slate-900 text-center font-bold text-xs py-1.5 tracking-wider uppercase">
+            SEP-26 - KALENDER PEMBACAAN METER INDUSTRI
+          </div>
+
+          <!-- Tabel Grid Matriks -->
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-center text-xs">
+              <thead>
+                <tr class="bg-slate-100 border-b border-slate-200 text-slate-600 font-semibold">
+                  <th class="p-2 border-r border-slate-200 w-24">Cycle</th>
+                  <!-- Grid 1-31 -->
+                  <script>
+                    for(let i=1; i<=31; i++){
+                      document.write(`<th class="p-1 border-r border-slate-200 w-8 ${i===6 || i===13 || i===20 || i===27 ? 'bg-red-50 text-red-600' : ''}">${i}</th>`);
+                    }
+                  </script>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 text-[11px]">
+                <!-- Example Rows Cycle 1-15 -->
+                <tr>
+                  <td class="p-2 font-bold text-blue-700 bg-slate-50 border-r">Cycle 1</td>
+                  <!-- Render cells demo matching the image pattern -->
+                  <td colspan="4"></td>
+                  <td class="bg-purple-600 text-white"></td>
+                  <td class="bg-red-600 text-white font-bold"></td>
+                  <td class="bg-yellow-400 text-slate-900 font-bold">1</td>
+                  <td class="bg-cyan-500 text-white"></td>
+                  <td class="bg-amber-800 text-white"></td>
+                  <td colspan="3"></td>
+                  <td class="bg-red-600 text-white"></td>
+                  <td colspan="6"></td>
+                  <td class="bg-red-600 text-white"></td>
+                  <td colspan="6"></td>
+                  <td class="bg-red-600 text-white"></td>
+                  <td colspan="4"></td>
+                </tr>
+                <tr>
+                  <td class="p-2 font-bold text-blue-700 bg-slate-50 border-r">Cycle 2</td>
+                  <td colspan="5"></td>
+                  <td class="bg-red-600 text-white"></td>
+                  <td class="bg-purple-600"></td>
+                  <td class="bg-yellow-400 font-bold text-slate-900">2</td>
+                  <td class="bg-cyan-500"></td>
+                  <td class="bg-amber-800"></td>
+                  <td colspan="2"></td>
+                  <td class="bg-red-600"></td>
+                  <td colspan="6"></td>
+                  <td class="bg-red-600"></td>
+                  <td colspan="6"></td>
+                  <td class="bg-red-600"></td>
+                  <td colspan="4"></td>
+                </tr>
+                <!-- (Rows continue to Cycle 15) -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Keterangan Warna Legend -->
+          <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600">
+            <div class="flex items-center space-x-4">
+              <span class="font-bold">KETERANGAN WARNA WORKFLOW:</span>
+              <span class="flex items-center space-x-1"><span class="w-3 h-3 bg-purple-600 rounded-sm"></span><span>Pra-Baca</span></span>
+              <span class="flex items-center space-x-1"><span class="w-3 h-3 bg-yellow-400 rounded-sm"></span><span>Hari H Pembacaan Meter (Nomor Cycle)</span></span>
+              <span class="flex items-center space-x-1"><span class="w-3 h-3 bg-cyan-500 rounded-sm"></span><span>Verifikasi Stand</span></span>
+              <span class="flex items-center space-x-1"><span class="w-3 h-3 bg-amber-800 rounded-sm"></span><span>Billing / Invoicing</span></span>
+              <span class="flex items-center space-x-1"><span class="w-3 h-3 bg-red-600 rounded-sm"></span><span>Hari Minggu / Libur</span></span>
+            </div>
+            <div class="italic text-[11px] text-slate-400">*Admin Meter Reading: Pak Solihin & Pak Kabul (Office / Database)</div>
+          </div>
+        </div>
+
+        <!-- Detail Rinci Tabel Tanggal Pembacaan -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 space-y-4">
+          <h3 class="font-bold text-sm text-slate-800">Daftar Rinci Tanggal Pembacaan Tiap Cycle</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 uppercase text-[10px] text-slate-400 border-b">
+                <tr>
+                  <th class="p-2">Nama Cycle</th>
+                  <th class="p-2">Hari H Baca Meter</th>
+                  <th class="p-2">Rentang Tanggal</th>
+                  <th class="p-2">Petugas Pembaca Lapangan</th>
+                  <th class="p-2">Kategori</th>
+                  <th class="p-2">Industri Terdaftar</th>
+                  <th class="p-2">Status Siklus</th>
+                  <th class="p-2">Catatan Wilayah</th>
+                  <th class="p-2">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-xs">
+                <tr>
+                  <td class="p-3 font-bold text-blue-700">Cycle 1</td>
+                  <td class="p-3"><span class="bg-yellow-400 text-slate-900 px-2 py-0.5 font-bold rounded">7</span> Tanggal 7</td>
+                  <td class="p-3">07 Sep 2026 - 08 Sep 2026</td>
+                  <td class="p-3 font-semibold text-slate-800">Ahmad Fauzi</td>
+                  <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px]">Kontraktor (PT Hideco)</span></td>
+                  <td class="p-3">2</td>
+                  <td class="p-3"><span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-[10px] font-semibold">Selesai</span></td>
+                  <td class="p-3">Kawasan Manis & Bitung (PT Hideco)</td>
+                  <td class="p-3"><button class="text-blue-600 font-semibold hover:underline"><i class="fa-solid fa-pen text-[10px]"></i> Ubah</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ================= 2. TAB MONITORING PEMBACAAN CYCLE ================= -->
+      <div id="tab-monitoring" class="space-y-6 hidden">
+        <!-- Sub Header Info -->
+        <div class="bg-blue-50 border border-blue-200 text-blue-900 text-xs p-3 rounded-lg flex justify-between items-center">
+          <div><strong>Struktur Operasional:</strong> <em>Pak Solihin & Pak Kabul</em> bertindak sebagai <strong>Admin Meter Reading</strong>. Pembaca meter fisik di lapangan dilakukan oleh <strong>Petugas Kontraktor PT Hideco</strong> dan <strong>Tim Key Account Aetra</strong>.</div>
+          <div class="flex space-x-2">
+            <span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-semibold">Kontraktor (PT Hideco)</span>
+            <span class="bg-purple-100 text-purple-800 text-[10px] px-2 py-0.5 rounded font-semibold">Tim Key Account</span>
+          </div>
+        </div>
+
+        <!-- Cards Petugas -->
+        <div class="grid grid-cols-3 gap-4">
+          <!-- Card 1 -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center">AF</div>
+                <div>
+                  <h4 class="font-bold text-xs text-slate-800">Ahmad Fauzi</h4>
+                  <p class="text-[10px] text-slate-400">HDC-MR-041 &bull; PT Hideco</p>
+                </div>
+              </div>
+              <span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold">PT Hideco</span>
+            </div>
+            <div class="text-xs space-y-1">
+              <div class="flex justify-between text-slate-500"><span>Penugasan:</span><span class="font-bold text-slate-700">3 Cycle (2 Industri)</span></div>
+              <div class="flex justify-between text-slate-500"><span>Selesai / Pending:</span><span class="font-bold text-slate-700">2 / 0</span></div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-1">
+                <div class="bg-emerald-500 h-full w-full"></div>
+              </div>
+              <div class="text-right text-[10px] font-bold text-emerald-600">100%</div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center">BS</div>
+                <div>
+                  <h4 class="font-bold text-xs text-slate-800">Budi Santoso</h4>
+                  <p class="text-[10px] text-slate-400">AET-KA-2019-014 &bull; PT Aetra Air Tangerang</p>
+                </div>
+              </div>
+              <span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded font-bold">Key Account</span>
+            </div>
+            <div class="text-xs space-y-1">
+              <div class="flex justify-between text-slate-500"><span>Penugasan:</span><span class="font-bold text-slate-700">7 Cycle (2 Industri)</span></div>
+              <div class="flex justify-between text-slate-500"><span>Selesai / Pending:</span><span class="font-bold text-slate-700">2 / 0</span></div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-1">
+                <div class="bg-emerald-500 h-full w-full"></div>
+              </div>
+              <div class="text-right text-[10px] font-bold text-emerald-600">100%</div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center">DL</div>
+                <div>
+                  <h4 class="font-bold text-xs text-slate-800">Dewi Lestari</h4>
+                  <p class="text-[10px] text-slate-400">AET-KA-2021-022 &bull; Key Account</p>
+                </div>
+              </div>
+              <span class="bg-purple-100 text-purple-700 text-[10px] px-2 py-0.5 rounded font-bold">Key Account</span>
+            </div>
+            <div class="text-xs space-y-1">
+              <div class="flex justify-between text-slate-500"><span>Penugasan:</span><span class="font-bold text-slate-700">8 Cycle (0 Industri)</span></div>
+              <div class="flex justify-between text-slate-500"><span>Selesai / Pending:</span><span class="font-bold text-slate-700">0 / 0</span></div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-1">
+                <div class="bg-slate-300 h-full w-0"></div>
+              </div>
+              <div class="text-right text-[10px] font-bold text-slate-400">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Matriks Container Re-used -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 italic">Gunakan filter tim atau jadwal di atas untuk menyaring tampilan progres lapangan.</p>
+        </div>
+      </div>
+
+
+      <!-- ================= 3. TAB VERIFIKASI READING ================= -->
+      <div id="tab-verifikasi" class="space-y-6 hidden">
+        <!-- Banner Alert -->
+        <div class="bg-amber-700 text-white p-4 rounded-xl shadow-xs flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-amber-800 rounded-lg"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+            <div>
+              <h3 class="font-bold text-sm">Verifikasi Hasil Pembacaan Meter <span class="bg-yellow-400 text-slate-900 text-[10px] px-2 py-0.5 rounded uppercase font-bold">Otoritas MeterReading</span></h3>
+              <p class="text-xs text-amber-100">Daftar pelanggan industri berstatus 'Pending Verification' atau 'Belum Dibaca' yang membutuhkan validasi hak dan SPM lapangan.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pembaruan Status Massal Card -->
+        <div class="bg-[#0b3c6d] text-white p-5 rounded-xl shadow-md space-y-4">
+          <div class="flex justify-between items-center border-b border-blue-800 pb-3">
+            <div>
+              <h4 class="font-bold text-sm flex items-center space-x-2">
+                <span>Pembaruan Status Massal (1-Click Batch Update per Cycle)</span>
+                <span class="bg-orange-500 text-white text-[10px] px-2 py-0.5 rounded uppercase">Kontraktor & Key Account</span>
+              </h4>
+              <p class="text-xs text-blue-200">Tandai pelanggan industri di siklus terpilih menjadi 'Verified' atau 'Pending' sekaligus dalam 1 klik.</p>
+            </div>
+            <div class="flex space-x-2 text-xs">
+              <span class="bg-white/10 px-3 py-1 rounded">CYCLE: <strong>Cycle 1</strong></span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-4 items-center">
+            <div class="bg-blue-900/50 p-3 rounded-lg border border-blue-700 text-xs space-y-1">
+              <div class="font-bold text-blue-200">Cycle 1</div>
+              <div class="text-[11px] text-blue-300">Kontraktor: Ahmad Fauzi | Key Account: Budi Santoso</div>
+              <div class="pt-2 flex space-x-2 text-center">
+                <div class="flex-1 bg-slate-700 p-1 rounded">Target <br><strong>2</strong></div>
+                <div class="flex-1 bg-amber-600 p-1 rounded">Pending <br><strong>0</strong></div>
+                <div class="flex-1 bg-emerald-600 p-1 rounded">Verified <br><strong>1</strong></div>
+              </div>
+            </div>
+
+            <button class="bg-emerald-500 hover:bg-emerald-600 text-white py-3 px-4 rounded-lg font-bold text-xs flex items-center justify-center space-x-2 shadow-sm">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>1-Klik Tandai Semua sbg 'Verified'</span>
+            </button>
+
+            <button class="bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-lg font-bold text-xs flex items-center justify-center space-x-2 shadow-sm">
+              <i class="fa-solid fa-clock"></i>
+              <span>1-Klik Tandai Semua sbg 'Pending'</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabel Monitoring -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 space-y-3">
+          <div class="flex justify-between items-center">
+            <h4 class="font-bold text-sm text-slate-800">Tabel Monitoring Pembacaan Meter Industri</h4>
+            <div class="flex space-x-2">
+              <button class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium">Cetak PDF</button>
+              <button class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium">Ekspor CSV</button>
+            </div>
+          </div>
+          <div class="text-center py-10 text-slate-400 text-xs">
+            Tidak ada data rekapitulasi yang sesuai dengan kriteria filter.
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ================= 4. TAB BILLING & INVOICING ================= -->
+      <div id="tab-billing" class="space-y-6 hidden">
+        <!-- Banner Modul -->
+        <div class="bg-emerald-700 text-white p-4 rounded-xl shadow-xs flex justify-between items-center">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-emerald-800 rounded-lg"><i class="fa-solid fa-file-invoice-dollar text-xl"></i></div>
+            <div>
+              <h3 class="font-bold text-sm">Modul Billing & Invoicing Unit Industri <span class="bg-emerald-400 text-slate-900 text-[10px] px-2 py-0.5 rounded uppercase font-bold">Otoritas Pak Yaya</span></h3>
+              <p class="text-xs text-emerald-100">Menampilkan seluruh pelanggan industri berstatus "Verified" yang siap diterbitkan faktur / invoice resmi.</p>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <button class="bg-white text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-lg">Cetak Rekap Billing</button>
+            <button class="bg-emerald-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg">Ekspor CSV</button>
+          </div>
+        </div>
+
+        <!-- Tabel Billing -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-4 space-y-4">
+          <h4 class="font-bold text-sm text-slate-800">Tabel Monitoring Pembacaan Meter Industri</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50 uppercase text-[10px] text-slate-400 border-b">
+                <tr>
+                  <th class="p-2 w-8"><input type="checkbox"></th>
+                  <th class="p-2">Pelanggan Industri</th>
+                  <th class="p-2">Cycle</th>
+                  <th class="p-2">Stand Lalu (M³)</th>
+                  <th class="p-2">Stand Skrg (M³)</th>
+                  <th class="p-2">Volume (M³)</th>
+                  <th class="p-2">Bea Materai (Rp)</th>
+                  <th class="p-2">Total Tagihan (Rp)</th>
+                  <th class="p-2">Status Alur Kerja</th>
+                  <th class="p-2">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y text-xs">
+                <tr>
+                  <td class="p-3"><input type="checkbox"></td>
+                  <td class="p-3 font-bold text-slate-800">
+                    PT Krakatau Steel Industry
+                    <div class="text-[10px] font-normal text-slate-400">IND-1001 &bull; Kawasan Manis</div>
+                  </td>
+                  <td class="p-3">Cycle 1</td>
+                  <td class="p-3">12.500</td>
+                  <td class="p-3">13.200</td>
+                  <td class="p-3 font-bold text-orange-600">700</td>
+                  <td class="p-3">Rp 0</td>
+                  <td class="p-3 font-bold text-slate-800">Rp 8.750.000</td>
+                  <td class="p-3">
+                    <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold">Verified</span>
+                    <span class="text-[10px] text-slate-400 block mt-0.5">Foto & DPM Terlampir</span>
+                  </td>
+                  <td class="p-3">
+                    <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded text-xs border font-medium"><i class="fa-solid fa-magnifying-glass"></i> Detail</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ================= 5. TAB LOG AUDIT & AKTIVITAS ================= -->
+      <div id="tab-audit" class="space-y-6 hidden">
+        <!-- Header Audit -->
+        <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 flex justify-between items-center">
+          <div class="flex items-center space-x-3">
+            <div class="p-3 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-clock-rotate-left text-xl"></i></div>
+            <div>
+              <h3 class="font-bold text-sm text-slate-800">Log Audit & Rekam Jejak Aktivitas Sistem</h3>
+              <p class="text-xs text-slate-500">Seluruh transaksi stand meter, pembaruan cycle oleh <strong>Pak Kabul</strong> & <strong>Pak Solihin</strong>, serta faktur invoice oleh <strong>Pak Yaya</strong> tercatat akuntabel.</p>
+            </div>
+          </div>
+          <button class="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-xs px-3 py-1.5 rounded-lg font-bold flex items-center space-x-1">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>Bersihkan Log</span>
+          </button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-white p-4 rounded-xl shadow-xs border border-slate-200 space-y-3">
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="text-slate-500 font-medium">Pengguna Cepat:</span>
+            <button class="bg-blue-600 text-white px-3 py-1 rounded-full font-semibold">Semua (12)</button>
+            <button class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full border">Pak Kabul (7)</button>
+            <button class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full border">Pak Solihin (1)</button>
+            <button class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full border">Pak Yaya (4)</button>
+          </div>
+
+          <div class="flex space-x-3 text-xs">
+            <div class="relative flex-1">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400"></i>
+              <input type="text" placeholder="Cari deskripsi transaksi / ID industri / peran..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border rounded-lg">
+            </div>
+            <input type="date" class="border rounded-lg px-3 py-2 bg-slate-50 text-slate-600">
+            <select class="border rounded-lg px-3 py-2 bg-slate-50 text-slate-600">
+              <option>Semua Bulan (12 Bulan)</option>
+            </select>
+            <select class="border rounded-lg px-3 py-2 bg-slate-50 text-slate-600">
+              <option>Semua Pengguna</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tabel Log Audit -->
+        <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 uppercase text-[10px] text-slate-400 border-b">
+              <tr>
+                <th class="p-3">Waktu Transaksi</th>
+                <th class="p-3">Pengguna / Staf</th>
+                <th class="p-3">Peran Operasional</th>
+                <th class="p-3">Deskripsi Aktivitas</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y text-xs text-slate-700">
+              <tr>
+                <td class="p-3 font-mono text-slate-500">28 Sep 2026 19:38:05</td>
+                <td class="p-3 font-bold flex items-center space-x-2">
+                  <span class="w-5 h-5 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center">PK</span>
+                  <span>Pak Kabul</span>
+                </td>
+                <td class="p-3"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px]">Admin Meter Reading</span></td>
+                <td class="p-3">Masuk ke dashboard sebagai Pak Yaya (Tim Billing & Invoicing)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-mono text-slate-500">28 Sep 2026 19:38:02</td>
+                <td class="p-3 font-bold flex items-center space-x-2">
+                  <span class="w-5 h-5 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center">PK</span>
+                  <span>Pak Kabul</span>
+                </td>
+                <td class="p-3"><span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px]">Admin Meter Reading</span></td>
+                <td class="p-3">Keluar dari sistem.</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-mono text-slate-500">28 Sep 2026 10:26:03</td>
+                <td class="p-3 font-bold flex items-center space-x-2">
+                  <span class="w-5 h-5 rounded-full bg-amber-600 text-white text-[10px] flex items-center justify-center">PY</span>
+                  <span>Pak Yaya</span>
+                </td>
+                <td class="p-3"><span class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[10px]">Tim Billing & Invoicing</span></td>
+                <td class="p-3">Masuk ke dashboard sebagai Pak Kabul (Admin Meter Reading)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- JAVASCRIPT NAVIGASI INTERAKTIF -->
+  <script>
+    function switchTab(tabName) {
+      // Sembunyikan semua tab content
+      document.getElementById('tab-database').classList.add('hidden');
+      document.getElementById('tab-monitoring').classList.add('hidden');
+      document.getElementById('tab-verifikasi').classList.add('hidden');
+      document.getElementById('tab-billing').classList.add('hidden');
+      document.getElementById('tab-audit').classList.add('hidden');
+
+      // Tampilkan tab yang dipilih
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+
+      // Reset style sidebar nav
+      const navIds = ['database', 'monitoring', 'verifikasi', 'billing', 'audit'];
+      navIds.forEach(id => {
+        const btn = document.getElementById('nav-' + id);
+        btn.classList.remove('sidebar-active', 'bg-[#0c4a85]', 'text-white', 'font-semibold');
+        btn.classList.add('text-slate-300');
+      });
+
+      // Highlight active sidebar menu
+      const activeBtn = document.getElementById('nav-' + tabName);
+      activeBtn.classList.add('sidebar-active');
+      activeBtn.classList.remove('text-slate-300');
+    }
+  </script>
+</body>
+</html>
