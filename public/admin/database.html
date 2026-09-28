@@ -1,374 +1,394 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Database & Input Cycle - Aetra Air Tangerang</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Pustaka SheetJS untuk membaca file Excel langsung di browser -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
-        function switchTab(tabId) {
-            document.getElementById('content-pelanggan').classList.add('hidden');
-            document.getElementById('content-pembaca').classList.add('hidden');
-            document.getElementById('content-jadwal').classList.add('hidden');
-            
-            document.getElementById('tab-pelanggan').className = "px-4 py-2 bg-white text-slate-600 hover:bg-slate-100 font-medium text-xs rounded-xl flex items-center space-x-2 border border-slate-200 transition";
-            document.getElementById('tab-pembaca').className = "px-4 py-2 bg-white text-slate-600 hover:bg-slate-100 font-medium text-xs rounded-xl flex items-center space-x-2 border border-slate-200 transition";
-            document.getElementById('tab-jadwal').className = "px-4 py-2 bg-white text-slate-600 hover:bg-slate-100 font-medium text-xs rounded-xl flex items-center space-x-2 border border-slate-200 transition";
-            
-            if(tabId === 'pelanggan') {
-                document.getElementById('content-pelanggan').classList.remove('hidden');
-                document.getElementById('tab-pelanggan').className = "px-4 py-2 bg-blue-50 text-blue-700 font-semibold text-xs rounded-xl flex items-center space-x-2 border border-blue-200 transition";
-            } else if(tabId === 'pembaca') {
-                document.getElementById('content-pembaca').classList.remove('hidden');
-                document.getElementById('tab-pembaca').className = "px-4 py-2 bg-blue-50 text-blue-700 font-semibold text-xs rounded-xl flex items-center space-x-2 border border-blue-200 transition";
-            } else if(tabId === 'jadwal') {
-                document.getElementById('content-jadwal').classList.remove('hidden');
-                document.getElementById('tab-jadwal').className = "px-4 py-2 bg-blue-50 text-blue-700 font-semibold text-xs rounded-xl flex items-center space-x-2 border border-blue-200 transition";
-            }
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetra Air Tangerang - Dashboard Admin Database</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        // Fungsi untuk menangani pemilihan file Excel dari komputer
-        function handleExcelUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+  <style>
+    :root {
+      --primary-color: #0284c7;
+      --primary-hover: #0369a1;
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+    }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    
-                    // Ambil sheet pertama
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    
-                    // Konversi ke JSON
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                    
-                    alert(`Berhasil membaca file "${file.name}"!\nDitemukan ${jsonData.length} baris data industri.`);
-                    console.log("Data Excel:", jsonData);
-                    
-                    // Di sini Anda bisa menambahkan logika untuk memasukkan data ke tabel/database lokal
-                } catch (error) {
-                    alert("Terjadi kesalahan saat membaca file Excel. Pastikan format file benar.");
-                    console.error(error);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-    </script>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header-card {
+      background: var(--card-bg);
+      padding: 20px 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .header-title h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .header-title p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .btn-logout {
+      background: #fee2e2;
+      color: var(--danger-color);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #fecaca;
+    }
+
+    /* Statistik Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-top: 6px;
+    }
+
+    /* Filter & Search Bar */
+    .filter-card {
+      background: var(--card-bg);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-card input, .filter-card select {
+      padding: 9px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      background: #f8fafc;
+      color: var(--text-main);
+    }
+
+    .filter-card input {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    /* Tabel Data */
+    .table-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    table th, table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    table th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    table tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .img-preview {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      transition: transform 0.2s;
+    }
+
+    .img-preview:hover {
+      transform: scale(1.1);
+    }
+
+    .map-frame {
+      width: 100px;
+      height: 60px;
+      border: none;
+      border-radius: 6px;
+    }
+
+    .coord-badge {
+      font-family: monospace;
+      font-size: 11px;
+      background: #f1f5f9;
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: #334155;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 font-sans antialiased">
-    <!-- Input File Tersembunyi untuk Memilih File dari Komputer -->
-    <input type="file" id="excelFilePicker" accept=".xlsx, .xls" class="hidden" onchange="handleExcelUpload(event)">
+<body>
 
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-blue-950 text-white flex flex-col justify-between hidden md:flex">
-            <div>
-                <div class="p-4 bg-white m-4 rounded-xl flex items-center space-x-3">
-                    <img src="../logoaetra.jpg" alt="Logo Aetra" class="h-8 w-auto">
-                    <div>
-                        <h1 class="text-xs font-bold text-blue-950 leading-tight">aetra</h1>
-                        <p class="text-[9px] text-slate-500 tracking-wider">AIR TANGERANG</p>
-                    </div>
-                </div>
-                <nav class="mt-4 space-y-1 px-3">
-                    <a href="database.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-orange-600 text-white font-medium text-sm shadow-md">
-                        <i class="fa-solid fa-database"></i>
-                        <span>Database & Input Cycle</span>
-                    </a>
-                    <a href="monitoring.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-blue-900 text-sm font-medium transition">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <span>Monitoring Pembacaan Cycle</span>
-                    </a>
-                    <a href="verifikasi.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-blue-900 text-sm font-medium transition">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>Verifikasi Reading</span>
-                    </a>
-                    <a href="billinginvoice.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-blue-900 text-sm font-medium transition">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                        <span>Billing & Invoicing</span>
-                    </a>
-                    <a href="log.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-blue-900 text-sm font-medium transition">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                        <span>Log Audit & Aktivitas</span>
-                    </a>
-                </nav>
-            </div>
-            <div class="p-4 border-t border-blue-900 text-xs text-slate-400">
-                <p class="font-semibold text-slate-300">Unit Pelayanan Industri</p>
-                <p class="text-[10px] mt-1">PT Aetra Air Tangerang © 2026</p>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-            <!-- Top Navbar -->
-            <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between sticky top-0 z-20">
-                <div class="flex items-center space-x-4">
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-search text-xs"></i>
-                        </span>
-                        <input type="text" placeholder="Cari ID Pelanggan atau Nama Industri..." class="pl-9 pr-4 py-1.5 text-xs bg-slate-100 rounded-full border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 w-72">
-                    </div>
-                </div>
-                <div class="flex items-center space-x-3 text-xs">
-                    <!-- Dropdown 1: Cycle -->
-                    <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 font-medium">
-                        <option>Semua Cycle (1-15)</option>
-                        <option selected>Cycle 2</option>
-                        <script>
-                            for(let i=1; i<=15; i++) document.write(`<option>Cycle ${i}</option>`);
-                        </script>
-                    </select>
-                    <!-- Dropdown 2: Kelas Pelanggan -->
-                    <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 font-medium">
-                        <option>Semua Kelas</option>
-                        <option>Premium</option>
-                        <option>Platinum</option>
-                        <option>Gold</option>
-                        <option>Silver</option>
-                        <option>Bronze</option>
-                    </select>
-                    <!-- Dropdown 3: Bulan -->
-                    <select class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 font-medium">
-                        <option>Semua Bulan (1 Tahun)</option>
-                        <option selected>Maret 2026</option>
-                        <option>Januari 2026</option><option>Februari 2026</option><option>Maret 2026</option>
-                        <option>April 2026</option><option>Mei 2026</option><option>Juni 2026</option>
-                        <option>Juli 2026</option><option>Agustus 2026</option><option>September 2026</option>
-                        <option>Oktober 2026</option><option>November 2026</option><option>Desember 2026</option>
-                    </select>
-                    <button class="flex items-center space-x-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 font-medium">
-                        <i class="fa-solid fa-database"></i><span>Supabase: Config</span>
-                    </button>
-                    <div class="flex items-center space-x-2 pl-2 border-l border-slate-200">
-                        <div class="w-7 h-7 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-xs">PY</div>
-                        <div>
-                            <p class="font-bold text-slate-800 leading-none">Pak Yaya</p>
-                            <p class="text-[10px] text-slate-500">Tim Billing & Invoicing</p>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Content Body -->
-            <div class="p-6 space-y-6">
-                <!-- Sub Tabs Navigation -->
-                <div class="flex space-x-2 border-b border-slate-200 pb-3">
-                    <button id="tab-pelanggan" onclick="switchTab('pelanggan')" class="px-4 py-2 bg-blue-50 text-blue-700 font-semibold text-xs rounded-xl flex items-center space-x-2 border border-blue-200 transition">
-                        <i class="fa-solid fa-users"></i><span>Daftar Pelanggan Industri (30)</span>
-                    </button>
-                    <button id="tab-pembaca" onclick="switchTab('pembaca')" class="px-4 py-2 bg-white text-slate-600 hover:bg-slate-100 font-medium text-xs rounded-xl flex items-center space-x-2 border border-slate-200 transition">
-                        <i class="fa-solid fa-gauge"></i><span>Section Pembaca Meter (0)</span>
-                    </button>
-                    <button id="tab-jadwal" onclick="switchTab('jadwal')" class="px-4 py-2 bg-white text-slate-600 hover:bg-slate-100 font-medium text-xs rounded-xl flex items-center space-x-2 border border-slate-200 transition">
-                        <i class="fa-solid fa-calendar-days"></i><span>Jadwal & Tanggal Cycle (15 Cycle)</span>
-                    </button>
-                </div>
-
-                <!-- TAB 1: DAFTAR PELANGGAN INDUSTRI -->
-                <div id="content-pelanggan" class="space-y-6">
-                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="flex items-center space-x-2">
-                                <i class="fa-solid fa-database text-blue-900 text-lg"></i>
-                                <h2 class="font-bold text-slate-800 text-sm">Manajemen & Master Data List Industri per Cycle</h2>
-                            </div>
-                            <!-- Tombol Impor Excel yang memicu file picker laptop -->
-                            <button onclick="document.getElementById('excelFilePicker').click()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-sm transition cursor-pointer">
-                                <i class="fa-solid fa-file-excel"></i><span>Impor Excel (.xlsx, .xls)</span>
-                            </button>
-                        </div>
-                        <p class="text-xs text-slate-500 mb-5">Tambahkan akun industri baru ke dalam database pencatatan meter atau impor secara massal dari Excel.</p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">ID Pelanggan</label>
-                                <input type="text" placeholder="Contoh: IND-1011" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Nama Perusahaan Industri</label>
-                                <input type="text" placeholder="PT Contoh Industri Tbk" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Email Industri</label>
-                                <input type="email" placeholder="finance@contoh.co.id" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-                            <div>
-                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Pilih Cycle (1–15)</label>
-                                <select class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none"><option>Cycle 1</option></select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Kelas Pelanggan</label>
-                                <select class="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none"><option>Gold</option></select>
-                            </div>
-                        </div>
-                        <div class="mt-5 flex justify-end">
-                            <button class="bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl shadow-md transition">
-                                + Simpan ke Database Cycle
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                            <div class="flex items-center space-x-2 mb-2">
-                                <i class="fa-solid fa-chart-bar text-blue-900"></i>
-                                <h3 class="font-bold text-slate-800 text-xs uppercase">Distribusi Target per Cycle</h3>
-                            </div>
-                            <p class="text-[11px] text-slate-500 mb-4">Kepadatan target pelanggan industri yang tersebar pada Cycle 1 hingga 15.</p>
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-between text-xs text-slate-600">
-                                    <span class="w-16">Cycle 1</span>
-                                    <div class="flex-1 mx-2 bg-blue-900 h-3 rounded-full"></div>
-                                    <span class="font-bold">2</span>
-                                </div>
-                                <div class="flex items-center justify-between text-xs text-slate-600">
-                                    <span class="w-16">Cycle 2</span>
-                                    <div class="flex-1 mx-2 bg-blue-900 h-3 rounded-full"></div>
-                                    <span class="font-bold">2</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-                            <div class="flex justify-between items-center mb-3">
-                                <div>
-                                    <h3 class="font-bold text-slate-800 text-xs">Daftar Kesiapan Pencatatan Meter per Cycle</h3>
-                                    <p class="text-[10px] text-slate-500">Daftar industri yang tergabung dalam jadwal pembacaan operasional.</p>
-                                </div>
-                                <span class="text-xs font-semibold text-slate-600">Total Terdaftar: <strong class="text-blue-900">38</strong></span>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs">
-                                    <thead class="bg-slate-100 text-slate-600 uppercase text-[10px]">
-                                        <tr>
-                                            <th class="p-2.5 rounded-l-lg"><input type="checkbox"></th>
-                                            <th class="p-2.5">ID Pelanggan</th>
-                                            <th class="p-2.5">Nama Perusahaan Industri</th>
-                                            <th class="p-2.5">Cycle</th>
-                                            <th class="p-2.5">Kelas</th>
-                                            <th class="p-2.5">Status Workflow</th>
-                                            <th class="p-2.5 rounded-r-lg text-center">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100 text-slate-700">
-                                        <tr>
-                                            <td class="p-2.5"><input type="checkbox"></td>
-                                            <td class="p-2.5 font-bold text-orange-600">IND-1001</td>
-                                            <td class="p-2.5 font-medium">PT Krakatau Steel Industry<br><span class="text-[10px] text-slate-400 font-normal">billing@krakatau.co.id</span></td>
-                                            <td class="p-2.5 font-semibold text-blue-700">Cycle 1</td>
-                                            <td class="p-2.5">Gold</td>
-                                            <td class="p-2.5"><span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-200">Verified</span></td>
-                                            <td class="p-2.5 text-center"><button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TAB 2: SECTION PEMBACA METER -->
-                <div id="content-pembaca" class="space-y-6 hidden">
-                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="flex items-center space-x-2">
-                                <i class="fa-solid fa-gauge text-orange-600 text-lg"></i>
-                                <h2 class="font-bold text-slate-800 text-sm">Manajemen Petugas Pembaca Meter Lapangan</h2>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="document.getElementById('excelFilePicker').click()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-2 shadow-sm transition cursor-pointer">
-                                    <i class="fa-solid fa-file-excel"></i><span>Impor Petugas Excel (.xlsx)</span>
-                                </button>
-                                <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl flex items-center space-x-1.5 transition">
-                                    <i class="fa-solid fa-download"></i><span>Unduh Template</span>
-                                </button>
-                                <button class="bg-orange-600 hover:bg-orange-700 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center space-x-1.5 shadow-sm transition">
-                                    <i class="fa-solid fa-plus"></i><span>Tambah Petugas</span>
-                                </button>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-500 mb-4">Kelola data petugas pembaca meter lapangan, penugasan perusahaan/instansi, serta wilayah operasi.</p>
-                        
-                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 mb-6">
-                            <strong>Catatan Pembagian Tugas:</strong> <i>Pak Solihin & Pak Kabul</i> bertindak sebagai <strong>Admin Meter Reading</strong> di kantor yang bertugas menginput cycle dan mengelola list industri. Pembaca meter fisik di lapangan dilakukan oleh petugas lapangan yang didaftarkan pada halaman ini[cite: 9].
-                        </div>
-
-                        <div class="flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs font-semibold mb-6">
-                            <span class="text-slate-500">Filter Kategori:</span>
-                            <button class="px-3 py-1 bg-blue-900 text-white rounded-lg shadow">Semua (0)</button>
-                            <button class="px-3 py-1 bg-white text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200">Kontraktor / Mitra (0)</button>
-                            <button class="px-3 py-1 bg-white text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200">Key Account (0)</button>
-                        </div>
-
-                        <div class="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
-                            <div class="w-12 h-12 bg-blue-50 text-blue-900 rounded-full flex items-center justify-center mx-auto mb-3 text-lg">
-                                <i class="fa-solid fa-users"></i>
-                            </div>
-                            <h3 class="font-bold text-slate-800 text-xs">Belum Ada Data Petugas Lapangan</h3>
-                            <p class="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">Data petugas lapangan dan perusahaanannya belum diinput. Klik tombol <strong>+ Tambah Petugas</strong> di atas atau impor file Excel untuk mendaftarkan petugas[cite: 9].</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TAB 3: JADWAL & TANGGAL CYCLE -->
-                <div id="content-jadwal" class="space-y-6 hidden">
-                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="flex items-center space-x-2">
-                                <i class="fa-solid fa-calendar-days text-blue-900 text-lg"></i>
-                                <h2 class="font-bold text-slate-800 text-sm">Jadwal & Plotting Matriks Kalender Cycle (1 Tahun)</h2>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="document.getElementById('excelFilePicker').click()" class="bg-emerald-600 text-white text-xs px-4 py-2 rounded-xl font-semibold flex items-center space-x-2 cursor-pointer">
-                                    <i class="fa-solid fa-file-excel"></i><span>Impor Matriks Excel 1 Thn</span>
-                                </button>
-                                <button class="bg-slate-100 text-slate-700 text-xs px-3 py-2 rounded-xl font-semibold flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-download"></i><span>Unduh Template 1 Thn</span>
-                                </button>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-500 mb-6">Otomatisasi plotting tanggal pembacaan tiap cycle per bulan dari spreadsheet Excel matriks 1 tahun[cite: 10].</p>
-
-                        <div class="border border-slate-200 rounded-xl p-4 bg-white shadow-sm overflow-x-auto">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="font-bold text-xs text-slate-700 bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">Matriks Plotting Jadwal Cycle 1 Tahun (Tanggal 1–31)</span>
-                                <div class="flex items-center space-x-2 text-xs">
-                                    <button class="px-2.5 py-1 bg-slate-100 rounded hover:bg-slate-200">&lt;</button>
-                                    <span class="font-semibold bg-slate-50 border border-slate-200 px-3 py-1 rounded">September 2026 (Sep-26)</span>
-                                    <button class="px-2.5 py-1 bg-slate-100 rounded hover:bg-slate-200">&gt;</button>
-                                </div>
-                            </div>
-                            <table class="w-full text-center text-[10px] border-collapse border border-slate-200">
-                                <tr class="bg-emerald-600 text-white">
-                                    <th class="border p-2">Cycle</th>
-                                    <script>for(let i=1; i<=31; i++) document.write(`<th class="border p-1">${i}</th>`);</script>
-                                </tr>
-                                <tr class="hover:bg-slate-50">
-                                    <td class="border font-semibold p-1.5 text-blue-800 bg-slate-50">Cycle 1</td>
-                                    <script>
-                                        for(let i=1; i<=31; i++) {
-                                            let bg = (i===6 || i===13 || i===20 || i===27)?'bg-red-600 text-white':(i===7)?'bg-yellow-400 font-bold text-black':(i===8)?'bg-blue-500 text-white':(i===9)?'bg-amber-900 text-white':'';
-                                            document.write(`<td class="border p-1 ${bg}">${i===7?'1':''}</td>`);
-                                        }
-                                    </script>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </main>
+  <div class="container">
+    <!-- Header Admin -->
+    <div class="header-card">
+      <div class="header-title">
+        <h1>Dashboard Admin Database</h1>
+        <p>Kelola dan pantau seluruh hasil inputan pembacaan meter petugas.</p>
+      </div>
+      <button class="btn-logout" onclick="logoutAdmin()">🚪 Keluar</button>
     </div>
+
+    <!-- Statistik Ringkas -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Data Masuk</div>
+        <div class="stat-value" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Pelanggan Tercatat</div>
+        <div class="stat-value" id="stat-pelanggan">0</div>
+      </div>
+    </div>
+
+    <!-- Filter & Search -->
+    <div class="filter-card">
+      <input type="text" id="search-input" placeholder="Cari ID Pelanggan atau Nama Perusahaan..." oninput="filterData()">
+      <select id="filter-cycle" onchange="filterData()">
+        <option value="">Semua Cycle</option>
+      </select>
+    </div>
+
+    <!-- Tabel Data -->
+    <div class="table-card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu Input</th>
+              <th>ID Pelanggan</th>
+              <th>Nama Perusahaan</th>
+              <th>Cycle</th>
+              <th>Stand Meter</th>
+              <th>Koordinat GPS</th>
+              <th>Foto Stand Meter</th>
+              <th>Foto Berkas</th>
+              <th>Lokasi Peta</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <tr>
+              <td colspan="9" class="empty-state">Memuat data database...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Konfigurasi Supabase (gunakan kredensial yang sama)
+    const SUPABASE_URL = 'https://tcikpmtuxaxjfucwjrah.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjaWtwbXR1eGF4amZ1Y3dqcmFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDc5MTUsImV4cCI6MjEwNjE4MzkxNX0.Tg75hNg6zzaRSJ-L5O3w9UtzQbyqBgjlMaLBGv_ANYc'; 
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allData = [];
+
+    async function checkAdminSession() {
+      const { data: { session } } = await _supabase.auth.getSession();
+      // Jika ingin membatasi khusus admin yang login, Anda bisa tambahkan validasi email di sini.
+      // Untuk saat ini, kita pastikan user sudah login terlebih dahulu.
+      if (!session) {
+        window.location.href = '/petugas/login.html';
+      } else {
+        loadAdminData();
+      }
+    }
+
+    async function logoutAdmin() {
+      await _supabase.auth.signOut();
+      window.location.href = '/petugas/login.html';
+    }
+
+    async function loadAdminData() {
+      const tableBody = document.getElementById('table-body');
+      
+      const { data, error } = await _supabase
+        .from('meter_readings')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        tableBody.innerHTML = `<tr><td colspan="9" class="empty-state" style="color:var(--danger-color);">Gagal memuat data: ${error.message}</td></tr>`;
+        return;
+      }
+
+      allData = data || [];
+      updateDashboardUI(allData);
+      populateCycleFilter(allData);
+    }
+
+    function updateDashboardUI(dataList) {
+      const tableBody = document.getElementById('table-body');
+      
+      // Update Statistik
+      document.getElementById('stat-total').textContent = dataList.length;
+      // Hitung total ID pelanggan unik
+      const uniquePelanggan = new Set(dataList.map(item => item.id_pelanggan)).size;
+      document.getElementById('stat-pelanggan').textContent = uniquePelanggan;
+
+      if (dataList.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="9" class="empty-state">Belum ada data rekaman meter yang tersedia.</td></tr>`;
+        return;
+      }
+
+      let html = '';
+      dataList.forEach(row => {
+        const latVal = row.latitude ? Number(row.latitude).toFixed(6) : '-';
+        const lngVal = row.longitude ? Number(row.longitude).toFixed(6) : '-';
+
+        const fotoStandHtml = row.foto_stand_meter_url 
+          ? `<a href="${row.foto_stand_meter_url}" target="_blank"><img src="${row.foto_stand_meter_url}" class="img-preview" alt="Stand Meter"></a>` 
+          : '-';
+
+        const fotoBerkasHtml = row.foto_berkas_url 
+          ? `<a href="${row.foto_berkas_url}" target="_blank"><img src="${row.foto_berkas_url}" class="img-preview" alt="Berkas"></a>` 
+          : '-';
+
+        const mapHtml = (row.latitude && row.longitude)
+          ? `<iframe class="map-frame" src="https://maps.google.com/maps?q=${row.latitude},${row.longitude}&z=15&output=embed" loading="lazy"></iframe>`
+          : '-';
+
+        html += `
+          <tr>
+            <td style="white-space: nowrap;">${new Date(row.created_at).toLocaleString('id-ID')}</td>
+            <td><b>${row.id_pelanggan || '-'}</b></td>
+            <td>${row.nama_perusahaan || '-'}</td>
+            <td><span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:6px; font-weight:600;">${row.cycle || '-'}</span></td>
+            <td><b>${row.stand_meter || '0'} m³</b></td>
+            <td><span class="coord-badge">${latVal}, ${lngVal}</span></td>
+            <td>${fotoStandHtml}</td>
+            <td>${fotoBerkasHtml}</td>
+            <td>${mapHtml}</td>
+          </tr>
+        `;
+      });
+
+      tableBody.innerHTML = html;
+    }
+
+    function populateCycleFilter(dataList) {
+      const cycleSelect = document.getElementById('filter-cycle');
+      const cycles = [...new Set(dataList.map(item => item.cycle))].filter(Boolean);
+      
+      let options = '<option value="">Semua Cycle</option>';
+      cycles.forEach(c => {
+        options += `<option value="${c}">Cycle ${c}</option>`;
+      });
+      cycleSelect.innerHTML = options;
+    }
+
+    function filterData() {
+      const keyword = document.getElementById('search-input').value.toLowerCase();
+      const selectedCycle = document.getElementById('filter-cycle').value;
+
+      const filtered = allData.filter(item => {
+        const matchKeyword = (
+          (item.id_pelanggan && item.id_pelanggan.toLowerCase().includes(keyword)) ||
+          (item.nama_perusahaan && item.nama_perusahaan.toLowerCase().includes(keyword))
+        );
+        const matchCycle = selectedCycle === "" || item.cycle === selectedCycle;
+
+        return matchKeyword && matchCycle;
+      });
+
+      updateDashboardUI(filtered);
+    }
+
+    // Jalankan pemeriksaan sesi saat halaman dibuka
+    checkAdminSession();
+  </script>
 </body>
 </html>
