@@ -295,7 +295,10 @@
 
     function toggleMenu(event) {
       event.stopPropagation();
-      document.getElementById('nav-dropdown').classList.toggle('show');
+      const dropdown = document.getElementById('nav-dropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('show');
+      }
     }
 
     window.addEventListener('click', function(e) {
@@ -306,25 +309,37 @@
     });
 
     async function checkAuthSession() {
-      const { data: { session } } = await _supabase.auth.getSession();
-      
-      if (!session) {
+      try {
+        const { data: { session }, error } = await _supabase.auth.getSession();
+        
+        if (error || !session) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Validasi Peran (Cegah Admin masuk ke halaman petugas)
+        const role = session.user.user_metadata?.role;
+        if (role === 'admin') {
+          alert('Akses Ditolak: Akun Admin tidak diizinkan masuk ke halaman petugas.');
+          await _supabase.auth.signOut();
+          window.location.href = '../admin/login.html';
+          return;
+        }
+
+        const emailDisplay = document.getElementById('display-email');
+        if (emailDisplay) {
+          emailDisplay.textContent = session.user.email;
+        }
+
+        // Berikan jeda sejenak agar DOM siap sepenuhnya, lalu muat peta
+        setTimeout(() => {
+          initMap();
+        }, 300);
+
+      } catch (err) {
+        console.error('Auth session error:', err);
         window.location.href = 'login.html';
-        return;
       }
-
-      // Validasi Peran (Cegah Admin masuk ke halaman petugas)
-      const role = session.user.user_metadata?.role;
-      if (role === 'admin') {
-        alert('Akses Ditolak: Akun Admin tidak diizinkan masuk ke halaman petugas.');
-        await _supabase.auth.signOut();
-        window.location.href = '../admin/login.html'; // Sesuaikan path login admin jika berada di folder berbeda
-        return;
-      }
-
-      document.getElementById('display-email').textContent = session.user.email;
-      // Inisialisasi peta setelah sesi aman dan elemen siap
-      setTimeout(initMap, 200);
     }
 
     async function logout() {
@@ -334,10 +349,13 @@
 
     function initMap() {
       const statusText = document.getElementById('coord-status');
-      statusText.textContent = 'Mendeteksi lokasi GPS...';
+      if (statusText) statusText.textContent = 'Mendeteksi lokasi GPS...';
 
       const defaultLat = -6.1783;
       const defaultLng = 106.6319;
+
+      const container = document.getElementById('map-container');
+      if (!container) return;
 
       if (!map) {
         map = L.map('map-container').setView([defaultLat, defaultLng], 15);
@@ -352,7 +370,9 @@
           const latLng = marker.getLatLng();
           userLocation.latitude = latLng.lat;
           userLocation.longitude = latLng.lng;
-          statusText.textContent = `Lat: ${latLng.lat.toFixed(5)}, Lng: ${latLng.lng.toFixed(5)} (Manual)`;
+          if (statusText) {
+            statusText.textContent = `Lat: ${latLng.lat.toFixed(5)}, Lng: ${latLng.lng.toFixed(5)} (Manual)`;
+          }
         });
       } else {
         map.invalidateSize();
@@ -366,19 +386,28 @@
             userLocation.latitude = lat;
             userLocation.longitude = lng;
 
-            map.setView([lat, lng], 16);
-            marker.setLatLng([lat, lng]);
-            statusText.textContent = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+            if (map && marker) {
+              map.setView([lat, lng], 16);
+              marker.setLatLng([lat, lng]);
+              map.invalidateSize();
+            }
+            if (statusText) {
+              statusText.textContent = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+            }
           },
           (err) => {
-            statusText.textContent = 'GPS gagal/dinonaktifkan. Geser pin pada peta.';
+            if (statusText) {
+              statusText.textContent = 'GPS gagal/dinonaktifkan. Geser pin pada peta.';
+            }
             userLocation.latitude = defaultLat;
             userLocation.longitude = defaultLng;
           },
           { enableHighAccuracy: true, timeout: 10000 }
         );
       } else {
-        statusText.textContent = 'Browser tidak mendukung GPS.';
+        if (statusText) {
+          statusText.textContent = 'Browser tidak mendukung GPS.';
+        }
       }
     }
 
@@ -407,7 +436,6 @@
       btn.textContent = 'Mengunggah & Menyimpan...';
 
       try {
-        // Ambil sesi login terbaru untuk memastikan email petugas tercatat dengan akurat
         const { data: { session } } = await _supabase.auth.getSession();
         const petugasEmail = session ? session.user.email : 'unknown';
 
@@ -426,7 +454,7 @@
           longitude: userLocation.longitude,
           foto_meter_url: foto_meter_url,
           foto_berkas_url: foto_berkas_url,
-          petugas_email: petugasEmail // Email petugas tersimpan dengan benar di database
+          petugas_email: petugasEmail
         };
 
         const { error } = await _supabase.from('meter_readings').insert([payload]);
@@ -441,8 +469,10 @@
       }
     }
 
-    // Jalankan pemeriksaan sesi saat halaman dibuka
-    checkAuthSession();
+    // Jalankan pemeriksaan sesi saat halaman selesai dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAuthSession();
+    });
   </script>
 </body>
 </html>
