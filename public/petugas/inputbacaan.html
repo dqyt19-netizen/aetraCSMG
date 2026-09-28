@@ -396,9 +396,14 @@
       btn.textContent = 'Mengunggah & Menyimpan...';
 
       try {
-        // Ambil sesi user aktif untuk email petugas
-        const { data: { session } } = await _supabase.auth.getSession();
-        const petugasEmail = session ? session.user.email : 'unknown';
+        // Pastikan bagian ini ada di dalam fungsi handleSubmit(e) di inputbacaan.html
+          const { data: { session } } = await _supabase.auth.getSession();
+          const petugasEmail = session ? session.user.email : 'unknown';
+
+        const payload = {
+      // ... data form lainnya ...
+        petugas_email: petugasEmail // Ini memastikan email petugas ikut tersimpan ke database
+    };
 
         const fotoMeterFile = document.getElementById('foto_meter').files[0];
         const fotoBerkasFile = document.getElementById('foto_berkas').files[0];
