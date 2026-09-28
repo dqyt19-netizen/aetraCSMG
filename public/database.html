@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMBA-IN - Dashboard Utama</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .sidebar-active {
+      background-color: #ea580c; /* Warna oranye aktif */
+      color: #ffffff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 font-sans antialiased text-slate-800 flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR NAVIGASI -->
+  <aside class="w-64 bg-[#083c6c] text-white flex flex-col justify-between flex-shrink-0">
+    <div>
+      <!-- LOGO AETRA -->
+      <div class="p-4 bg-white m-3 rounded-xl flex items-center justify-center shadow-sm">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-water text-cyan-600 text-2xl"></i>
+          <div>
+            <h1 class="text-lg font-black text-[#083c6c] tracking-tight leading-none">aetra</h1>
+            <p class="text-[9px] text-cyan-600 font-semibold tracking-widest uppercase">AIR TANGERANG</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENU TOMBOL NAVIGASI -->
+      <nav class="mt-4 px-2 space-y-1">
+        <!-- Default Active Nav: Database & Input Cycle -->
+        <button onclick="loadPage('database.html', 'nav-database')" id="nav-database" class="w-full text-left px-4 py-3 rounded-lg text-xs flex items-center space-x-3 transition sidebar-active">
+          <i class="fa-solid fa-database w-5 text-sm"></i>
+          <span>Database & Input Cycle</span>
+        </button>
+
+        <button onclick="loadPage('monitoring.html', 'nav-monitoring')" id="nav-monitoring" class="w-full text-left px-4 py-3 rounded-lg text-xs flex items-center space-x-3 text-slate-300 hover:bg-[#0c4a85] transition">
+          <i class="fa-solid fa-chart-line w-5 text-sm"></i>
+          <span>Monitoring Pembacaan Cycle</span>
+        </button>
+
+        <button onclick="loadPage('verifikasi.html', 'nav-verifikasi')" id="nav-verifikasi" class="w-full text-left px-4 py-3 rounded-lg text-xs flex items-center space-x-3 text-slate-300 hover:bg-[#0c4a85] transition">
+          <i class="fa-solid fa-circle-check w-5 text-sm"></i>
+          <span>Verifikasi Reading</span>
+        </button>
+
+        <button onclick="loadPage('billing.html', 'nav-billing')" id="nav-billing" class="w-full text-left px-4 py-3 rounded-lg text-xs flex items-center space-x-3 text-slate-300 hover:bg-[#0c4a85] transition">
+          <i class="fa-solid fa-file-invoice-dollar w-5 text-sm"></i>
+          <span>Billing & Invoicing</span>
+        </button>
+
+        <button onclick="loadPage('audit.html', 'nav-audit')" id="nav-audit" class="w-full text-left px-4 py-3 rounded-lg text-xs flex items-center space-x-3 text-slate-300 hover:bg-[#0c4a85] transition">
+          <i class="fa-solid fa-clock-rotate-left w-5 text-sm"></i>
+          <span>Log Audit & Aktivitas</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- FOOTER SIDEBAR -->
+    <div class="p-4 border-t border-slate-700/50 text-[11px] text-slate-400">
+      <div class="flex items-center space-x-2 mb-1">
+        <i class="fa-solid fa-building text-slate-400"></i>
+        <span>Unit Pelayanan Industri</span>
+      </div>
+      <p>PT Aetra Air Tangerang &copy; 2026</p>
+    </div>
+  </aside>
+
+  <!-- KONTAINER UTAMA -->
+  <div class="flex-1 flex flex-col h-full overflow-hidden">
+
+    <!-- HEADER / TOPBAR -->
+    <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shadow-xs">
+      <div class="relative w-80">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+        <input type="text" placeholder="Cari ID Pelanggan atau Nama Industri..." class="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <select class="border border-slate-300 text-xs rounded-lg px-3 py-1.5 bg-white text-slate-700">
+          <option>Cycle 1</option>
+          <option>Cycle 2</option>
+        </select>
+        <select class="border border-slate-300 text-xs rounded-lg px-3 py-1.5 bg-white text-slate-700">
+          <option>Semua Kelas</option>
+        </select>
+        <select class="border border-slate-300 text-xs rounded-lg px-3 py-1.5 bg-white text-slate-700">
+          <option>Semua Bulan (1 Tahun)</option>
+        </select>
+
+        <div class="text-right text-[11px] text-slate-500 border-l pl-3 border-slate-200">
+          <div class="font-semibold text-slate-700 flex items-center justify-end space-x-1">
+            <i class="fa-regular fa-clock"></i>
+            <span id="liveClock">19:48:13</span>
+          </div>
+          <div>Senin, 28 September 2026</div>
+        </div>
+
+        <!-- USER PROFILE BAR -->
+        <div class="flex items-center space-x-2 pl-2">
+          <div id="userAvatar" class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-xs">
+            PY
+          </div>
+          <div class="text-xs">
+            <div id="userName" class="font-bold text-slate-800">Pak Yaya</div>
+            <div id="userRole" class="text-[10px] text-slate-500">Tim Billing & Invoicing</div>
+          </div>
+        </div>
+
+        <!-- TOMBOL KELUAR -> RE-DIRECT KE LOGINADMIN.HTML -->
+        <a href="loginadmin.html" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg flex items-center space-x-1 font-semibold ml-2">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Keluar</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- KONTEN DINAMIS UTAMA -->
+    <main id="main-content" class="flex-1 overflow-y-auto p-6 bg-slate-100 space-y-6">
+      <!-- Default memuat database.html -->
+    </main>
+  </div>
+
+  <!-- SCRIPT NAVIGASI DINAMIS -->
+  <script>
+    async function loadPage(pageUrl, activeNavId) {
+      try {
+        const response = await fetch(pageUrl);
+        if (response.ok) {
+          const htmlContent = await response.text();
+          document.getElementById('main-content').innerHTML = htmlContent;
+
+          // Update Tampilan Aktif Menu Sidebar
+          document.querySelectorAll('nav button').forEach(btn => {
+            btn.classList.remove('sidebar-active');
+            btn.classList.add('text-slate-300');
+          });
+
+          const activeBtn = document.getElementById(activeNavId);
+          if (activeBtn) {
+            activeBtn.classList.add('sidebar-active');
+            activeBtn.classList.remove('text-slate-300');
+          }
+        } else {
+          document.getElementById('main-content').innerHTML = `<p class="text-red-500 text-center py-10">Gagal memuat halaman ${pageUrl}</p>`;
+        }
+      } catch (err) {
+        console.error('Error loading page:', err);
+      }
+    }
+
+    // Panggil halaman default (Database & Input Cycle) saat admin.html dibuka
+    window.onload = () => {
+      loadPage('database.html', 'nav-database');
+      
+      // Update Profil berdasarkan user yang dipilih di login
+      const currentUser = localStorage.getItem('simba_user');
+      if (currentUser === 'kabul') {
+        document.getElementById('userName').innerText = 'Pak Kabul';
+        document.getElementById('userRole').innerText = 'Admin Meter Reading';
+        document.getElementById('userAvatar').innerText = 'PK';
+      } else if (currentUser === 'solihin') {
+        document.getElementById('userName').innerText = 'Pak Solihin';
+        document.getElementById('userRole').innerText = 'Admin Meter Reading';
+        document.getElementById('userAvatar').innerText = 'PS';
+      }
+    };
+  </script>
+</body>
+</html>
