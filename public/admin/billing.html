@@ -25,11 +25,11 @@
           <img src="../logoaetra.jpg" alt="Logo Aetra Tangerang" class="h-8 object-contain" />
         </div>
         <nav class="space-y-1.5">
-          <a href="overview.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">📊 Overview SIMBA-IN</a>
-          <a href="database.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">📂 Database & Input Cycle</a>
-          <a href="verifikasi.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">✔️ Verifikasi Reading</a>
+          <a href="index.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white transition">📊 Overview SIMBA-IN</a>
+          <a href="database.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white transition">📂 Database & Input Cycle</a>
+          <a href="verifikasi.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white transition">✔️ Verifikasi Reading</a>
           <a href="billing.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold bg-aetra-orange text-white shadow-md">🧾 Billing & Invoicing</a>
-          <a href="audit.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">📋 Log Audit & Aktivitas</a>
+          <a href="audit.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white transition">📋 Log Audit & Aktivitas</a>
         </nav>
       </div>
     </aside>
@@ -40,7 +40,7 @@
           <h2 class="font-bold text-aetra-blue text-sm">🧾 Otomatisasi Invoice & Pengiriman Email Billing</h2>
           <p class="text-xs text-slate-400">Proses pencetakan invoice PDF dan pengiriman tagihan resmi ke surel pelanggan.</p>
         </div>
-        <button onclick="exportToCSV()" class="px-3 py-1.5 bg-aetra-blue text-white rounded-xl text-xs font-bold">📥 Ekspor Rekap CSV</button>
+        <button onclick="exportToCSV()" class="px-3 py-1.5 bg-aetra-blue text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition">📥 Ekspor Rekap CSV</button>
       </div>
 
       <div class="bg-white dark:bg-slate-800 rounded-2xl border overflow-hidden">
@@ -80,7 +80,7 @@
             <td class="p-3 font-mono font-bold">Rp ${total.toLocaleString()}</td>
             <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold ${badge}">${item.status}</span></td>
             <td class="p-3 text-center">
-              <button onclick="prosesInvoice('${item.id}')" class="px-3 py-1 bg-aetra-orange text-white font-bold rounded-lg text-xs">📧 Cetak & Kirim Invoice</button>
+              <button onclick="prosesInvoice('${item.id}')" class="px-3 py-1 bg-aetra-orange text-white font-bold rounded-lg text-xs hover:bg-orange-600 transition">📧 Cetak & Kirim Invoice</button>
             </td>
           </tr>
         `;
