@@ -229,7 +229,7 @@
           </button>
         </div>
       </div>
-      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
+      <img src="../logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
     <div class="content-body">
@@ -307,13 +307,24 @@
 
     async function checkAuthSession() {
       const { data: { session } } = await _supabase.auth.getSession();
+      
       if (!session) {
         window.location.href = 'login.html';
-      } else {
-        document.getElementById('display-email').textContent = session.user.email;
-        // Inisialisasi peta setelah sesi aman dan elemen siap
-        setTimeout(initMap, 200);
+        return;
       }
+
+      // Validasi Peran (Cegah Admin masuk ke halaman petugas)
+      const role = session.user.user_metadata?.role;
+      if (role === 'admin') {
+        alert('Akses Ditolak: Akun Admin tidak diizinkan masuk ke halaman petugas.');
+        await _supabase.auth.signOut();
+        window.location.href = '../admin/login.html'; // Sesuaikan path login admin jika berada di folder berbeda
+        return;
+      }
+
+      document.getElementById('display-email').textContent = session.user.email;
+      // Inisialisasi peta setelah sesi aman dan elemen siap
+      setTimeout(initMap, 200);
     }
 
     async function logout() {
@@ -396,14 +407,9 @@
       btn.textContent = 'Mengunggah & Menyimpan...';
 
       try {
-        // Pastikan bagian ini ada di dalam fungsi handleSubmit(e) di inputbacaan.html
-          const { data: { session } } = await _supabase.auth.getSession();
-          const petugasEmail = session ? session.user.email : 'unknown';
-
-        const payload = {
-      // ... data form lainnya ...
-        petugas_email: petugasEmail // Ini memastikan email petugas ikut tersimpan ke database
-    };
+        // Ambil sesi login terbaru untuk memastikan email petugas tercatat dengan akurat
+        const { data: { session } } = await _supabase.auth.getSession();
+        const petugasEmail = session ? session.user.email : 'unknown';
 
         const fotoMeterFile = document.getElementById('foto_meter').files[0];
         const fotoBerkasFile = document.getElementById('foto_berkas').files[0];
@@ -420,7 +426,7 @@
           longitude: userLocation.longitude,
           foto_meter_url: foto_meter_url,
           foto_berkas_url: foto_berkas_url,
-          petugas_email: petugasEmail // <-- Diperbaiki dengan tanda koma (,) di baris sebelumnya
+          petugas_email: petugasEmail // Email petugas tersimpan dengan benar di database
         };
 
         const { error } = await _supabase.from('meter_readings').insert([payload]);
@@ -435,6 +441,7 @@
       }
     }
 
+    // Jalankan pemeriksaan sesi saat halaman dibuka
     checkAuthSession();
   </script>
 </body>
