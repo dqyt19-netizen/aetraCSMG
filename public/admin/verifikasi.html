@@ -3,25 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verifikasi - SIMBA-IN</title>
+  <title>Database - SIMBA-IN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
     tailwind.config = {
       theme: { extend: { colors: { aetra: { blue: '#0055A5', darkblue: '#003E78', orange: '#E86216' } } } }
     }
   </script>
+  <style> body { font-family: 'Poppins', sans-serif; } </style>
 </head>
 <body class="bg-slate-100 text-slate-800">
   <div class="flex h-screen overflow-hidden">
+    <!-- SIDEBAR -->
     <aside class="w-64 bg-aetra-darkblue text-slate-200 flex flex-col justify-between p-4 hidden md:flex shrink-0 h-full">
       <div>
         <div class="bg-white rounded-xl p-3 mb-6 flex items-center justify-center">
-          <span class="font-extrabold text-aetra-blue">AETRA TANGERANG</span>
+          <span class="font-extrabold text-aetra-blue text-sm">AETRA TANGERANG</span>
         </div>
         <nav class="space-y-1.5">
           <a href="./overview.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">📊 Overview SIMBA-IN</a>
-          <a href="./database.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">📂 Database & Input Cycle</a>
-          <a href="./verifikasi.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold bg-aetra-orange text-white shadow-md">✔️ Verifikasi Reading</a>
+          <a href="./database.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold bg-aetra-orange text-white shadow-md">📂 Database & Input Cycle</a>
+          <a href="./verifikasi.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">✔️ Verifikasi Reading</a>
           <a href="./billing.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">🧾 Billing & Invoicing</a>
           <a href="./audit.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue transition">📋 Log Audit & Aktivitas</a>
         </nav>
@@ -31,16 +35,151 @@
       </div>
     </aside>
 
+    <!-- CONTENT -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
       <header class="bg-white border-b p-4 flex justify-between items-center sticky top-0 z-20">
-        <h1 class="font-extrabold text-aetra-blue text-base">✔️ Verifikasi Reading</h1>
+        <h1 class="font-extrabold text-aetra-blue text-base">📂 Master Database & Input Cycle</h1>
       </header>
-      <main class="p-6">
-        <div class="bg-white p-6 rounded-2xl border shadow-sm">
-          <h2 class="text-lg font-bold text-aetra-blue mb-2">Halaman Verifikasi Reading</h2>
+
+      <main class="p-6 space-y-6">
+        <div class="bg-white p-6 rounded-2xl border shadow-sm space-y-4">
+          <div class="flex justify-between items-center border-b pb-4">
+            <div>
+              <h2 class="font-bold text-aetra-blue text-sm">Tambah Data Pelanggan Industri</h2>
+              <p class="text-xs text-slate-400">Input manual atau upload via Excel.</p>
+            </div>
+            <label class="cursor-pointer bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition">
+              📊 Import Excel
+              <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importExcel(event)">
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border">
+            <div>
+              <label class="block text-[11px] font-bold mb-1">ID Pelanggan</label>
+              <input id="inputNewId" type="text" placeholder="IND-1005" class="w-full p-2 border rounded-xl text-xs" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold mb-1">Nama Perusahaan</label>
+              <input id="inputNewName" type="text" placeholder="PT Industri Baru" class="w-full p-2 border rounded-xl text-xs" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold mb-1">Email</label>
+              <input id="inputNewEmail" type="email" placeholder="finance@perusahaan.com" class="w-full p-2 border rounded-xl text-xs" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold mb-1">Pilih Cycle</label>
+              <select id="inputNewCycle" class="w-full p-2 border rounded-xl text-xs"></select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold mb-1">Kelas</label>
+              <select id="inputNewKelas" class="w-full p-2 border rounded-xl text-xs">
+                <option value="Premium">Premium</option><option value="Platinum">Platinum</option><option value="Gold">Gold</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="addNewIndustry()" class="w-full py-2 bg-aetra-orange text-white font-bold text-xs rounded-xl hover:bg-orange-600 transition">➕ Simpan ke DB</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border shadow-sm">
+          <div class="overflow-x-auto border rounded-xl">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="bg-slate-100 uppercase text-[10px]">
+                  <th class="p-3">ID</th>
+                  <th class="p-3">Nama Perusahaan</th>
+                  <th class="p-3">Email</th>
+                  <th class="p-3">Cycle</th>
+                  <th class="p-3">Kelas</th>
+                  <th class="p-3 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="dbTable" class="divide-y font-medium"></tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>
   </div>
+
+  <script>
+    let dataIndustri = JSON.parse(localStorage.getItem('aetra_industri_data')) || [
+      { id: 'IND-1001', nama: 'PT Krakatau Steel Industry', email: 'billing@krakatau.co.id', cycle: 'Cycle 1', kelas: 'Gold', lalu: 12500, skrg: 13200, status: 'Verified' },
+      { id: 'IND-1002', nama: 'PT Indah Kiat Pulp & Paper', email: 'finance@indahkiat.co.id', cycle: 'Cycle 1', kelas: 'Premium', lalu: 45000, skrg: 47500, status: 'Invoiced' },
+      { id: 'IND-1003', nama: 'PT Gajah Tunggal Tbk', email: 'acc@gajahtunggal.co.id', cycle: 'Cycle 2', kelas: 'Platinum', lalu: 21000, skrg: 21800, status: 'Pending Verification' }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      let el = document.getElementById('inputNewCycle');
+      for(let i=1; i<=15; i++) el.innerHTML += `<option value="Cycle ${i}">Cycle ${i}</option>`;
+      renderDB();
+    });
+
+    function renderDB() {
+      let tbody = document.getElementById('dbTable');
+      tbody.innerHTML = '';
+      dataIndustri.forEach(i => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold text-aetra-orange">${i.id}</td>
+            <td class="p-3 font-bold">${i.nama}</td>
+            <td class="p-3 text-slate-500">${i.email || '-'}</td>
+            <td class="p-3 text-aetra-blue">${i.cycle}</td>
+            <td class="p-3">${i.kelas || 'Gold'}</td>
+            <td class="p-3 text-center">
+              <button onclick="hapusData('${i.id}')" class="text-rose-500 font-bold hover:underline">🗑️ Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function addNewIndustry() {
+      let id = document.getElementById('inputNewId').value;
+      let nama = document.getElementById('inputNewName').value;
+      let email = document.getElementById('inputNewEmail').value;
+      let cycle = document.getElementById('inputNewCycle').value;
+      let kelas = document.getElementById('inputNewKelas').value;
+
+      if(!id || !nama) return alert("Isi ID dan Nama!");
+
+      dataIndustri.push({ id, nama, email, cycle, kelas, lalu: 0, skrg: 0, status: 'Pending Verification' });
+      saveAndRefresh();
+    }
+
+    function hapusData(id) {
+      if(confirm(`Hapus ${id}?`)) {
+        dataIndustri = dataIndustri.filter(i => i.id !== id);
+        saveAndRefresh();
+      }
+    }
+
+    function importExcel(e) {
+      let reader = new FileReader();
+      reader.onload = (evt) => {
+        let wb = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
+        let data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+        data.forEach(item => {
+          dataIndustri.push({
+            id: String(item.ID || 'IND-' + Math.floor(Math.random()*1000)),
+            nama: String(item.Nama || 'Industri Baru'),
+            email: 'finance@import.com',
+            cycle: 'Cycle 1',
+            kelas: 'Gold',
+            lalu: 0, skrg: 0, status: 'Pending Verification'
+          });
+        });
+        saveAndRefresh();
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    }
+
+    function saveAndRefresh() {
+      localStorage.setItem('aetra_industri_data', JSON.stringify(dataIndustri));
+      renderDB();
+    }
+  </script>
 </body>
 </html>
