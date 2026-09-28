@@ -45,7 +45,7 @@
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       width: 100%;
       max-width: 600px;
-      overflow: visible;
+      position: relative;
       border: 1px solid var(--border-color);
     }
 
@@ -56,7 +56,6 @@
       padding: 16px 20px;
       border-bottom: 1px solid var(--border-color);
       background: #ffffff;
-      position: relative;
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
     }
@@ -83,7 +82,7 @@
     .nav-dropdown {
       display: none;
       position: absolute;
-      top: calc(100% + 8px);
+      top: 70px;
       left: 20px;
       width: 260px;
       background: #ffffff;
@@ -211,13 +210,13 @@
   <div class="app-card">
     <div class="header-bar">
       <div id="nav-wrapper">
-        <button class="menu-trigger-btn" onclick="toggleMenu()">
+        <button class="menu-trigger-btn" onclick="toggleMenu(event)">
           <span>☰ Menu</span>
         </button>
         <div class="nav-dropdown" id="nav-dropdown">
           <div class="user-profile-item">
             <div class="label">Petugas Aktif</div>
-            <div class="name" id="display-email">petugas@aetra.co.id</div>
+            <div class="name" id="display-email">Memuat...</div>
           </div>
           <button class="nav-item-btn active" onclick="window.location.href='inputbacaan.html'">
             📝 Input Bacaan
@@ -230,7 +229,7 @@
           </button>
         </div>
       </div>
-      <img src="/logoaetra.jpg" alt="Logo Aetra Air Tangerang">
+      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
     <div class="content-body">
@@ -250,7 +249,7 @@
 
         <div class="form-group">
           <label for="cycle">Cycle</label>
-          <input type="number" id="cycle" required placeholder="01">
+          <input type="text" id="cycle" required placeholder="01">
         </div>
 
         <div class="form-group">
@@ -290,18 +289,19 @@
 
     const STORAGE_BUCKET = 'meter-photos';
 
-    let userLocation = { latitude: null, longitude: null };
+    let userLocation = { latitude: -6.1783, longitude: 106.6319 };
     let map = null;
     let marker = null;
 
-    function toggleMenu() {
+    function toggleMenu(event) {
+      event.stopPropagation();
       document.getElementById('nav-dropdown').classList.toggle('show');
     }
 
     window.addEventListener('click', function(e) {
-      const wrapper = document.getElementById('nav-wrapper');
-      if (wrapper && !wrapper.contains(e.target)) {
-        document.getElementById('nav-dropdown').classList.remove('show');
+      const dropdown = document.getElementById('nav-dropdown');
+      if (dropdown && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
       }
     });
 
@@ -311,7 +311,8 @@
         window.location.href = 'login.html';
       } else {
         document.getElementById('display-email').textContent = session.user.email;
-        initMap();
+        // Inisialisasi peta setelah sesi aman dan elemen siap
+        setTimeout(initMap, 200);
       }
     }
 
@@ -328,7 +329,7 @@
       const defaultLng = 106.6319;
 
       if (!map) {
-        map = L.map('map-container').setView([defaultLat, defaultLng], 13);
+        map = L.map('map-container').setView([defaultLat, defaultLng], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           maxZoom: 19,
           attribution: '© OpenStreetMap'
@@ -342,6 +343,8 @@
           userLocation.longitude = latLng.lng;
           statusText.textContent = `Lat: ${latLng.lat.toFixed(5)}, Lng: ${latLng.lng.toFixed(5)} (Manual)`;
         });
+      } else {
+        map.invalidateSize();
       }
 
       if (navigator.geolocation) {
@@ -357,11 +360,11 @@
             statusText.textContent = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
           },
           (err) => {
-            statusText.textContent = 'GPS gagal/dinonaktifkan. Anda bisa menggeser pin lokasi.';
+            statusText.textContent = 'GPS gagal/dinonaktifkan. Geser pin pada peta.';
             userLocation.latitude = defaultLat;
             userLocation.longitude = defaultLng;
           },
-          { enableHighAccuracy: true }
+          { enableHighAccuracy: true, timeout: 10000 }
         );
       } else {
         statusText.textContent = 'Browser tidak mendukung GPS.';
@@ -393,6 +396,10 @@
       btn.textContent = 'Mengunggah & Menyimpan...';
 
       try {
+        // Ambil sesi user aktif untuk email petugas
+        const { data: { session } } = await _supabase.auth.getSession();
+        const petugasEmail = session ? session.user.email : 'unknown';
+
         const fotoMeterFile = document.getElementById('foto_meter').files[0];
         const fotoBerkasFile = document.getElementById('foto_berkas').files[0];
 
@@ -406,9 +413,9 @@
           stand_meter: parseFloat(document.getElementById('stand_meter').value),
           latitude: userLocation.latitude,
           longitude: userLocation.longitude,
-          foto_meter_url: foto_meter_url, // DIPERBAIKI: Menggunakan nama kolom yang benar
-          foto_berkas_url: foto_berkas_url
-          petugas_email: petugasEmail
+          foto_meter_url: foto_meter_url,
+          foto_berkas_url: foto_berkas_url,
+          petugas_email: petugasEmail // <-- Diperbaiki dengan tanda koma (,) di baris sebelumnya
         };
 
         const { error } = await _supabase.from('meter_readings').insert([payload]);
