@@ -230,7 +230,7 @@
           </button>
         </div>
       </div>
-      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
+      <img src="/logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
     <div class="content-body">
@@ -288,7 +288,6 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjaWtwbXR1eGF4amZ1Y3dqcmFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MDc5MTUsImV4cCI6MjEwNjE4MzkxNX0.Tg75hNg6zzaRSJ-L5O3w9UtzQbyqBgjlMaLBGv_ANYc'; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // KUNCI PERBAIKAN: Menggunakan nama bucket 'meter-photos' sesuai dengan dashboard Supabase Anda
     const STORAGE_BUCKET = 'meter-photos';
 
     let userLocation = { latitude: null, longitude: null };
@@ -321,7 +320,6 @@
       window.location.href = 'login.html';
     }
 
-    // Inisialisasi Peta
     function initMap() {
       const statusText = document.getElementById('coord-status');
       statusText.textContent = 'Mendeteksi lokasi GPS...';
@@ -398,7 +396,7 @@
         const fotoMeterFile = document.getElementById('foto_meter').files[0];
         const fotoBerkasFile = document.getElementById('foto_berkas').files[0];
 
-        let foto_meter_url = await uploadFile(fotoMeterFile, 'stand');
+        let foto_stand_meter_url = await uploadFile(fotoMeterFile, 'stand');
         let foto_berkas_url = fotoBerkasFile ? await uploadFile(fotoBerkasFile, 'berkas') : null;
 
         const payload = {
@@ -408,7 +406,7 @@
           stand_meter: parseFloat(document.getElementById('stand_meter').value),
           latitude: userLocation.latitude,
           longitude: userLocation.longitude,
-          foto_meter_url: foto_meter_url,
+          foto_stand_meter_url: foto_stand_meter_url, // DIPERBAIKI: Menggunakan nama kolom yang benar
           foto_berkas_url: foto_berkas_url
         };
 
