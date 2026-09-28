@@ -18,16 +18,16 @@
                 <!-- Logo Brand -->
                 <div class="p-4 bg-white m-3 rounded-lg flex items-center justify-center shadow">
                     <span class="text-[#0A3663] font-black text-xl tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-droplet text-blue-500">3</i> AETRA
+                        <i class="fa-solid fa-droplet text-blue-500"></i> AETRA
                     </span>
                 </div>
 
                 <!-- Menu Navigation -->
                 <nav class="mt-4 px-2 space-y-1">
-                    <a href="database.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-900/50 transition">
+                    <a href="database.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-[#F58220] text-white shadow-md">
                         <i class="fa-solid fa-database w-5"></i> Database & Input Cycle
                     </a>
-                    <a href="monitoring.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-[#F58220] text-white shadow-md">
+                    <a href="monitoring.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-900/50 transition">
                         <i class="fa-solid fa-calendar-days w-5"></i> Monitoring Pembacaan Cycle
                     </a>
                     <a href="verifikasi.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium hover:bg-blue-900/50 transition">
@@ -124,7 +124,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION 2: MATRIKS PLOTTING JADWAL (GAMBAR 2) -->
+                <!-- SECTION 2: MATRIKS PLOTTING JADWAL -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
                         <div class="flex items-center gap-2">
@@ -153,7 +153,6 @@
                                 </tr>
                                 <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
                                     <th class="p-2 border-r border-slate-200 text-left pl-3">Cycle</th>
-                                    <!-- Tanggal 1 sampai 31 -->
                                     <script>
                                         for(let i=1; i<=31; i++) {
                                             document.write(`<th class="border-r border-slate-200 py-2 w-8">${i}</th>`);
@@ -162,7 +161,6 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200">
-                                <!-- Baris Cycle 1 -->
                                 <tr>
                                     <td class="p-2 font-semibold text-blue-600 text-left pl-3 border-r border-slate-200 bg-slate-50">Cycle 1</td>
                                     <td colspan="5" class="border-r border-slate-200"></td>
@@ -171,7 +169,6 @@
                                     <td class="bg-amber-400 font-bold text-slate-900">1</td>
                                     <td colspan="22" class="border-r border-slate-200"></td>
                                 </tr>
-                                <!-- Baris Cycle 2 -->
                                 <tr>
                                     <td class="p-2 font-semibold text-blue-600 text-left pl-3 border-r border-slate-200 bg-slate-50">Cycle 2</td>
                                     <td colspan="6" class="border-r border-slate-200"></td>
@@ -186,18 +183,35 @@
                         </table>
                     </div>
 
-                    <!-- Keterangan Warna Workflow (Gambar 3) -->
-                    <div class="mt-4 flex flex-wrap items-center gap-6 text-xs text-slate-600 pt-3 border-t border-slate-100">
-                        <span class="font-bold text-slate-700">KETERANGAN WARNA WORKFLOW:</span>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 bg-purple-600 rounded"><span>Pra-Baca</span></div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 bg-amber-400 rounded"><span>Hari H Pembacaan Meter (Nomor Cycle)</span></div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 bg-blue-500 rounded"><span>Verifikasi Stand</span></div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 bg-amber-800 rounded"><span>Billing / Invoicing</span></div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 bg-red-600 rounded"><span>Hari Minggu / Libur</span></div>
+                    <!-- KETERANGAN WARNA WORKFLOW (SUDAH DIPERBAIKI AGAR RAPI) -->
+                    <div class="mt-4 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-700">
+                        <span class="font-bold tracking-wide text-slate-800 uppercase text-[11px]">Keterangan Warna Workflow:</span>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
+                                <span class="w-3.5 h-3.5 bg-purple-600 rounded-sm shadow-sm shrink-0"></span>
+                                <span class="font-medium">Pra-Baca</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
+                                <span class="w-3.5 h-3.5 bg-amber-400 rounded-sm shadow-sm shrink-0"></span>
+                                <span class="font-medium">Hari H Pembacaan Meter (Nomor Cycle)</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
+                                <span class="w-3.5 h-3.5 bg-blue-500 rounded-sm shadow-sm shrink-0"></span>
+                                <span class="font-medium">Verifikasi Stand</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
+                                <span class="w-3.5 h-3.5 bg-amber-800 rounded-sm shadow-sm shrink-0"></span>
+                                <span class="font-medium">Billing / Invoicing</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
+                                <span class="w-3.5 h-3.5 bg-red-600 rounded-sm shadow-sm shrink-0"></span>
+                                <span class="font-medium">Hari Minggu / Libur</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- SECTION 3: TINGKAT KETERBACAAN METER (GAMBAR 3) -->
+                <!-- SECTION 3: TINGKAT KETERBACAAN METER -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
                         <div class="flex items-center gap-2">
@@ -244,7 +258,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION 4: PEMBARUAN STATUS MASSAL (GAMBAR 4) -->
+                <!-- SECTION 4: PEMBARUAN STATUS MASSAL -->
                 <div class="bg-[#0A3663] text-white p-5 rounded-xl shadow-lg">
                     <div class="flex justify-between items-center mb-4">
                         <div class="flex items-center gap-2">
@@ -274,7 +288,7 @@
                     </div>
                 </div>
 
-                <!-- SECTION 5: TABEL MONITORING PEMBACAAN METER (GAMBAR 4) -->
+                <!-- SECTION 5: TABEL MONITORING PEMBACAAN METER -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-sm font-bold text-slate-800">Tabel Monitoring Pembacaan Meter Industri <span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded">Cycle 5</span></h3>
