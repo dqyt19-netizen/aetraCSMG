@@ -1,21 +1,14 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/loginpetugas",
-      "destination": "/petugas/login.html"
-    },
+  "redirects": [
     {
       "source": "/loginpetugas.html",
-      "destination": "/petugas/login.html"
+      "destination": "/petugas/login.html",
+      "permanent": true
     },
     {
-      "source": "/petugas",
-      "destination": "/petugas/login.html"
-    },
-    {
-      "source": "/petugas/:path*",
-      "destination": "/petugas/:path*"
+      "source": "/loginpetugas",
+      "destination": "/petugas/login.html",
+      "permanent": true
     }
   ]
 }
