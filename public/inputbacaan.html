@@ -57,7 +57,7 @@
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       width: 100%;
       max-width: 700px;
-      overflow: visible; /* Penting: Dibuat visible agar dropdown menu tidak terpotong */
+      overflow: visible;
       border: 1px solid var(--border-color);
     }
     .header-bar {
@@ -98,7 +98,7 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      z-index: 9999; /* Dipasang tinggi agar melayang di atas konten lain */
+      z-index: 9999;
       padding: 8px;
     }
     .nav-dropdown.show { display: block; }
@@ -520,7 +520,7 @@
     }
 
     /* =========================================================
-       7. HANDLER SUBMIT FORM PENCATATAN
+       7. HANDLER SUBMIT FORM PENCATATAN (REVISI)
        ========================================================= */
     document.getElementById('form-input-bacaan').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -537,15 +537,17 @@
         const urlFotoMeter = await processAndUploadPhoto('foto_stand_meter', 'stand_meter', formattedTimeStr, selectedLat, selectedLng);
         const urlFotoBerkas = await processAndUploadPhoto('foto_berkas', 'berkas', formattedTimeStr, selectedLat, selectedLng);
 
+        // Payload disesuaikan persis dengan kolom tabel Supabase
         const payload = {
-          petugas_id: loggedInUser.id,
-          id_pelanggan: document.getElementById('customer_id').value,
-          nama_perusahaan: document.getElementById('company_name').value,
+          officer_id: loggedInUser ? loggedInUser.id : null,
+          customer_id: document.getElementById('customer_id').value,
+          company_name: document.getElementById('company_name').value,
           cycle: parseInt(document.getElementById('cycle').value),
+          stand_bulan_lalu: parseFloat(document.getElementById('stand_bulan_lalu').value) || 0,
           stand_meter: parseFloat(document.getElementById('stand_meter').value) || 0,
           latitude: selectedLat,
           longitude: selectedLng,
-          foto_meter_url: urlFotoMeter,
+          foto_stand_meter: urlFotoMeter,
           foto_berkas: urlFotoBerkas,
           created_at: new Date(`${readingDate}T${readingTime}`).toISOString()
         };
