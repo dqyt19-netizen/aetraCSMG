@@ -4,14 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aetra Air Tangerang - Hasil Bacaan Meter</title>
-
-  <!-- Library Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    /* =========================================================
-       1. CSS VARIABLES & BASE STYLES
-       ========================================================= */
     :root {
       --primary-color: #0284c7;
       --primary-hover: #0369a1;
@@ -40,16 +35,13 @@
       padding: 16px;
     }
 
-    /* =========================================================
-       2. TAMPILAN KARTU & KONTROL MENU DROPDOWN
-       ========================================================= */
     .app-card {
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       width: 100%;
       max-width: 900px;
-      overflow: visible; /* Penting: Dibuat visible agar dropdown menu tidak terpotong */
+      overflow: visible;
       border: 1px solid var(--border-color);
     }
 
@@ -94,7 +86,7 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      z-index: 9999; /* Z-index tinggi agar melayang di atas tabel */
+      z-index: 9999;
       padding: 8px;
     }
 
@@ -152,9 +144,6 @@
       padding-top: 12px;
     }
 
-    /* =========================================================
-       3. TAMPILAN KONTEN UTAMA & TABEL REKAP
-       ========================================================= */
     .content-body {
       padding: 20px;
     }
@@ -240,7 +229,6 @@
 <body>
 
   <div class="app-card">
-    <!-- Header dan Menu Navigasi Dropdown -->
     <div class="header-bar">
       <div id="nav-wrapper">
         <button class="menu-trigger-btn" onclick="toggleMenu()">
@@ -251,11 +239,10 @@
             <div class="label">Petugas Aktif</div>
             <div class="name" id="display-email">petugas@aetra.co.id</div>
           </div>
-          <!-- DIPERBAIKI: Navigasi relatif internal tanpa prefix dobel -->
-          <button class="nav-item-btn" onclick="window.location.href='inputbacaan.html'">
+          <button class="nav-item-btn" onclick="window.location.href='/petugas/inputbacaan.html'">
             📝 Input Bacaan
           </button>
-          <button class="nav-item-btn active" onclick="window.location.href='hasilbacaan.html'">
+          <button class="nav-item-btn active" onclick="window.location.href='/petugas/hasilbacaan.html'">
             📋 Hasil Bacaan
           </button>
           <button class="nav-item-btn logout" onclick="logout()">
@@ -263,12 +250,12 @@
           </button>
         </div>
       </div>
-      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
+      <!-- Path logo dibuat absolut dari root folder public -->
+      <img src="/logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
-    <!-- Konten Utama List Hasil Bacaan -->
     <div class="content-body">
-      <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text-main);">List Hasil Bacaan Meter</h2>
+      <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">List Hasil Bacaan Meter</h2>
       <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Data riwayat pencatatan meter yang telah diinput.</p>
       
       <div id="grouped-data-container">
@@ -278,21 +265,14 @@
   </div>
 
   <script>
-    /* =========================================================
-       1. INISIALISASI SUPABASE CLIENT
-       ========================================================= */
     const SUPABASE_URL = 'https://dntuitawhmpqkbepnmwk.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY'; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    /* =========================================================
-       2. MANAJEMEN MENU DROPDOWN
-       ========================================================= */
     function toggleMenu() {
       document.getElementById('nav-dropdown').classList.toggle('show');
     }
 
-    // Menutup menu secara otomatis jika user mengklik bagian luar dropdown
     window.addEventListener('click', function(e) {
       const wrapper = document.getElementById('nav-wrapper');
       if (wrapper && !wrapper.contains(e.target)) {
@@ -300,13 +280,9 @@
       }
     });
 
-    /* =========================================================
-       3. VERIFIKASI SESI LOGIN & LOGOUT (DIPERBAIKI)
-       ========================================================= */
     async function checkAuthSession() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) {
-        // DIPERBAIKI: Mengarahkan dari akar domain (/petugas/login.html)
         window.location.href = '/petugas/login.html';
       } else {
         document.getElementById('display-email').textContent = session.user.email;
@@ -316,13 +292,9 @@
 
     async function logout() {
       await _supabase.auth.signOut();
-      // DIPERBAIKI: Mengarahkan dari akar domain (/petugas/login.html) untuk mencegah error 404
       window.location.href = '/petugas/login.html';
     }
 
-    /* =========================================================
-       4. AMBIL DATA DAN RENDER TABEL
-       ========================================================= */
     async function loadDataHasilBaca() {
       const container = document.getElementById('grouped-data-container');
       
@@ -332,7 +304,7 @@
         .order('created_at', { ascending: false });
 
       if (error) {
-        container.innerHTML = `<p style="color:red; padding: 12px;">Error: ${error.message}</p>`;
+        container.innerHTML = `<p style="color:red; padding: 12px; font-size: 13px;">Gagal memuat data (${error.message}). Pastikan RLS di Supabase sudah dikonfigurasi.</p>`;
         return;
       }
 
@@ -367,8 +339,8 @@
       `;
 
       data.forEach(row => {
-        const latVal = row.latitude ? row.latitude.toFixed(6) : '-';
-        const lngVal = row.longitude ? row.longitude.toFixed(6) : '-';
+        const latVal = row.latitude ? Number(row.latitude).toFixed(6) : '-';
+        const lngVal = row.longitude ? Number(row.longitude).toFixed(6) : '-';
 
         const fotoStandHtml = row.foto_meter_url 
           ? `<a href="${row.foto_meter_url}" target="_blank"><img src="${row.foto_meter_url}" class="img-preview" alt="Foto Stand"></a>` 
@@ -408,7 +380,6 @@
       container.innerHTML = html;
     }
 
-    // Jalankan verifikasi sesi saat halaman dimuat
     checkAuthSession();
   </script>
 </body>
