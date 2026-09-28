@@ -305,7 +305,7 @@
     async function checkAuthSession() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) {
-        window.location.href = 'loginpetugas.html';
+        window.location.href = 'petugas/login.html';
       } else {
         document.getElementById('display-email').textContent = session.user.email;
         loadDataHasilBaca();
@@ -314,7 +314,7 @@
 
     async function logout() {
       await _supabase.auth.signOut();
-      window.location.href = 'loginpetugas.html';
+      window.location.href = 'petugas/login.html';
     }
 
     /* =========================================================
