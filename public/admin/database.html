@@ -361,7 +361,12 @@
         const fotoMeter = item.foto_meter_url ? `<img src="${item.foto_meter_url}" class="thumbnail" alt="Meter">` : '-';
         const fotoBerkas = item.foto_berkas_url ? `<img src="${item.foto_berkas_url}" class="thumbnail" alt="Berkas">` : '-';
         const koordinat = (item.latitude && item.longitude) ? `${item.latitude}, ${item.longitude}` : '-';
-        const mapLink = (item.latitude && item.longitude) 
+        const lat = item.latitude ? String(item.latitude).trim() : '';
+        const lng = item.longitude ? String(item.longitude).trim() : '';
+        
+        const mapLink = (lat && lng) 
+          ? `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="map-link">📍 Buka Peta</a>` 
+          : '-'; 
           ? `<a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" class="map-link">📍 Buka Peta</a>` 
           : '-';
 
