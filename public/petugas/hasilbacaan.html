@@ -250,7 +250,6 @@
           </button>
         </div>
       </div>
-      <!-- Path logo dibuat absolut dari root folder public -->
       <img src="/logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
@@ -342,8 +341,9 @@
         const latVal = row.latitude ? Number(row.latitude).toFixed(6) : '-';
         const lngVal = row.longitude ? Number(row.longitude).toFixed(6) : '-';
 
-        const fotoStandHtml = row.foto_meter_url 
-          ? `<a href="${row.foto_meter_url}" target="_blank"><img src="${row.foto_meter_url}" class="img-preview" alt="Foto Stand"></a>` 
+        // DIPERBAIKI: Menggunakan foto_stand_meter_url sesuai database
+        const fotoStandHtml = row.foto_stand_meter_url 
+          ? `<a href="${row.foto_stand_meter_url}" target="_blank"><img src="${row.foto_stand_meter_url}" class="img-preview" alt="Foto Stand"></a>` 
           : '-';
 
         const fotoBerkasHtml = row.foto_berkas_url 
