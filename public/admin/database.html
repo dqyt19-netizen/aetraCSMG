@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Database & Input Cycle - SIMBA-IN</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { aetra: { blue: '#0055A5', darkblue: '#003E78', orange: '#E86216' } } } }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style> body { font-family: 'Poppins', sans-serif; } </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans">
+
+  <div class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-aetra-darkblue text-slate-200 flex flex-col justify-between p-4 hidden md:flex shrink-0 h-full">
+      <div>
+        <div class="bg-white rounded-xl p-3 mb-6 flex items-center justify-center">
+          <img src="../logoaetra.jpg" alt="Logo Aetra Tangerang" class="h-8 object-contain" />
+        </div>
+        <nav class="space-y-1.5">
+          <a href="overview.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">📊 Overview SIMBA-IN</a>
+          <a href="database.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold bg-aetra-orange text-white shadow-md">📂 Database & Input Cycle</a>
+          <a href="verifikasi.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">✔️ Verifikasi Reading</a>
+          <a href="billing.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">🧾 Billing & Invoicing</a>
+          <a href="audit.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">📋 Log Audit & Aktivitas</a>
+        </nav>
+      </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto">
+      <main class="p-6 space-y-6">
+        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex justify-between items-center border-b pb-4">
+            <div>
+              <h2 class="font-extrabold text-aetra-blue text-base">🗂️ Manajemen & Master Data List Industri per Cycle</h2>
+              <p class="text-xs text-slate-400">Tambah industri baru atau upload kolektif via Excel.</p>
+            </div>
+            <label class="cursor-pointer bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow transition">
+              📊 Import Excel
+              <input type="file" accept=".xlsx, .xls" class="hidden" onchange="importExcel(event)">
+            </label>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border">
+            <div>
+              <label class="block text-[11px] font-bold uppercase mb-1">ID Pelanggan</label>
+              <input id="inputNewId" type="text" placeholder="Contoh: IND-1005" class="w-full p-2.5 border rounded-xl text-xs dark:bg-slate-800" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold uppercase mb-1">Nama Perusahaan Industri</label>
+              <input id="inputNewName" type="text" placeholder="PT Contoh Industri Tbk" class="w-full p-2.5 border rounded-xl text-xs dark:bg-slate-800" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold uppercase mb-1">Email Industri</label>
+              <input id="inputNewEmail" type="email" placeholder="finance@contoh.co.id" class="w-full p-2.5 border rounded-xl text-xs dark:bg-slate-800" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold uppercase mb-1">Pilih Cycle</label>
+              <select id="inputNewCycle" class="w-full p-2.5 border rounded-xl text-xs dark:bg-slate-800"></select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold uppercase mb-1">Kelas Pelanggan</label>
+              <select id="inputNewKelas" class="w-full p-2.5 border rounded-xl text-xs dark:bg-slate-800">
+                <option value="Premium">Premium</option><option value="Platinum">Platinum</option><option value="Gold">Gold</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button onclick="addNewIndustry()" class="w-full py-2.5 bg-aetra-orange text-white font-bold text-xs rounded-xl">➕ Simpan ke Database</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border shadow-sm">
+            <h3 class="font-bold text-xs uppercase mb-3 text-center">Distribusi Industri / Cycle</h3>
+            <div class="w-full h-[200px]"><canvas id="dbCycleChart"></canvas></div>
+          </div>
+
+          <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border shadow-sm">
+            <div class="overflow-x-auto border rounded-xl">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="bg-slate-100 dark:bg-slate-700/50 uppercase text-[10px]">
+                    <th class="p-3">ID Pelanggan</th>
+                    <th class="p-3">Nama Perusahaan</th>
+                    <th class="p-3">Cycle</th>
+                    <th class="p-3">Kelas</th>
+                    <th class="p-3 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="dbTableBody" class="divide-y font-medium"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    let dataIndustri = JSON.parse(localStorage.getItem('aetra_industri_data')) || [];
+    let dbChart = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const el = document.getElementById('inputNewCycle');
+      for (let i = 1; i <= 15; i++) el.innerHTML += `<option value="Cycle ${i}">Cycle ${i}</option>`;
+      refreshDatabaseView();
+    });
+
+    function refreshDatabaseView() {
+      let tbody = document.getElementById('dbTableBody');
+      tbody.innerHTML = '';
+      dataIndustri.forEach(item => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
+            <td class="p-3 font-mono font-bold text-aetra-orange">${item.id}</td>
+            <td class="p-3 font-bold">${item.nama}</td>
+            <td class="p-3 text-aetra-blue">${item.cycle}</td>
+            <td class="p-3">${item.kelas}</td>
+            <td class="p-3 text-center">
+              <button onclick="hapusIndustri('${item.id}')" class="text-rose-500 font-bold">🗑️ Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+      renderChart();
+    }
+
+    function addNewIndustry() {
+      const id = document.getElementById('inputNewId').value;
+      const nama = document.getElementById('inputNewName').value;
+      const email = document.getElementById('inputNewEmail').value;
+      const cycle = document.getElementById('inputNewCycle').value;
+      const kelas = document.getElementById('inputNewKelas').value;
+
+      if(!id || !nama) return alert("Mohon lengkapi Form!");
+
+      dataIndustri.push({ id, nama, email, cycle, kelas, lalu: 10000, skrg: 10000, status: 'Pending Verification' });
+      localStorage.setItem('aetra_industri_data', JSON.stringify(dataIndustri));
+      refreshDatabaseView();
+    }
+
+    function hapusIndustri(id) {
+      dataIndustri = dataIndustri.filter(i => i.id !== id);
+      localStorage.setItem('aetra_industri_data', JSON.stringify(dataIndustri));
+      refreshDatabaseView();
+    }
+
+    function renderChart() {
+      const ctx = document.getElementById('dbCycleChart');
+      let counts = {};
+      dataIndustri.forEach(i => counts[i.cycle] = (counts[i.cycle] || 0) + 1);
+      if(dbChart) dbChart.destroy();
+      dbChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: Object.keys(counts), datasets: [{ label: 'Jumlah', data: Object.values(counts), backgroundColor: '#0055A5' }] },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    function importExcel(e) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const wb = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
+        const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+        data.forEach(item => {
+          dataIndustri.push({
+            id: String(item.ID || 'IND-' + Math.floor(Math.random()*1000)),
+            nama: String(item.Nama || 'Industri Baru'),
+            email: 'finance@import.co.id',
+            cycle: 'Cycle 1',
+            kelas: 'Gold',
+            lalu: 10000,
+            skrg: 10000,
+            status: 'Pending Verification'
+          });
+        });
+        localStorage.setItem('aetra_industri_data', JSON.stringify(dataIndustri));
+        refreshDatabaseView();
+      };
+      reader.readAsArrayBuffer(e.target.files[0]);
+    }
+  </script>
+</body>
+</html>
