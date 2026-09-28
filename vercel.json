@@ -2,12 +2,12 @@
   "redirects": [
     {
       "source": "/petugas.html",
-      "destination": "/loginpetugas.html",
+      "destination": "/petugas/login.html",
       "permanent": true
     },
     {
       "source": "/petugas",
-      "destination": "/loginpetugas.html",
+      "destination": "/petugas/login.html",
       "permanent": true
     }
   ]
