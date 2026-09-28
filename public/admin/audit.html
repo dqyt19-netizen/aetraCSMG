@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log Audit & Aktivitas - SIMBA-IN</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { colors: { aetra: { blue: '#0055A5', darkblue: '#003E78', orange: '#E86216' } } } }
+    }
+  </script>
+  <style> body { font-family: 'Poppins', sans-serif; } </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans">
+
+  <div class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-aetra-darkblue text-slate-200 flex flex-col justify-between p-4 hidden md:flex shrink-0 h-full">
+      <div>
+        <div class="bg-white rounded-xl p-3 mb-6 flex items-center justify-center">
+          <img src="../logoaetra.jpg" alt="Logo Aetra Tangerang" class="h-8 object-contain" />
+        </div>
+        <nav class="space-y-1.5">
+          <a href="overview.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">📊 Overview SIMBA-IN</a>
+          <a href="database.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">📂 Database & Input Cycle</a>
+          <a href="verifikasi.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">✔️ Verifikasi Reading</a>
+          <a href="billing.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-blue-100 hover:bg-aetra-blue hover:text-white">🧾 Billing & Invoicing</a>
+          <a href="audit.html" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold bg-aetra-orange text-white shadow-md">📋 Log Audit & Aktivitas</a>
+        </nav>
+      </div>
+    </aside>
+
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-y-auto p-6 space-y-6">
+      <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border shadow-sm flex justify-between items-center">
+        <div>
+          <h2 class="font-extrabold text-aetra-blue text-base">📋 Log Audit & Rekam Jejak Aktivitas Sistem</h2>
+          <p class="text-xs text-slate-400">Seluruh pergerakan aktivitas pembacaan dan transaksi billing terekam di sini.</p>
+        </div>
+        <button onclick="clearAudit()" class="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-xl text-xs font-bold">Bersihkan Log</button>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-2xl border overflow-hidden">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="bg-slate-100 dark:bg-slate-700/50 uppercase text-[10px]">
+              <th class="p-3">Waktu</th>
+              <th class="p-3">Pengguna</th>
+              <th class="p-3">Peran</th>
+              <th class="p-3">Aksi / Deskripsi Aktivitas</th>
+            </tr>
+          </thead>
+          <tbody id="auditTableBody" class="divide-y font-medium"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let auditLogs = JSON.parse(localStorage.getItem('aetra_audit_logs')) || [
+      { time: '24 Sep 2026 08:30', user: 'Pak Yaya', role: 'Billing', desc: 'Inisialisasi sistem SIMBA-IN.' }
+    ];
+
+    function refreshAuditView() {
+      let tbody = document.getElementById('auditTableBody');
+      tbody.innerHTML = '';
+      auditLogs.forEach(log => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
+            <td class="p-3 font-mono text-slate-500">${log.time}</td>
+            <td class="p-3 font-bold">${log.user}</td>
+            <td class="p-3"><span class="px-2 py-0.5 bg-blue-50 text-aetra-blue rounded font-bold">${log.role}</span></td>
+            <td class="p-3 text-slate-600 dark:text-slate-300">${log.desc}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function clearAudit() {
+      if(confirm("Bersihkan seluruh catatan audit?")) {
+        auditLogs = [];
+        localStorage.setItem('aetra_audit_logs', JSON.stringify(auditLogs));
+        refreshAuditView();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", refreshAuditView);
+  </script>
+</body>
+</html>
