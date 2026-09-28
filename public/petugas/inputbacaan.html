@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aetra Air Tangerang - Input Bacaan Meter</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- CSS & JS Leaflet untuk Peta -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     :root {
@@ -167,6 +171,24 @@
       font-size: 14px;
     }
 
+    /* Container untuk Peta */
+    #map-container {
+      width: 100%;
+      height: 220px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      margin-top: 6px;
+      z-index: 1;
+    }
+
+    .location-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
     .btn-primary {
       width: 100%;
       padding: 12px;
@@ -176,6 +198,7 @@
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
+      margin-top: 8px;
     }
 
     .btn-primary:hover {
@@ -207,7 +230,6 @@
           </button>
         </div>
       </div>
-      <!-- Gambar Logo Menggunakan Path Absolut -->
       <img src="/logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
@@ -246,6 +268,16 @@
           <input type="file" id="foto_berkas" accept="image/*">
         </div>
 
+        <!-- Bagian Elemen Peta Lokasi -->
+        <div class="form-group">
+          <label>Lokasi Petugas (GPS Map)</label>
+          <div id="map-container"></div>
+          <div class="location-info">
+            <span id="coord-status">Mendeteksi lokasi...</span>
+            <button type="button" onclick="initMap()" style="background:none; border:none; color:var(--primary-color); cursor:pointer; font-weight:600;">🔄 Refresh Lokasi</button>
+          </div>
+        </div>
+
         <button type="submit" class="btn-primary" id="btn-submit">Simpan Data</button>
       </form>
     </div>
@@ -257,6 +289,8 @@
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let userLocation = { latitude: null, longitude: null };
+    let map = null;
+    let marker = null;
 
     function toggleMenu() {
       document.getElementById('nav-dropdown').classList.toggle('show');
@@ -275,7 +309,7 @@
         window.location.href = '/petugas/login.html';
       } else {
         document.getElementById('display-email').textContent = session.user.email;
-        getGeoLocation();
+        initMap();
       }
     }
 
@@ -284,12 +318,54 @@
       window.location.href = '/petugas/login.html';
     }
 
-    function getGeoLocation() {
+    // Inisialisasi Peta
+    function initMap() {
+      const statusText = document.getElementById('coord-status');
+      statusText.textContent = 'Mendeteksi lokasi GPS...';
+
+      // Default Tangerang jika GPS gagal
+      const defaultLat = -6.1783;
+      const defaultLng = 106.6319;
+
+      if (!map) {
+        map = L.map('map-container').setView([defaultLat, defaultLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+        // Jika petugas menggeser marker secara manual
+        marker.on('dragend', function (e) {
+          const latLng = marker.getLatLng();
+          userLocation.latitude = latLng.lat;
+          userLocation.longitude = latLng.lng;
+          statusText.textContent = `Lat: ${latLng.lat.toFixed(5)}, Lng: ${latLng.lng.toFixed(5)} (Manual)`;
+        });
+      }
+
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((pos) => {
-          userLocation.latitude = pos.coords.latitude;
-          userLocation.longitude = pos.coords.longitude;
-        }, (err) => console.log(err));
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            userLocation.latitude = lat;
+            userLocation.longitude = lng;
+
+            map.setView([lat, lng], 16);
+            marker.setLatLng([lat, lng]);
+            statusText.textContent = `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+          },
+          (err) => {
+            statusText.textContent = 'GPS gagal/dinonaktifkan. Anda bisa menggeser pin lokasi.';
+            userLocation.latitude = defaultLat;
+            userLocation.longitude = defaultLng;
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        statusText.textContent = 'Browser tidak mendukung GPS.';
       }
     }
 
