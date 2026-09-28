@@ -219,10 +219,10 @@
             <div class="label">Petugas Aktif</div>
             <div class="name" id="display-email">petugas@aetra.co.id</div>
           </div>
-          <button class="nav-item-btn active" onclick="window.location.href='/petugas/inputbacaan.html'">
+          <button class="nav-item-btn active" onclick="window.location.href='inputbacaan.html'">
             📝 Input Bacaan
           </button>
-          <button class="nav-item-btn" onclick="window.location.href='/petugas/hasilbacaan.html'">
+          <button class="nav-item-btn" onclick="window.location.href='hasilbacaan.html'">
             📋 Hasil Bacaan
           </button>
           <button class="nav-item-btn logout" onclick="logout()">
@@ -230,7 +230,7 @@
           </button>
         </div>
       </div>
-      <img src="/logoaetra.jpg" alt="Logo Aetra Air Tangerang">
+      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
     <div class="content-body">
@@ -288,6 +288,9 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY'; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // KUNCI PERBAIKAN: Menggunakan nama bucket 'meter-photos' sesuai dengan dashboard Supabase Anda
+    const STORAGE_BUCKET = 'meter-photos';
+
     let userLocation = { latitude: null, longitude: null };
     let map = null;
     let marker = null;
@@ -306,7 +309,7 @@
     async function checkAuthSession() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) {
-        window.location.href = '/petugas/login.html';
+        window.location.href = 'login.html';
       } else {
         document.getElementById('display-email').textContent = session.user.email;
         initMap();
@@ -315,7 +318,7 @@
 
     async function logout() {
       await _supabase.auth.signOut();
-      window.location.href = '/petugas/login.html';
+      window.location.href = 'login.html';
     }
 
     // Inisialisasi Peta
@@ -323,7 +326,6 @@
       const statusText = document.getElementById('coord-status');
       statusText.textContent = 'Mendeteksi lokasi GPS...';
 
-      // Default Tangerang jika GPS gagal
       const defaultLat = -6.1783;
       const defaultLng = 106.6319;
 
@@ -336,7 +338,6 @@
 
         marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
 
-        // Jika petugas menggeser marker secara manual
         marker.on('dragend', function (e) {
           const latLng = marker.getLatLng();
           userLocation.latitude = latLng.lat;
@@ -375,13 +376,13 @@
       const filePath = `${folder}/${fileName}`;
 
       const { data, error } = await _supabase.storage
-        .from('meter_photos')
+        .from(STORAGE_BUCKET)
         .upload(filePath, file);
 
       if (error) throw error;
 
       const { data: { publicUrl } } = _supabase.storage
-        .from('meter_photos')
+        .from(STORAGE_BUCKET)
         .getPublicUrl(filePath);
 
       return publicUrl;
@@ -415,7 +416,7 @@
         if (error) throw error;
 
         alert('Data berhasil disimpan!');
-        window.location.href = '/petugas/hasilbacaan.html';
+        window.location.href = 'hasilbacaan.html';
       } catch (err) {
         alert('Gagal menyimpan: ' + err.message);
         btn.disabled = false;
