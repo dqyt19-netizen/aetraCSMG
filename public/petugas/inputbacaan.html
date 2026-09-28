@@ -396,7 +396,7 @@
         const fotoMeterFile = document.getElementById('foto_meter').files[0];
         const fotoBerkasFile = document.getElementById('foto_berkas').files[0];
 
-        let foto_stand_meter_url = await uploadFile(fotoMeterFile, 'stand');
+        let foto_meter_url = await uploadFile(fotoMeterFile, 'stand');
         let foto_berkas_url = fotoBerkasFile ? await uploadFile(fotoBerkasFile, 'berkas') : null;
 
         const payload = {
