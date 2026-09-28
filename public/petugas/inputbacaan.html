@@ -3,15 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aetra Air Tangerang - Hasil Bacaan Meter</title>
-
-  <!-- Library Supabase JS -->
+  <title>Aetra Air Tangerang - Input Bacaan Meter</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    /* =========================================================
-       1. CSS VARIABLES & BASE STYLES
-       ========================================================= */
     :root {
       --primary-color: #0284c7;
       --primary-hover: #0369a1;
@@ -40,16 +35,13 @@
       padding: 16px;
     }
 
-    /* =========================================================
-       2. TAMPILAN KARTU & KONTROL MENU DROPDOWN
-       ========================================================= */
     .app-card {
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       width: 100%;
-      max-width: 900px;
-      overflow: visible; /* Penting: Dibuat visible agar dropdown menu tidak terpotong */
+      max-width: 600px;
+      overflow: visible;
       border: 1px solid var(--border-color);
     }
 
@@ -94,7 +86,7 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      z-index: 9999; /* Z-index tinggi agar melayang di atas tabel */
+      z-index: 9999;
       padding: 8px;
     }
 
@@ -152,95 +144,48 @@
       padding-top: 12px;
     }
 
-    /* =========================================================
-       3. TAMPILAN KONTEN UTAMA & TABEL REKAP
-       ========================================================= */
     .content-body {
       padding: 20px;
     }
 
-    .officer-group {
-      margin-bottom: 24px;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      overflow: hidden;
-      background: #ffffff;
+    .form-group {
+      margin-bottom: 16px;
     }
 
-    .officer-group-header {
-      background-color: #f8fafc;
-      padding: 12px 16px;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary-color);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .officer-badge {
-      background: #e0f2fe;
-      color: #0369a1;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-    }
-
-    .table-responsive {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      background: #ffffff;
-    }
-
-    table th, table td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color);
-      text-align: left;
-      vertical-align: middle;
-    }
-
-    table th {
-      background-color: #f8fafc;
+    label {
+      display: block;
+      font-size: 13px;
       font-weight: 600;
-      color: #475569;
-      white-space: nowrap;
+      margin-bottom: 6px;
     }
 
-    .img-preview {
-      width: 52px;
-      height: 52px;
-      object-fit: cover;
-      border-radius: 6px;
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
       border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
     }
 
-    .map-frame {
-      width: 110px;
-      height: 65px;
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary-color);
+      color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    .coord-badge {
-      font-family: monospace;
-      font-size: 11px;
-      background: #f1f5f9;
-      padding: 3px 6px;
-      border-radius: 4px;
-      color: #334155;
+    .btn-primary:hover {
+      background: var(--primary-hover);
     }
   </style>
 </head>
 <body>
 
   <div class="app-card">
-    <!-- Header dan Menu Navigasi Dropdown -->
     <div class="header-bar">
       <div id="nav-wrapper">
         <button class="menu-trigger-btn" onclick="toggleMenu()">
@@ -251,11 +196,10 @@
             <div class="label">Petugas Aktif</div>
             <div class="name" id="display-email">petugas@aetra.co.id</div>
           </div>
-          <!-- DIPERBAIKI: Mengarahkan langsung ke login.html atau inputbacaan.html tanpa menambah prefix 'petugas/' -->
-          <button class="nav-item-btn" onclick="window.location.href='inputbacaan.html'">
+          <button class="nav-item-btn active" onclick="window.location.href='/petugas/inputbacaan.html'">
             📝 Input Bacaan
           </button>
-          <button class="nav-item-btn active" onclick="window.location.href='hasilbacaan.html'">
+          <button class="nav-item-btn" onclick="window.location.href='/petugas/hasilbacaan.html'">
             📋 Hasil Bacaan
           </button>
           <button class="nav-item-btn logout" onclick="logout()">
@@ -263,36 +207,61 @@
           </button>
         </div>
       </div>
-      <img src="logoaetra.jpg" alt="Logo Aetra Air Tangerang">
+      <!-- Gambar Logo Menggunakan Path Absolut -->
+      <img src="/logoaetra.jpg" alt="Logo Aetra Air Tangerang">
     </div>
 
-    <!-- Konten Utama List Hasil Bacaan -->
     <div class="content-body">
-      <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 4px; color: var(--text-main);">List Hasil Bacaan Meter</h2>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Data riwayat pencatatan meter yang telah diinput.</p>
-      
-      <div id="grouped-data-container">
-        <p style="color: var(--text-muted); padding: 12px; font-size: 13px;">Memuat data...</p>
-      </div>
+      <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Form Input Bacaan Meter</h2>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Masukkan data pencatatan meter terbaru.</p>
+
+      <form id="input-form" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label for="id_pelanggan">ID Pelanggan</label>
+          <input type="text" id="id_pelanggan" required placeholder="Contoh: PLG-1001">
+        </div>
+
+        <div class="form-group">
+          <label for="nama_perusahaan">Nama Perusahaan / Pelanggan</label>
+          <input type="text" id="nama_perusahaan" required placeholder="PT. Jaya Abadi">
+        </div>
+
+        <div class="form-group">
+          <label for="cycle">Cycle</label>
+          <input type="number" id="cycle" required placeholder="01">
+        </div>
+
+        <div class="form-group">
+          <label for="stand_meter">Stand Meter (m³)</label>
+          <input type="number" step="any" id="stand_meter" required placeholder="0">
+        </div>
+
+        <div class="form-group">
+          <label for="foto_meter">Foto Stand Meter</label>
+          <input type="file" id="foto_meter" accept="image/*" required>
+        </div>
+
+        <div class="form-group">
+          <label for="foto_berkas">Foto Berkas / Lokasi</label>
+          <input type="file" id="foto_berkas" accept="image/*">
+        </div>
+
+        <button type="submit" class="btn-primary" id="btn-submit">Simpan Data</button>
+      </form>
     </div>
   </div>
 
   <script>
-    /* =========================================================
-       1. INISIALISASI SUPABASE CLIENT
-       ========================================================= */
     const SUPABASE_URL = 'https://dntuitawhmpqkbepnmwk.supabase.co'; 
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRudHVpdGF3aG1wcWtiZXBubXdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyMTQ3ODksImV4cCI6MjEwNTc5MDc4OX0.9RHqwdWIb2xQ0M5I8xD189PB9Yms5gFbxNVqNa2BmlY'; 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    /* =========================================================
-       2. MANAJEMEN MENU DROPDOWN
-       ========================================================= */
+    let userLocation = { latitude: null, longitude: null };
+
     function toggleMenu() {
       document.getElementById('nav-dropdown').classList.toggle('show');
     }
 
-    // Menutup menu secara otomatis jika user mengklik bagian luar dropdown
     window.addEventListener('click', function(e) {
       const wrapper = document.getElementById('nav-wrapper');
       if (wrapper && !wrapper.contains(e.target)) {
@@ -300,115 +269,84 @@
       }
     });
 
-    /* =========================================================
-       3. VERIFIKASI SESI LOGIN & LOGOUT (DIPERBAIKI)
-       ========================================================= */
     async function checkAuthSession() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) {
-        // DIPERBAIKI: Menggunakan '/petugas/login.html' atau 'login.html'
         window.location.href = '/petugas/login.html';
       } else {
         document.getElementById('display-email').textContent = session.user.email;
-        loadDataHasilBaca();
+        getGeoLocation();
       }
     }
 
     async function logout() {
       await _supabase.auth.signOut();
-      // DIPERBAIKI: Menggunakan '/petugas/login.html' agar selalu kembali ke halaman login petugas secara konsisten
       window.location.href = '/petugas/login.html';
     }
 
-    /* =========================================================
-       4. AMBIL DATA DAN RENDER TABEL
-       ========================================================= */
-    async function loadDataHasilBaca() {
-      const container = document.getElementById('grouped-data-container');
-      
-      const { data, error } = await _supabase
-        .from('meter_readings')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        container.innerHTML = `<p style="color:red; padding: 12px;">Error: ${error.message}</p>`;
-        return;
+    function getGeoLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          userLocation.latitude = pos.coords.latitude;
+          userLocation.longitude = pos.coords.longitude;
+        }, (err) => console.log(err));
       }
-
-      if (!data || data.length === 0) {
-        container.innerHTML = '<p style="color: var(--text-muted); padding: 12px; font-size: 13px;">Belum ada data hasil baca.</p>';
-        return;
-      }
-
-      let html = `
-        <div class="officer-group">
-          <div class="officer-group-header">
-            <span>📋 Rekap Data Masuk</span>
-            <span class="officer-badge">${data.length} Data</span>
-          </div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>Waktu Baca</th>
-                  <th>ID Pelanggan</th>
-                  <th>Perusahaan</th>
-                  <th>Cycle</th>
-                  <th>Stand Meter</th>
-                  <th>Latitude</th>
-                  <th>Longitude</th>
-                  <th>Foto Stand</th>
-                  <th>Foto Berkas</th>
-                  <th>Peta</th>
-                </tr>
-              </thead>
-              <tbody>
-      `;
-
-      data.forEach(row => {
-        const latVal = row.latitude ? row.latitude.toFixed(6) : '-';
-        const lngVal = row.longitude ? row.longitude.toFixed(6) : '-';
-
-        const fotoStandHtml = row.foto_meter_url 
-          ? `<a href="${row.foto_meter_url}" target="_blank"><img src="${row.foto_meter_url}" class="img-preview" alt="Foto Stand"></a>` 
-          : '-';
-
-        const fotoBerkasHtml = row.foto_berkas_url 
-          ? `<a href="${row.foto_berkas_url}" target="_blank"><img src="${row.foto_berkas_url}" class="img-preview" alt="Foto Berkas"></a>` 
-          : '-';
-
-        const mapHtml = (row.latitude && row.longitude)
-          ? `<iframe class="map-frame" src="https://maps.google.com/maps?q=${row.latitude},${row.longitude}&z=15&output=embed" loading="lazy"></iframe>`
-          : '-';
-
-        html += `
-          <tr>
-            <td style="white-space: nowrap;">${new Date(row.created_at).toLocaleString('id-ID')}</td>
-            <td><b>${row.id_pelanggan}</b></td>
-            <td>${row.nama_perusahaan}</td>
-            <td>${row.cycle}</td>
-            <td><b>${row.stand_meter} m³</b></td>
-            <td><span class="coord-badge">${latVal}</span></td>
-            <td><span class="coord-badge">${lngVal}</span></td>
-            <td>${fotoStandHtml}</td>
-            <td>${fotoBerkasHtml}</td>
-            <td>${mapHtml}</td>
-          </tr>
-        `;
-      });
-
-      html += `
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-
-      container.innerHTML = html;
     }
 
-    // Jalankan verifikasi sesi saat halaman dimuat
+    async function uploadFile(file, folder) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${folder}/${fileName}`;
+
+      const { data, error } = await _supabase.storage
+        .from('meter_photos')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = _supabase.storage
+        .from('meter_photos')
+        .getPublicUrl(filePath);
+
+      return publicUrl;
+    }
+
+    async function handleSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.textContent = 'Mengunggah & Menyimpan...';
+
+      try {
+        const fotoMeterFile = document.getElementById('foto_meter').files[0];
+        const fotoBerkasFile = document.getElementById('foto_berkas').files[0];
+
+        let foto_meter_url = await uploadFile(fotoMeterFile, 'stand');
+        let foto_berkas_url = fotoBerkasFile ? await uploadFile(fotoBerkasFile, 'berkas') : null;
+
+        const payload = {
+          id_pelanggan: document.getElementById('id_pelanggan').value,
+          nama_perusahaan: document.getElementById('nama_perusahaan').value,
+          cycle: document.getElementById('cycle').value,
+          stand_meter: parseFloat(document.getElementById('stand_meter').value),
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          foto_meter_url: foto_meter_url,
+          foto_berkas_url: foto_berkas_url
+        };
+
+        const { error } = await _supabase.from('meter_readings').insert([payload]);
+        if (error) throw error;
+
+        alert('Data berhasil disimpan!');
+        window.location.href = '/petugas/hasilbacaan.html';
+      } catch (err) {
+        alert('Gagal menyimpan: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Simpan Data';
+      }
+    }
+
     checkAuthSession();
   </script>
 </body>
