@@ -251,6 +251,7 @@
             <div class="label">Petugas Aktif</div>
             <div class="name" id="display-email">petugas@aetra.co.id</div>
           </div>
+          <!-- DIPERBAIKI: Navigasi relatif internal tanpa prefix dobel -->
           <button class="nav-item-btn" onclick="window.location.href='inputbacaan.html'">
             📝 Input Bacaan
           </button>
@@ -300,12 +301,13 @@
     });
 
     /* =========================================================
-       3. VERIFIKASI SESI LOGIN & LOGOUT
+       3. VERIFIKASI SESI LOGIN & LOGOUT (DIPERBAIKI)
        ========================================================= */
     async function checkAuthSession() {
       const { data: { session } } = await _supabase.auth.getSession();
       if (!session) {
-        window.location.href = 'petugas/login.html';
+        // DIPERBAIKI: Mengarahkan dari akar domain (/petugas/login.html)
+        window.location.href = '/petugas/login.html';
       } else {
         document.getElementById('display-email').textContent = session.user.email;
         loadDataHasilBaca();
@@ -314,7 +316,8 @@
 
     async function logout() {
       await _supabase.auth.signOut();
-      window.location.href = 'petugas/login.html';
+      // DIPERBAIKI: Mengarahkan dari akar domain (/petugas/login.html) untuk mencegah error 404
+      window.location.href = '/petugas/login.html';
     }
 
     /* =========================================================
