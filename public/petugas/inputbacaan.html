@@ -331,10 +331,10 @@
           emailDisplay.textContent = session.user.email;
         }
 
-        // Berikan jeda sejenak agar DOM siap sepenuhnya, lalu muat peta
+        // Panggil initMap setelah sesi sukses divalidasi dan DOM benar-benar siap
         setTimeout(() => {
           initMap();
-        }, 300);
+        }, 400);
 
       } catch (err) {
         console.error('Auth session error:', err);
@@ -469,7 +469,7 @@
       }
     }
 
-    // Jalankan pemeriksaan sesi saat halaman selesai dimuat
+    // Eksekusi pemeriksaan sesi aman saat halaman selesai dimuat
     document.addEventListener('DOMContentLoaded', () => {
       checkAuthSession();
     });
